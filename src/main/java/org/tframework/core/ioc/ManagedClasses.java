@@ -1,10 +1,12 @@
 package org.tframework.core.ioc;
 
+import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.ioc.exceptions.MultipleManagedEntitiesException;
 import org.tframework.core.ioc.exceptions.NameNotUniqueException;
 import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +16,7 @@ import java.util.Map;
  * <p>
  * This class provides the managed classes wrapped in {@link ManagedContainer}s.
  */
+@Slf4j
 public class ManagedClasses {
 
     /**
@@ -28,8 +31,22 @@ public class ManagedClasses {
      */
     private Map<String, List<ManagedContainer<?>>> multiInstances;
 
-    protected <T> void registerManagedSingletonContainer(ManagedContainer<T> container) {
+    public ManagedClasses() {
+        singletons = new HashMap<>();
+        multiInstances = new HashMap<>();
+    }
 
+    /**
+     * Register a new managed singleton.
+     * @param container Container with the singleton, contains all data about it.
+     * @param <T> Type of the managed entity.
+     * @throws NameNotUniqueException If the managed entity uses a duplicate name.
+     */
+    protected <T> void registerManagedSingletonContainer(ManagedContainer<T> container) throws NameNotUniqueException {
+        checkNameUniqueness(container.getName());
+        singletons.put(container.getName(), container);
+        log.debug("Registered new managed singleton with name '{}' and class '{}'",
+                container.getName(), container.getInstanceType().getName());
     }
 
     /**
@@ -52,7 +69,7 @@ public class ManagedClasses {
         });
         if(candidates.isEmpty()) throw new NoSuchManagedEntityException(clazz);
         if(candidates.size() > 1) throw new MultipleManagedEntitiesException(clazz);
-        //must be only one
+        //must be only one (it's a safe cast)
         return (ManagedContainer<T>) candidates.get(0);
     }
 
@@ -64,6 +81,8 @@ public class ManagedClasses {
         singletons.keySet().forEach(singletonName -> {
             if(name.equals(singletonName)) throw new NameNotUniqueException(name);
         });
-        multiInstances.
+        multiInstances.keySet().forEach(multiInstanceBaseName -> {
+            if(name.equals(multiInstanceBaseName)) throw new NameNotUniqueException(name);
+        });
     }
 }

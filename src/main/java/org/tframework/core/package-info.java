@@ -1,4 +1,2 @@
-/**
- * Contains the core, most important classes of the TFramework.
- */
+/** Contains the core, most important classes of the TFramework. */
 package org.tframework.core;

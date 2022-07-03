@@ -5,9 +5,13 @@
  * <p>Each class that you want to be managed by TFramework IoC must be
  *
  * <ul>
- *   <li>Annotated with {@link org.tframework.core.ioc.annotations.Managed}. This will mark the
+ *   <li>
+ *       Annotated with {@link org.tframework.core.ioc.annotations.Managed}. This will mark the
  *       class to be picked up by the framework.
- *   <li>Constructable by the framework. There are multiple way to achieve this.
+ *   </li>
+ *   <li>
+ *       Constructable by the framework. There are multiple way to achieve this.
+ *   </li>
  * </ul>
  *
  * <p>Managed classes can have different types, which controls how many of the are constructed. The

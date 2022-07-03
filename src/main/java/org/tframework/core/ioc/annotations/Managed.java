@@ -2,37 +2,41 @@
 package org.tframework.core.ioc.annotations;
 
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import org.tframework.core.ioc.ManagedType;
 
 /**
  * Marks a class to be managed by the TFramework. Such a class will be injectable as a dependency
  * into other managed classes.
- *
- * <p>In a managed class, you also have the ability to define lifecycle callbacks with annotations
+ * <p>
+ * In a managed class, you also have the ability to define lifecycle callbacks with annotations
  * such as {@link AfterConstruct}.
  */
+@Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 public @interface Managed {
 
-  /** Decides the management type of this class. Default is {@link ManagedType#SINGLETON}. */
-  ManagedType managedType() default ManagedType.SINGLETON;
+    /**
+     * This value is used as name of the managed entity, if the user does not specify a custom value.
+     */
+    String DEFAULT_MANAGED_NAME = "";
 
-  /**
-   * Base name for the managed entity. It will have a default value for each type:
-   *
-   * <ul>
-   *   <li>For singletons: name of the class of this managed entity. For example if the managed
-   *       class is a {@link String}, it will be 'java.lang.String'.
-   *   <li>For multi instances: same as for singleton but the final will be appended with an
-   *       integer, to keep it unique. For example if the managed class is a {@link
-   *       java.util.BitSet}, the managed instances will be called 'java.util.BitSet-1',
-   *       'java.util.BitSet-2'
-   * </ul>
-   *
-   * <p>Names must be unique for each managed entity, and since they are generated from the class
-   * name, this means that in case you have multiple managed classes of the same type, you must
-   * specify a custom name for them.
-   */
-  String name() default "";
+    /**
+     * Decides the management type of this class. Default is {@link ManagedType#SINGLETON}.
+     */
+    ManagedType managedType() default ManagedType.SINGLETON;
+
+    /**
+     * Base name for the managed entity. It will have a default value created from the class name of the
+     * managed entity. For example, in case of managing a String, the default name is 'java.lang.String'.
+     * <p>
+     * Names must be unique for each managed entity, and since they are generated from the class
+     * name, this means that in case you have multiple managed classes of the same type, you must
+     * specify a custom name for them.
+     * <p>
+     * The name is only allowed to contain alphanumeric characters and '.' and '-' characters.
+     */
+    String name() default DEFAULT_MANAGED_NAME;
 }

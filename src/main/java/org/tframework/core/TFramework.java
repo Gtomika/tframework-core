@@ -3,6 +3,7 @@ package org.tframework.core;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.tframework.core.ioc.ManagedEntityScanner;
 
 /**
  * The core class of the framework, which includes methods to start and stop a TFramework
@@ -11,14 +12,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class TFramework {
 
-  /**
-   * Start the TFramework application. This method is intended to be called from the {@code main}
-   * method.
-   *
-   * @param args Command line arguments, as received in the {@code main} method.
-   */
-  public static void start(String[] args) {}
+    /**
+     * Start the TFramework application. This method is intended to be called from the {@code main}
+     * method.
+     *
+     * @param args Command line arguments, as received in the {@code main} method.
+     */
+    public static void start(String[] args) {
+        ApplicationContext.initApplicationContext();
+        ManagedEntityScanner.scanAndRegisterManagedEntities();
+    }
 
-  /** Stops the TFramework application gracefully. */
-  public static void stop() {}
+    /** Stops the TFramework application gracefully. */
+    public static void stop() {}
 }

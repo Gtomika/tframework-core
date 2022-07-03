@@ -3,6 +3,7 @@ package org.tframework.core.ioc;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -14,19 +15,26 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ManagedContainer<T> {
 
-  /** Type of the managed entity. */
-  @Getter private final ManagedType managedType;
+    /** Type of the managed entity. */
+    @Getter
+    @NonNull
+    private final ManagedType managedType;
 
-  /** Name of the managed entity. This is unique across all managed entities. */
-  @Getter private final String name;
+    /** Name of the managed entity. This is unique across all managed entities. */
+    @Getter
+    @NonNull
+    private final String name;
 
-  /** Class of the managed entity. */
-  @Getter private final Class<T> instanceType;
+    /** Class of the managed entity. */
+    @Getter
+    @NonNull
+    private final Class<T> instanceType;
 
-  /** Actual instance of the managed entity. */
-  private final T instance;
+    /** Actual instance of the managed entity. */
+    @NonNull
+    private final T instance;
 
-  public T grab() {
-    return instance;
-  }
+    public T grab() {
+        return instance;
+    }
 }

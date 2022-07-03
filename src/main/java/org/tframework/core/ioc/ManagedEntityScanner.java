@@ -8,6 +8,7 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.tframework.core.ApplicationContext;
 import org.tframework.core.ioc.annotations.Managed;
+import org.tframework.core.ioc.containers.ManagedSingletonContainer;
 import org.tframework.core.ioc.exceptions.IocException;
 import org.tframework.core.ioc.exceptions.NameNotUniqueException;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
@@ -34,6 +35,8 @@ public class ManagedEntityScanner {
         var managedEntities = reflections.getTypesAnnotatedWith(Managed.class);
         log.debug("Found {} entities annotated with @Managed on the classpath", managedEntities.size());
         registerManagedEntities(managedEntities);
+        //finally, register the ApplicationContext to make it injectable
+        registerApplicationContext();
     }
 
     /**
@@ -53,6 +56,7 @@ public class ManagedEntityScanner {
                     break;
             }
         }
+        log.debug("Finished registration of {} managed entities.", managedEntities.size());
     }
 
     /**
@@ -67,13 +71,11 @@ public class ManagedEntityScanner {
                 ? managedEntity.getName() : managedAnnotation.name();
         //attempt to build and register container
         try {
-            ManagedContainer<T> container = ManagedContainer
-                    .<T>builder()
-                    .managedType(ManagedType.SINGLETON)
-                    .name(IocValidator.validateEntityName(name))
-                    .instance(ManagedEntityConstructor.constructManagedEntity(managedEntity))
-                    .instanceType(managedEntity)
-                    .build();
+            ManagedSingletonContainer<T> container = new ManagedSingletonContainer<>(
+                    IocValidator.validateEntityName(name),
+                    managedEntity,
+                    ManagedEntityConstructor.constructManagedEntity(managedEntity)
+            );
             //application context is not managed yet, need to use getInstance
             ManagedEntitiesRepository managedEntitiesRepository = ApplicationContext.getInstance().getManagedEntitiesRepository();
             managedEntitiesRepository.registerManagedSingletonContainer(container);
@@ -82,4 +84,19 @@ public class ManagedEntityScanner {
         }
     }
 
+    /**
+     * Registers the {@link ApplicationContext} class as a manages singleton. This cannot be done
+     * with the {@link Managed} annotation, because the context is initialized and used before the
+     * managed entity scanning takes place.
+     */
+    private static void registerApplicationContext() {
+        var contextContainer = new ManagedSingletonContainer<>(
+                ApplicationContext.class.getName(),
+                ApplicationContext.class,
+                ApplicationContext.getInstance()
+        );
+        ApplicationContext.getInstance().getManagedEntitiesRepository()
+                .registerManagedSingletonContainer(contextContainer);
+        log.debug("Registered the ApplicationContext as managed singleton.");
+    }
 }

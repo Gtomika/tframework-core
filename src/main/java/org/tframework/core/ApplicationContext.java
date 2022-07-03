@@ -5,6 +5,8 @@ import lombok.Getter;
 import org.tframework.core.exceptions.TFrameworkRuntimeException;
 import org.tframework.core.ioc.ManagedEntitiesRepository;
 import org.tframework.core.ioc.annotations.Managed;
+import org.tframework.core.ioc.exceptions.MultipleManagedEntitiesException;
+import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
 
 /**
  * The singleton application context class, which stores information about the running TFramework
@@ -47,5 +49,9 @@ public class ApplicationContext {
     private ApplicationContext() {
         //initialize managed classes, it will be filled later
         managedEntitiesRepository = new ManagedEntitiesRepository();
+    }
+
+    public <T> T grab(Class<T> managedEntityType) throws NoSuchManagedEntityException, MultipleManagedEntitiesException {
+        return null; //TODO
     }
 }

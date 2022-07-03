@@ -5,7 +5,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.tframework.core.ioc.ManagedType;
+import org.tframework.core.ioc.ManagingType;
 
 /**
  * Marks a class to be managed by the TFramework. Such a class will be injectable as a dependency
@@ -24,9 +24,9 @@ public @interface Managed {
     String DEFAULT_MANAGED_NAME = "";
 
     /**
-     * Decides the management type of this class. Default is {@link ManagedType#SINGLETON}.
+     * Decides the management type of this class. Default is {@link ManagingType#SINGLETON}.
      */
-    ManagedType managedType() default ManagedType.SINGLETON;
+    ManagingType managedType() default ManagingType.SINGLETON;
 
     /**
      * Base name for the managed entity. It will have a default value created from the class name of the

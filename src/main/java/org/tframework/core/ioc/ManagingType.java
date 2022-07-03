@@ -2,7 +2,7 @@
 package org.tframework.core.ioc;
 
 /** The possible types of managed classes. */
-public enum ManagedType {
+public enum ManagingType {
 
     /**
      * Manage only one instance of the class, which will be injected to every place and returned by

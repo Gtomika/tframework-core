@@ -24,16 +24,19 @@ public class ManagedEntityScanner {
 
     /**
      * Scans the classpath for entities that are to be managed by the TFramework.
+     * @param rootClass The only class on the classpath that is annotated with {@link org.tframework.core.TFrameworkRoot}.
      * @throws IocException If an exception happened when attempting to register the managed entities.
      */
-    public static void scanAndRegisterManagedEntities() throws IocException {
+    public static void scanAndRegisterManagedEntities(Class<?> rootClass) throws IocException {
+        log.info("Scanning for managed entities in package '{}' and subpackages...", rootClass.getPackageName());
         //scan the class path for managed entities
         Reflections reflections = new Reflections(
                 new ConfigurationBuilder()
-                        .setUrls(ClasspathHelper.forJavaClassPath())
+                        .setUrls(ClasspathHelper.forPackage(rootClass.getPackageName()))
         );
         var managedEntities = reflections.getTypesAnnotatedWith(Managed.class);
-        log.debug("Found {} entities annotated with @Managed on the classpath", managedEntities.size());
+        log.info("Found {} entities annotated with @Managed in the package (and subpackages) of '{}'",
+                managedEntities.size(), rootClass.getPackageName());
         registerManagedEntities(managedEntities);
         //finally, register the ApplicationContext to make it injectable
         registerApplicationContext();
@@ -72,9 +75,7 @@ public class ManagedEntityScanner {
         //attempt to build and register container
         try {
             ManagedSingletonContainer<T> container = new ManagedSingletonContainer<>(
-                    IocValidator.validateEntityName(name),
-                    managedEntity,
-                    ManagedEntityConstructor.constructManagedEntity(managedEntity)
+                    IocValidator.validateEntityName(name), managedEntity
             );
             //application context is not managed yet, need to use getInstance
             ManagedEntitiesRepository managedEntitiesRepository = ApplicationContext.getInstance().getManagedEntitiesRepository();

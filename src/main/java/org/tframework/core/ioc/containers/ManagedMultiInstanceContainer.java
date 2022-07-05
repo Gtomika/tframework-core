@@ -2,6 +2,7 @@ package org.tframework.core.ioc.containers;
 
 import lombok.Getter;
 import org.tframework.core.ioc.ManagingType;
+import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +39,20 @@ public class ManagedMultiInstanceContainer<T> extends AbstractContainer<T> {
     /**
      * Constructs a new instance of this managed entity.
      * @return The new instance.
+     * @throws NotConstructibleException If no new instance could be created.
      */
-    public T constructNewInstance() {
+    private T constructNewInstance() throws NotConstructibleException {
         T instance = null; //TODO: use managed entity constructor
         instances.add(instance);
         return instance;
+    }
+
+    /**
+     * Constructs and returns a new instance of the managed multi-instance entity.
+     * @throws NotConstructibleException If no new instance could be created.
+     */
+    @Override
+    public T grabInstance() throws NotConstructibleException {
+        return constructNewInstance();
     }
 }

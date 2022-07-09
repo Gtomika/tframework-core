@@ -8,7 +8,7 @@ import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.tframework.core.exceptions.TFrameworkRuntimeException;
-import org.tframework.core.ioc.ManagedEntityScanner;
+import org.tframework.core.ioc.TFrameworkIoc;
 
 import java.util.stream.Collectors;
 
@@ -30,7 +30,8 @@ public final class TFramework {
         Class<?> rootClass = findClassAnnotatedWithTFrameworkRoot();
         log.info("Found root class: '{}'", rootClass.getName());
         ApplicationContext.initApplicationContext();
-        ManagedEntityScanner.scanAndRegisterManagedEntities(rootClass);
+        //set up everything related to inversion of control: managed entities, dependency injection...
+        TFrameworkIoc.initializeIoc(rootClass);
     }
 
     /** Stops the TFramework application gracefully. */
@@ -43,7 +44,7 @@ public final class TFramework {
      * @return The class.
      * @throws TFrameworkRuntimeException If no (or multiple) class was found having this annotation.
      */
-    private static Class<?> findClassAnnotatedWithTFrameworkRoot() throws TFrameworkRuntimeException {
+    public static Class<?> findClassAnnotatedWithTFrameworkRoot() throws TFrameworkRuntimeException {
         Reflections reflections = new Reflections(
                 new ConfigurationBuilder()
                         .setUrls(ClasspathHelper.forJavaClassPath())

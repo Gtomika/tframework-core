@@ -1,10 +1,9 @@
 /* Licensed under Apache-2.0 2022. */
 package org.tframework.core.ioc.containers;
 
+import org.tframework.core.ioc.ManagedEntityConstructor;
 import org.tframework.core.ioc.ManagingType;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
-
-import java.util.Optional;
 
 /**
  * Wraps a managed singleton class and provides additional details and data about it.
@@ -39,12 +38,15 @@ public class ManagedSingletonContainer<T> extends AbstractContainer<T> {
     }
 
     /**
-     * Gets the only, singleton instance of the managed entity.
+     * Gets the only, singleton instance of the managed entity. If this is not constructed,
+     * it will be now.
      * @throws NotConstructibleException If the singleton instance could not be constructed.
      */
     @Override
     public T grabInstance() throws NotConstructibleException {
-        return Optional.ofNullable(instance)
-                .orElseThrow(() -> new NotConstructibleException(name));
+        if(instance == null) {
+            ManagedEntityConstructor.constructManagedEntity(instanceType);
+        }
+        return instance;
     }
 }

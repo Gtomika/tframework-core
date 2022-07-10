@@ -64,13 +64,14 @@ public abstract class AbstractContainer<T> {
     /**
      * Similar to {@link #AbstractContainer(ManagingType, String, Class)}, but also allows to pass a
      * provider method.
+     * @throws IllegalArgumentException If the 'providerMethod' was not null, and it was invalid.
      */
     public AbstractContainer(
             ManagingType managingType,
             String name,
             Class<T> instanceType,
             @Nullable Method providerMethod
-    ) {
+    ) throws IllegalArgumentException {
         this.managingType = managingType;
         this.name = name;
         this.instanceType = instanceType;

@@ -13,11 +13,11 @@ import org.tframework.core.ioc.constants.InjectionType;
 public class DependencyInformation {
 
     /**
-     * Name of the dependency, which is a name of a managed entity;
+     * Name of the dependency, which is a name of a managed entity.
      * For example, if managed entity 'A' has an {@link org.tframework.core.ioc.annotations.Injected}
      * field of another managed entity 'B', then this will be the entity name of 'B'.
      */
-    private final String managedEntityName;
+    private final String dependencyEntityName;
 
     /**
      * Stores how the injection takes place.

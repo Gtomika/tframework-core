@@ -108,4 +108,28 @@ class IocValidatorTest {
         assertDoesNotThrow(() -> IocValidator.validateProviderMethod(method, Integer.class));
     }
 
+    @Managed
+    static class ProviderStatic {
+        @Managed
+        public static String getString() {return ""; }
+    }
+
+    @Test
+    public void testProviderStatic() {
+        Method method = MethodUtils.getMatchingMethod(ProviderStatic.class, "getString");
+        assertThrows(IllegalArgumentException.class, () -> IocValidator.validateProviderMethod(method, null));
+    }
+
+    @Managed
+    static class ProviderWithParams {
+        @Managed
+        public String getString(int x) {return x + "x"; }
+    }
+
+    @Test
+    public void testProviderWithParams() {
+        Method method = MethodUtils.getMatchingMethod(ProviderWithParams.class, "getString", Integer.class);
+        assertThrows(IllegalArgumentException.class, () -> IocValidator.validateProviderMethod(method, null));
+    }
+
 }

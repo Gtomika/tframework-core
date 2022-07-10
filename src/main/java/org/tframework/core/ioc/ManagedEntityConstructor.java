@@ -1,11 +1,9 @@
 package org.tframework.core.ioc;
 
-import lombok.experimental.NonFinal;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.tframework.core.ioc.constants.ConstructionMethod;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -59,11 +57,13 @@ public class ManagedEntityConstructor<T> {
      *                       need provider method, use the other constructor.
      * @throws IllegalArgumentException If the 'providerMethod' cannot be used to construct instances of 'managedEntity'.
      */
-    public ManagedEntityConstructor(Class<T> managedEntity, @Nonnull Method providerMethod) throws IllegalArgumentException {
+    public ManagedEntityConstructor(Class<T> managedEntity, @Nullable Method providerMethod) throws IllegalArgumentException {
         this.managedEntity = managedEntity;
         constructionMethod = ConstructionMethod.PROVIDER;
         this.providerMethod = providerMethod;
-        IocValidator.validateProviderMethod(providerMethod, managedEntity);
+        if(providerMethod != null) {
+            IocValidator.validateProviderMethod(providerMethod, managedEntity);
+        }
     }
 
     /**

@@ -23,7 +23,6 @@ public class ManagedSingletonContainer<T> extends AbstractContainer<T> {
      */
     public ManagedSingletonContainer(String name, Class<T> managedEntityClass) {
         super(ManagingType.SINGLETON, name, managedEntityClass);
-        //this.instance remains null
     }
 
     /**
@@ -44,8 +43,9 @@ public class ManagedSingletonContainer<T> extends AbstractContainer<T> {
      * @param name Name of the entity.
      * @param managedEntityClass The class of the managed entity.
      * @param providerMethod Method that can be called to construct an instance.
+     * @throws IllegalArgumentException If the 'providerMethod' was not null, and it was invalid.
      */
-    public ManagedSingletonContainer(String name, Class<T> managedEntityClass, Method providerMethod) {
+    public ManagedSingletonContainer(String name, Class<T> managedEntityClass, Method providerMethod) throws IllegalArgumentException {
         super(ManagingType.SINGLETON, name, managedEntityClass, providerMethod);
     }
 

@@ -37,6 +37,11 @@ public class IocValidator {
      *     <li>Be declared in another managed entity, a class also annotated with {@link org.tframework.core.ioc.annotations.Managed}.</li>
      *     <li>Must have a return type. A void method cannot provide anything.</li>
      *     <li>Must be public.</li>
+     *     <li>
+     *         Must not have any parameters. If the provided entity has dependencies, they can be injected into the
+     *         parent managed entity and used in the method.
+     *     </li>
+     *     <li>Must not be static.</li>
      *     <li>If 'requiredReturnType' is provided, then the method must have return value of this type.</li>
      * </ul>
      * @param providerMethod The method which is annotated with {@link org.tframework.core.ioc.annotations.Managed},
@@ -56,7 +61,16 @@ public class IocValidator {
                     "can only be declared inside classes annotated with @Managed", IocUtils.createClassAndMethodName(providerMethod)));
         }
         if(!Modifier.isPublic(providerMethod.getModifiers())) {
-            throw new IllegalArgumentException(String.format("Provider method '%s' is not public!",
+            throw new IllegalArgumentException(String.format("Provider method '%s' is not public, but this is required!",
+                    IocUtils.createClassAndMethodName(providerMethod)));
+        }
+        if(Modifier.isStatic(providerMethod.getModifiers())) {
+            throw new IllegalArgumentException(String.format("Provider method '%s' is static! This is not allowed!",
+                    IocUtils.createClassAndMethodName(providerMethod)));
+        }
+        if(providerMethod.getParameterCount() != 0) {
+            throw new IllegalArgumentException(String.format("Provider method '%s' has parameters! This is not allowed. If this provided entity has " +
+                    "dependencies, inject them into the parent managed entity and use them in the method.",
                     IocUtils.createClassAndMethodName(providerMethod)));
         }
         if(providerMethod.getReturnType().equals(Void.TYPE)) {

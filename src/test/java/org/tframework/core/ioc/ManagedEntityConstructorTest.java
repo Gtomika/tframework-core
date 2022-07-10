@@ -3,7 +3,10 @@ package org.tframework.core.ioc;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.Method;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.junit.jupiter.api.Test;
+import org.tframework.core.ioc.annotations.Managed;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
 class ManagedEntityConstructorTest {
@@ -14,7 +17,8 @@ class ManagedEntityConstructorTest {
 
     @Test
     public void testConstructionMethodIsNoArgsConstructor() {
-        var test = ManagedEntityConstructor.constructManagedEntity(TestClassNoArgsConstructor.class);
+        var constructor = new ManagedEntityConstructor<>(TestClassNoArgsConstructor.class);
+        var test = constructor.constructManagedEntity();
         assertNotNull(test);
     }
 
@@ -24,8 +28,23 @@ class ManagedEntityConstructorTest {
 
     @Test
     public void testNotConstructible() {
-        assertThrows(NotConstructibleException.class, () ->
-                ManagedEntityConstructor.constructManagedEntity(TestClassOneArgConstructor.class));
+        var e = assertThrows(NotConstructibleException.class,
+                () -> new ManagedEntityConstructor<>(TestClassOneArgConstructor.class));
+        System.out.println(e.getMessage());
+    }
+
+    @Managed
+    static class ManagedClass {
+        @Managed
+        public TestClassNoArgsConstructor something() {return new TestClassNoArgsConstructor(); };
+    }
+
+    @Test
+    public void testConstructWithProvider() {
+        Method provider = MethodUtils.getMatchingMethod(ManagedClass.class, "something");
+        var constructor = new ManagedEntityConstructor<>(TestClassNoArgsConstructor.class, provider);
+        TestClassNoArgsConstructor t = constructor.constructManagedEntity();
+        assertNotNull(t);
     }
 
 }

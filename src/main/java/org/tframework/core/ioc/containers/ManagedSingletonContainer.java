@@ -5,6 +5,8 @@ import org.tframework.core.ioc.ManagedEntityConstructor;
 import org.tframework.core.ioc.constants.ManagingType;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
+import java.lang.reflect.Method;
+
 /**
  * Wraps a managed singleton class and provides additional details and data about it.
  *
@@ -29,12 +31,22 @@ public class ManagedSingletonContainer<T> extends AbstractContainer<T> {
      * create its own instances, but there are times when it is necessary, such as when creating container of
      * {@link org.tframework.core.ApplicationContext}. In this case, the managed entity cannot have dependencies!
      * @param name Name of the entity.
-     * @param managedEntity The class of the managed entity.
+     * @param managedEntityClass The class of the managed entity.
      * @param instance The singleton instance.
      */
-    public ManagedSingletonContainer(String name, Class<T> managedEntity, T instance) {
-        super(ManagingType.SINGLETON, name, managedEntity);
+    public ManagedSingletonContainer(String name, Class<T> managedEntityClass, T instance) {
+        super(ManagingType.SINGLETON, name, managedEntityClass);
         this.instance = instance;
+    }
+
+    /**
+     * Constructor where it is possible to specify a provider method.
+     * @param name Name of the entity.
+     * @param managedEntityClass The class of the managed entity.
+     * @param providerMethod Method that can be called to construct an instance.
+     */
+    public ManagedSingletonContainer(String name, Class<T> managedEntityClass, Method providerMethod) {
+        super(ManagingType.SINGLETON, name, managedEntityClass, providerMethod);
     }
 
     /**
@@ -45,7 +57,7 @@ public class ManagedSingletonContainer<T> extends AbstractContainer<T> {
     @Override
     public T grabInstance() throws NotConstructibleException {
         if(instance == null) {
-            ManagedEntityConstructor.constructManagedEntity(instanceType);
+            instance = managedEntityConstructor.constructManagedEntity();
         }
         return instance;
     }

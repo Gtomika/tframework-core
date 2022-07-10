@@ -42,7 +42,7 @@ public class ManagedEntityScanner {
         //need to find the managed entities defined as provider methods
         //they can only be in managed entities classes
         var providedManagedEntities = reflections.getMethodsAnnotatedWith(Managed.class);
-        providedManagedEntities.forEach(IocValidator::validateProviderMethod);
+        providedManagedEntities.forEach(pme -> IocValidator.validateProviderMethod(pme, null));
         log.info("Found {} provided entities annotated with @Managed in the subpackages of '{}'",
                 providedManagedEntities.size(), rootClass.getPackageName());
         //TODO: register provided managed entities. Somehow we need to save provider method

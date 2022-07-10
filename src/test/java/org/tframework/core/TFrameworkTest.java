@@ -16,4 +16,7 @@ class TFrameworkTest {
         assertEquals(TestClass.class, rootClass);
     }
 
+    //TODO: how to test no root class case, multiple root class case?!
+    //TODO: maybe separate test classes, with separate class loader?
+
 }

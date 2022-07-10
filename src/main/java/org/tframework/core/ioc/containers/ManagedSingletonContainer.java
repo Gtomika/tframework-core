@@ -2,7 +2,7 @@
 package org.tframework.core.ioc.containers;
 
 import org.tframework.core.ioc.ManagedEntityConstructor;
-import org.tframework.core.ioc.ManagingType;
+import org.tframework.core.ioc.constants.ManagingType;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
 /**

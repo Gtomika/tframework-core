@@ -7,6 +7,7 @@ import java.io.File;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.tframework.core.ioc.constants.ManagingType;
 import org.tframework.core.ioc.containers.ManagedSingletonContainer;
 import org.tframework.core.ioc.exceptions.MultipleManagedEntitiesException;
 import org.tframework.core.ioc.exceptions.NameNotUniqueException;

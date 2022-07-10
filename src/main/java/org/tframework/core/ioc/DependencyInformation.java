@@ -2,6 +2,7 @@ package org.tframework.core.ioc;
 
 import lombok.Builder;
 import lombok.Data;
+import org.tframework.core.ioc.constants.InjectionType;
 
 /**
  * Collects information about a dependency in a managed entity. This does not contain

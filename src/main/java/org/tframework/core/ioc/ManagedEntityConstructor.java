@@ -3,6 +3,7 @@ package org.tframework.core.ioc;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
+import org.tframework.core.ioc.constants.ConstructionMethod;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
 import java.lang.reflect.Constructor;
@@ -11,27 +12,9 @@ import java.lang.reflect.InvocationTargetException;
 /**
  * This class is responsible for creating instances of the managed classes. There are multiple ways
  * how a managed entity can be constructed, see {@link ConstructionMethod}.
- * TODO: add more methods to construct managed entities
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ManagedEntityConstructor {
-
-    /**
-     * Possible ways of constructing a managed entity, including not constructible.
-     */
-    enum ConstructionMethod {
-
-        /**
-         * Indicates that the managed entity should be constructed with a public,
-         * no argument constructor.
-         */
-        PUBLIC_NO_ARGS_CONSTRUCTOR,
-
-        /**
-         * Indicates that no supported way was found to construct the managed entity.
-         */
-        NOT_CONSTRUCTIBLE
-    }
 
     /**
      * Create an instance of the managed entity using one of the {@link ConstructionMethod}s.

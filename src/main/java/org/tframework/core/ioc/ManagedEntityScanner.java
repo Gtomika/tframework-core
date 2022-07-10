@@ -16,14 +16,14 @@ import org.tframework.core.ioc.exceptions.NotConstructibleException;
 import java.util.Set;
 
 /**
- * Contains methods about finding managed classes.
+ * Contains methods about finding managed entities (these are annotated by {@link Managed}.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Slf4j
 public class ManagedEntityScanner {
 
     /**
-     * Scans the classpath for entities that are to be managed by the TFramework.
+     * Scans the subpackages of the root class for entities that are to be managed by the TFramework.
      * @param rootClass The only class on the classpath that is annotated with {@link org.tframework.core.TFrameworkRoot}.
      * @throws IocException If an exception happened when attempting to register the managed entities.
      */
@@ -34,10 +34,18 @@ public class ManagedEntityScanner {
                 new ConfigurationBuilder()
                         .setUrls(ClasspathHelper.forPackage(rootClass.getPackageName()))
         );
+        //these are the CLASSES annotated by @Managed -> does not include provider fields
         var managedEntities = reflections.getTypesAnnotatedWith(Managed.class);
-        log.info("Found {} entities annotated with @Managed in the package (and subpackages) of '{}'",
+        log.info("Found {} class entities annotated with @Managed in the subpackages of '{}'",
                 managedEntities.size(), rootClass.getPackageName());
         registerManagedEntities(managedEntities);
+        //need to find the managed entities defined as provider methods
+        //they can only be in managed entities classes
+        var providedManagedEntities = reflections.getMethodsAnnotatedWith(Managed.class);
+        providedManagedEntities.forEach(IocValidator::validateProviderMethod);
+        log.info("Found {} provided entities annotated with @Managed in the subpackages of '{}'",
+                providedManagedEntities.size(), rootClass.getPackageName());
+        //TODO: register provided managed entities. Somehow we need to save provider method
         //finally, register the ApplicationContext to make it injectable
         registerApplicationContext();
     }

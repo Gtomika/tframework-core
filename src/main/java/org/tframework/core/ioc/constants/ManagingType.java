@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2022. */
-package org.tframework.core.ioc;
+package org.tframework.core.ioc.constants;
 
 /** The possible types of managed classes. */
 public enum ManagingType {

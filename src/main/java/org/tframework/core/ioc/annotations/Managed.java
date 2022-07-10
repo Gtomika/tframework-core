@@ -5,17 +5,17 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
-import org.tframework.core.ioc.ManagingType;
+import org.tframework.core.ioc.constants.ManagingType;
 
 /**
- * Marks a class to be managed by the TFramework. Such a class will be injectable as a dependency
- * into other managed classes.
+ * Marks a class or method (provider method) to be managed by the TFramework. It will become a managed entity, and thus
+ * will be injectable as a dependency into other managed entities using {@link Injected}.
  * <p>
- * In a managed class, you also have the ability to define lifecycle callbacks with annotations
+ * In a managed entity, you also have the ability to define lifecycle callbacks with annotations
  * such as {@link AfterConstruct}.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.TYPE)
+@Target({ElementType.TYPE, ElementType.METHOD})
 public @interface Managed {
 
     /**

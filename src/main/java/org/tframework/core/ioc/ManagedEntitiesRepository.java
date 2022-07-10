@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.ioc.constants.ManagingType;
 import org.tframework.core.ioc.containers.AbstractContainer;
 import org.tframework.core.ioc.containers.ManagedMultiInstanceContainer;
 import org.tframework.core.ioc.containers.ManagedSingletonContainer;

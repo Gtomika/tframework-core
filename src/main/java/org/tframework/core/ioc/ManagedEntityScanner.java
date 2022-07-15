@@ -114,7 +114,8 @@ public class ManagedEntityScanner {
                     IocValidator.validateEntityName(name), managedEntityClass, providerMethod
             );
             //application context is not managed yet, need to use getInstance
-            ManagedEntitiesRepository managedEntitiesRepository = ApplicationContext.getInstance().getManagedEntitiesRepository();
+            ManagedEntitiesRepository managedEntitiesRepository = ApplicationContext.getInstance()
+                    .getTFrameworkIoc().getManagedEntitiesRepository();
             managedEntitiesRepository.registerManagedSingletonContainer(container);
         } catch (IllegalArgumentException | NotConstructibleException | NameNotUniqueException e) {
             throw new IocException(String.format("Failed to register managed singleton '%s'", managedEntityClass.getName()), e);
@@ -132,7 +133,7 @@ public class ManagedEntityScanner {
                 ApplicationContext.class,
                 ApplicationContext.getInstance()
         );
-        ApplicationContext.getInstance().getManagedEntitiesRepository()
+        ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository()
                 .registerManagedSingletonContainer(contextContainer);
         log.debug("Registered the ApplicationContext as managed singleton.");
     }

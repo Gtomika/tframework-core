@@ -8,7 +8,6 @@ import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.tframework.core.exceptions.TFrameworkRuntimeException;
-import org.tframework.core.ioc.TFrameworkIoc;
 
 import java.util.stream.Collectors;
 
@@ -29,9 +28,8 @@ public final class TFramework {
         log.info("Initializing TFramework application...");
         Class<?> rootClass = findClassAnnotatedWithTFrameworkRoot();
         log.info("Found root class: '{}'", rootClass.getName());
-        ApplicationContext.initApplicationContext();
-        //set up everything related to inversion of control: managed entities, dependency injection...
-        TFrameworkIoc.initializeIoc(rootClass);
+        ApplicationContext.initApplicationContext(rootClass);
+        log.info("Application context is initialized.");
     }
 
     /** Stops the TFramework application gracefully. */

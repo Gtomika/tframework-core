@@ -80,6 +80,13 @@ public abstract class AbstractContainer<T> {
     }
 
     /**
+     * Saves information about one dependency of this managed entity.
+     */
+    public void addDependency(DependencyInformation dependencyInformation) {
+        dependencyInformationList.add(dependencyInformation);
+    }
+
+    /**
      * Gets an instance of this managed entity. The container has control of creating a
      * new instance, or using an already existing one.
      * @throws NotConstructibleException If no instance can be constructed and provided.

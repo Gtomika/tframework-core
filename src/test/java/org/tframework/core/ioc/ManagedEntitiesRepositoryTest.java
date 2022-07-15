@@ -91,6 +91,14 @@ class ManagedEntitiesRepositoryTest {
                 () -> managedEntitiesRepository.getManagingTypeByName("Hello there"));
     }
 
+    @Test
+    public void testIterateAllEntities() {
+        var allContainers = managedEntitiesRepository.iterateManagedEntities();
+        for(var container: allContainers) {
+            assertEquals(testString, container.grabInstance().toString());
+        }
+    }
+
     private ManagedSingletonContainer<String> createManagedSingletonContainer() {
         return  new ManagedSingletonContainer<>(
                 String.class.getName(), String.class, testString

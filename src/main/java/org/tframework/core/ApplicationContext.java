@@ -3,7 +3,7 @@ package org.tframework.core;
 
 import lombok.Getter;
 import org.tframework.core.exceptions.TFrameworkRuntimeException;
-import org.tframework.core.ioc.ManagedEntitiesRepository;
+import org.tframework.core.ioc.TFrameworkIoc;
 import org.tframework.core.ioc.annotations.Managed;
 import org.tframework.core.ioc.exceptions.MultipleManagedEntitiesException;
 import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
@@ -25,10 +25,11 @@ public class ApplicationContext {
     /**
      * Initialize application context {@link #instance}. This must only be called
      * once, at the startup of the application.
+     * @param rootClass The class annotated with {@link org.tframework.core.TFrameworkRoot}.
      */
-    protected static void initApplicationContext() {
+    protected static void initApplicationContext(Class<?> rootClass) {
         if(instance != null) throw new TFrameworkRuntimeException("Multiple application context initialization is not allowed.");
-        instance = new ApplicationContext();
+        instance = new ApplicationContext(rootClass);
     }
 
     /**
@@ -41,14 +42,17 @@ public class ApplicationContext {
     }
 
     /**
-     * Stores and handles the managed classes.
+     * Contains data and operations related to the TFramework IoC.
      */
     @Getter
-    private final ManagedEntitiesRepository managedEntitiesRepository;
+    private final TFrameworkIoc tFrameworkIoc;
 
-    private ApplicationContext() {
-        //initialize managed classes, it will be filled later
-        managedEntitiesRepository = new ManagedEntitiesRepository();
+    /**
+     * Create application context.
+     * @param rootClass The class annotated with {@link org.tframework.core.TFrameworkRoot}.
+     */
+    private ApplicationContext(Class<?> rootClass) {
+        tFrameworkIoc = TFrameworkIoc.createInstance(rootClass);
     }
 
     public <T> T grab(Class<T> managedEntityType) throws NoSuchManagedEntityException, MultipleManagedEntitiesException {

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.ioc.constants.ManagingType;
 import org.tframework.core.ioc.containers.AbstractContainer;
@@ -103,6 +106,15 @@ public class ManagedEntitiesRepository {
         if (candidates.isEmpty()) throw new NoSuchManagedEntityException(clazz);
         if (candidates.size() > 1) throw new MultipleManagedEntitiesException(clazz);
         return candidates.get(0).getManagingType();
+    }
+
+    /**
+     * Collects and returns all managed entities.
+     * @return Iterable of all managed entities.
+     */
+    public Iterable<AbstractContainer<?>> iterateManagedEntities() {
+        return Stream.concat(singletons.values().stream(), multiInstances.values().stream())
+                .collect(Collectors.toUnmodifiableList());
     }
 
     /**

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.ioc.exceptions.IocException;
+import org.tframework.core.ioc.scan.DefaultManagedEntityScanner;
+import org.tframework.core.ioc.scan.ManagedEntityScanner;
 
 /**
  * Contains the methods to initialize the TFramework inversion of control, and holds the data related
@@ -22,10 +24,25 @@ public class TFrameworkIoc {
      */
     public static TFrameworkIoc createInstance(Class<?> rootClass) throws IocException {
         return new TFrameworkIoc(
+            findManagedEntityScanner(),
             new ManagedEntitiesRepository(),
             new DependencyResolver()
         ).initializeIoc(rootClass);
     }
+
+    /**
+     * Finds the appropriate {@link ManagedEntityScanner} implementation to be used.
+     * TODO: control this with some property.
+     */
+    private static ManagedEntityScanner findManagedEntityScanner() {
+        return new DefaultManagedEntityScanner();
+    }
+
+    /**
+     * Looks for managed entities.
+     */
+    @Getter
+    private final ManagedEntityScanner managedEntityScanner;
 
     /**
      * Stores and handles the managed classes.
@@ -52,7 +69,7 @@ public class TFrameworkIoc {
      */
     public TFrameworkIoc initializeIoc(Class<?> rootClass) throws IocException {
         log.info("Initializing TFramework IoC...");
-        ManagedEntityScanner.scanAndRegisterManagedEntities(rootClass);
+        managedEntityScanner.scanAndRegisterManagedEntities(rootClass);
         //discover the dependency relations between managed entities
         dependencyResolver.discoverDependencies();
         //resolve them after discovery

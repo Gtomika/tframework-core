@@ -6,8 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.tframework.core.ApplicationContext;
 import org.tframework.core.ioc.annotations.Injected;
+import org.tframework.core.ioc.annotations.Managed;
 import org.tframework.core.ioc.containers.AbstractContainer;
+import org.tframework.core.ioc.exceptions.InvalidDependencyException;
 import org.tframework.core.ioc.exceptions.IocException;
+import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -28,12 +31,18 @@ public class DependencyResolver {
     private final MutableGraph<String> dependencyGraph;
 
     /**
+     * Managed entity repository, which should already be initialized by the time the dependency resolver is created.
+     */
+    private final ManagedEntitiesRepository repository;
+
+    /**
      * Create a dependency resolver with an empty dependency graph.
      */
     protected DependencyResolver() {
         dependencyGraph = GraphBuilder.directed()
                 .allowsSelfLoops(false)
                 .build();
+        repository = ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository();
     }
 
     /**
@@ -43,17 +52,21 @@ public class DependencyResolver {
      * Note that this does not resolve the dependencies, only discovers them. For example if managed entity 'A'
      * has an {@link org.tframework.core.ioc.annotations.Injected} field of managed entity 'B', then this dependency
      * will be discovered and saved in the container of 'A', and also in the {@link #dependencyGraph}.
-     * @throws IocException If the dependencies could not be discovered or an illegal relation was found between them.
+     * @throws InvalidDependencyException If the dependencies could not be discovered or an illegal relation was found between them.
      * The cause exception contains the details.
      */
-    public void discoverDependencies() throws IocException {
-        var repository = ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository();
+    public void discoverDependencies() throws InvalidDependencyException {
         for(AbstractContainer<?> container: repository.iterateManagedEntities()) {
             discoverDependenciesOfEntity(container);
         }
     }
 
-    private void discoverDependenciesOfEntity(AbstractContainer<?> container) {
+    /**
+     * Discovers the dependencies of one managed entity.
+     * @param container The {@link AbstractContainer} of the entity.
+     * @throws InvalidDependencyException If there is an illegal dependency relation.
+     */
+    private void discoverDependenciesOfEntity(AbstractContainer<?> container) throws InvalidDependencyException {
         List<Field> injectedFields = FieldUtils.getFieldsListWithAnnotation(container.getInstanceType(), Injected.class);
         log.debug("Found {} fields in managed entity '{}' annotated with @Injected", injectedFields.size(), container.getName());
         if(!injectedFields.isEmpty()) {
@@ -63,8 +76,19 @@ public class DependencyResolver {
         for(Field injectedField: injectedFields) {
             log.debug("Checking the @Injected annotated field '{}' of managed entity '{}'", injectedField.getName(), container.getName());
             Injected injectedAnnotation = injectedField.getAnnotation(Injected.class);
-            //TODO: save dependency in container as DependencyInformation
-            //TODO: save dependency in graph as edge, put dependent node if needed
+            String dependencyName = getDependencyEntityName(injectedField, injectedAnnotation);
+            try {
+                var dependencyContainer = repository.grabManagedEntityContainer(dependencyName);
+                log.debug("This dependency references the following managed entity: '{}'", dependencyName);
+                if(isSelfDependency(container.getName(), dependencyName)) {
+                    throw new InvalidDependencyException(container.getName(), dependencyName, "Cannot depend on itself.");
+                }
+                //TODO: save dependency in container as DependencyInformation
+                //TODO: save dependency in graph as edge, put dependent node if needed
+            } catch (NoSuchManagedEntityException e) {
+                log.debug("This dependency references the managed entity with name '{}', but no such entity exists.", dependencyName);
+                throw new InvalidDependencyException(container.getName(), dependencyName, e);
+            }
         }
 
     }
@@ -78,12 +102,30 @@ public class DependencyResolver {
     }
 
     /**
+     * Calculates the name that the {@link Injected} annotation has. This will be by default the type of the
+     * field it was placed on, or if {@link Injected#name()} was specified, then this custom name.
+     * @param field The field the annotation was placed on.
+     * @param injected The annotation.
+     * @return The name of the injected entity.
+     */
+    private String getDependencyEntityName(Field field, Injected injected) {
+        return injected.name().equals(Managed.DEFAULT_MANAGED_NAME) ? field.getType().getName() : injected.name();
+    }
+
+    /**
+     * Checks if the managed entity and its dependency are the same.
+     */
+    private boolean isSelfDependency(String managedEntityName, String dependencyEntityName) {
+        return managedEntityName.equals(dependencyEntityName);
+    }
+
+    /**
      * Injects the dependencies into each managed entity. This method assumes the dependencies are discovered and valid (
      * can be done with {@link #discoverDependencies()}).
      * @throws IocException If the dependencies could not be injected.
      */
     public void resolveDependencies() throws IocException {
-
+        //TODO: inject dependencies
     }
 
 }

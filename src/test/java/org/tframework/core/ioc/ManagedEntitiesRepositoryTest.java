@@ -24,18 +24,18 @@ class ManagedEntitiesRepositoryTest {
         testString = RandomStringUtils.randomAlphabetic(20);
 
         var container = createManagedSingletonContainer();
-        managedEntitiesRepository.registerManagedSingletonContainer(container);
+        managedEntitiesRepository.registerManagedEntityContainer(container);
     }
 
     @Test
     public void testRegisterSingletonDuplicateName() {
         assertThrows(NameNotUniqueException.class, () ->
-                managedEntitiesRepository.registerManagedSingletonContainer(createManagedSingletonContainer()));
+                managedEntitiesRepository.registerManagedEntityContainer(createManagedSingletonContainer()));
     }
 
     @Test
     public void testGrabSingleton() {
-        var receivedContainer = managedEntitiesRepository.grabSingletonContainer(String.class);
+        var receivedContainer = managedEntitiesRepository.grabManagedEntityContainer(String.class);
         assertEquals(String.class.getName(), receivedContainer.getName());
         assertEquals(ManagingType.SINGLETON, receivedContainer.getManagingType());
         assertEquals(testString, receivedContainer.grabInstance());
@@ -44,7 +44,7 @@ class ManagedEntitiesRepositoryTest {
 
     @Test
     public void testGrabNotExistingSingleton() {
-        assertThrows(NoSuchManagedEntityException.class, () -> managedEntitiesRepository.grabSingletonContainer(Integer.class));
+        assertThrows(NoSuchManagedEntityException.class, () -> managedEntitiesRepository.grabManagedEntityContainer(Integer.class));
     }
 
     @Test
@@ -52,9 +52,9 @@ class ManagedEntitiesRepositoryTest {
         var container = new ManagedSingletonContainer<>(
             "String 2", String.class, testString
         );
-        managedEntitiesRepository.registerManagedSingletonContainer(container);
+        managedEntitiesRepository.registerManagedEntityContainer(container);
 
-        assertThrows(MultipleManagedEntitiesException.class, () -> managedEntitiesRepository.grabSingletonContainer(String.class));
+        assertThrows(MultipleManagedEntitiesException.class, () -> managedEntitiesRepository.grabManagedEntityContainer(String.class));
     }
 
     @Test
@@ -74,7 +74,7 @@ class ManagedEntitiesRepositoryTest {
         var container = new ManagedSingletonContainer<>(
                 "String 2", String.class, testString
         );
-        managedEntitiesRepository.registerManagedSingletonContainer(container);
+        managedEntitiesRepository.registerManagedEntityContainer(container);
         assertThrows(MultipleManagedEntitiesException.class,
                 () -> managedEntitiesRepository.getManagingTypeByClass(String.class));
     }
@@ -99,8 +99,20 @@ class ManagedEntitiesRepositoryTest {
         }
     }
 
+    @Test
+    public void testGetManagedEntityByName() {
+        var container = managedEntitiesRepository.grabManagedEntityContainer(String.class.getName());
+        assertEquals(String.class.getName(), container.getName());
+    }
+
+    @Test
+    public void testGetManagedEntityByNameNotFound() {
+        assertThrows(NoSuchManagedEntityException.class,
+                () -> managedEntitiesRepository.grabManagedEntityContainer("hello there"));
+    }
+
     private ManagedSingletonContainer<String> createManagedSingletonContainer() {
-        return  new ManagedSingletonContainer<>(
+        return new ManagedSingletonContainer<>(
                 String.class.getName(), String.class, testString
         );
     }

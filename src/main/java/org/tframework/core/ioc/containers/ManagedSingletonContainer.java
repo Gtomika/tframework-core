@@ -5,6 +5,7 @@ import org.tframework.core.ioc.ManagedEntityConstructor;
 import org.tframework.core.ioc.constants.ManagingType;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
+import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 
 /**
@@ -42,10 +43,14 @@ public class ManagedSingletonContainer<T> extends AbstractContainer<T> {
      * Constructor where it is possible to specify a provider method.
      * @param name Name of the entity.
      * @param managedEntityClass The class of the managed entity.
-     * @param providerMethod Method that can be called to construct an instance.
+     * @param providerMethod Method that can be called to construct an instance. Can be null if this is not a provided entity.
      * @throws IllegalArgumentException If the 'providerMethod' was not null, and it was invalid.
      */
-    public ManagedSingletonContainer(String name, Class<T> managedEntityClass, Method providerMethod) throws IllegalArgumentException {
+    public ManagedSingletonContainer(
+            String name,
+            Class<T> managedEntityClass,
+            @Nullable Method providerMethod
+    ) throws IllegalArgumentException {
         super(ManagingType.SINGLETON, name, managedEntityClass, providerMethod);
     }
 

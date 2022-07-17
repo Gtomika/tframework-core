@@ -4,6 +4,8 @@ import lombok.Getter;
 import org.tframework.core.ioc.constants.ManagingType;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
+import javax.annotation.Nullable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +27,22 @@ public class ManagedMultiInstanceContainer<T> extends AbstractContainer<T> {
      */
     public ManagedMultiInstanceContainer(String name, Class<T> instanceType) {
         super(ManagingType.MULTI_INSTANCE, name, instanceType);
+        this.instances = new ArrayList<>();
+    }
+
+    /**
+     * Constructor where it is possible to specify a provider method.
+     * @param name Name of the entity.
+     * @param instanceType The class of the managed entity.
+     * @param providerMethod Method that can be called to construct an instance. Can be null if this is not a provided entity.
+     * @throws IllegalArgumentException If the 'providerMethod' was not null, and it was invalid.
+     */
+    public ManagedMultiInstanceContainer(
+            String name,
+            Class<T> instanceType,
+            @Nullable Method providerMethod
+    ) throws IllegalArgumentException {
+        super(ManagingType.MULTI_INSTANCE, name, instanceType, providerMethod);
         this.instances = new ArrayList<>();
     }
 

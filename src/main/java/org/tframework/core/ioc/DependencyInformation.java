@@ -35,6 +35,6 @@ public class DependencyInformation {
      * Flag to store whether this dependency was resolved or not. Resolved means that
      * an actual instance of the dependency was injected into the variable {@link #variableName}.
      */
-    private boolean resolved = false;
+    private boolean resolved;
 
 }

@@ -1,10 +1,7 @@
 /* Licensed under Apache-2.0 2022. */
 package org.tframework.core.ioc;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -17,6 +14,7 @@ import org.tframework.core.ioc.exceptions.MultipleManagedEntitiesException;
 import org.tframework.core.ioc.exceptions.NameNotUniqueException;
 import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -45,40 +43,63 @@ public class ManagedEntitiesRepository {
     }
 
     /**
-     * Register a new managed singleton.
-     *
-     * @param container Container with the singleton, contains all data about it.
+     * Register a new managed entity, wrapped in an {@link AbstractContainer}.
+     * @param container Container with the entity, contains all data about it.
      * @param <T> Type of the managed entity.
      * @throws NameNotUniqueException If the managed entity uses a duplicate name.
+     * @throws ClassCastException If the container's managing type and class do not match.
      */
-    public <T> void registerManagedSingletonContainer(ManagedSingletonContainer<T> container)
-            throws NameNotUniqueException {
+    public <T> void registerManagedEntityContainer(
+            @Nonnull AbstractContainer<T> container
+    ) throws NameNotUniqueException, ClassCastException {
+        Objects.requireNonNull(container);
         checkNameUniqueness(container.getName());
-        singletons.put(container.getName(), container);
+        switch (container.getManagingType()) {
+            case SINGLETON:
+                singletons.put(container.getName(), (ManagedSingletonContainer<?>) container);
+                break;
+            case MULTI_INSTANCE:
+                multiInstances.put(container.getName(), (ManagedMultiInstanceContainer<?>) container);
+                break;
+        }
         log.debug(
-                "Registered new managed singleton with name '{}' and class '{}'",
+                "Registered new managed entity with name '{}' and class '{}'",
                 container.getName(),
                 container.getInstanceType().getName());
     }
 
     /**
-     * Grab a container of a managed singleton.
-     *
-     * @param clazz Class of the managed class.
-     * @param <T> Type of the managed class.
-     * @return Container of the managed singleton.
-     * @throws NoSuchManagedEntityException If the provided class is not a managed singleton.
-     * @throws MultipleManagedEntitiesException If there are multiple managed singletons with the
-     *     same type.
+     * Grab a container of a managed entity by class.
+     * @param clazz Class of the managed entity.
+     * @param <T> Type of the managed entity.
+     * @return Container of the managed entity.
+     * @throws NoSuchManagedEntityException If there is no managed entity with provided class.
+     * @throws MultipleManagedEntitiesException If there are multiple managed entities with the same class.
      */
-    public <T> ManagedSingletonContainer<T> grabSingletonContainer(Class<T> clazz)
-            throws NoSuchManagedEntityException, MultipleManagedEntitiesException {
+    public <T> AbstractContainer<T> grabManagedEntityContainer(
+            Class<T> clazz
+    ) throws NoSuchManagedEntityException, MultipleManagedEntitiesException {
         // collect all candidates
-        var candidates = findManagedCandidatesByClass(clazz, ManagingType.SINGLETON);
+        var candidates = findManagedCandidatesByClass(clazz, null);
         if (candidates.isEmpty()) throw new NoSuchManagedEntityException(clazz);
         if (candidates.size() > 1) throw new MultipleManagedEntitiesException(clazz);
         // must be only one (it's a safe cast)
-        return (ManagedSingletonContainer<T>) candidates.get(0);
+        return candidates.get(0);
+    }
+
+    /**
+     * Grab a container of a managed entity by name.
+     * @param name Name of the managed entity.
+     * @param <T> Type of the managed entity.
+     * @return The {@link AbstractContainer} of the managed entity.
+     * @throws NoSuchManagedEntityException If there is no managed entity with the provided name.
+     */
+    public <T> AbstractContainer<T> grabManagedEntityContainer(
+            String name
+    ) throws NoSuchManagedEntityException {
+        if(singletons.containsKey(name)) return (AbstractContainer<T>) singletons.get(name);
+        if(multiInstances.containsKey(name)) return (AbstractContainer<T>) multiInstances.get(name);
+        throw new NoSuchManagedEntityException(name);
     }
 
     /**

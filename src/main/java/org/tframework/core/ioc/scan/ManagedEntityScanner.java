@@ -14,6 +14,8 @@ import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.util.Collection;
 import java.util.Set;
 
 /**
@@ -33,6 +35,13 @@ public abstract class ManagedEntityScanner {
      * @throws IocException If the scanning or registering failed.
      */
     public abstract void scanAndRegisterManagedEntities(Class<?> rootClass) throws IocException;
+
+    /**
+     * Gets a collection of package or class URLs that will be scanned for managed entities by the scanner.
+     * @param rootClass he root class of the Tframework application. Usually defined by annotation {@link org.tframework.core.TFrameworkRoot}.
+     *                  Different implementation of {@link ManagedEntityScanner} can interpret it differently.
+     */
+    public abstract Collection<URL> getScannedUrls(Class<?> rootClass);
 
     /**
      * Registers all detected managed entity classes (where a class was annotated with {@link Managed}).

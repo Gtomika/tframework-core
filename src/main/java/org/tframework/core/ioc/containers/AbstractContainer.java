@@ -1,8 +1,7 @@
 package org.tframework.core.ioc.containers;
 
-import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.ioc.DependencyInformation;
 import org.tframework.core.ioc.ManagedEntityConstructor;
 import org.tframework.core.ioc.constants.ManagingType;
@@ -16,6 +15,7 @@ import java.util.List;
 /**
  * Base class for containers that wrap managed entities.
  */
+@Slf4j
 public abstract class AbstractContainer<T> {
 
     /**
@@ -39,13 +39,14 @@ public abstract class AbstractContainer<T> {
     /**
      * Object responsible for creating new instances of the managed entity.
      */
+    @Getter
     protected final ManagedEntityConstructor<T> managedEntityConstructor;
 
     /**
      * Contains the data about the dependencies of this managed entity. This is not a list
      * of actual dependency instances, only information about them.
      */
-    protected final List<DependencyInformation> dependencyInformationList;
+    protected final List<DependencyInformation<?>> dependencyInformationList;
 
     /**
      * The default abstract container constructor.
@@ -82,8 +83,9 @@ public abstract class AbstractContainer<T> {
     /**
      * Saves information about one dependency of this managed entity.
      */
-    public void addDependency(DependencyInformation dependencyInformation) {
+    public void addDependency(DependencyInformation<?> dependencyInformation) {
         dependencyInformationList.add(dependencyInformation);
+        log.debug("Container '{}' received new dependency '{}'", name, dependencyInformation.getDependencyContainer().getName());
     }
 
     /**

@@ -120,16 +120,5 @@ class IocValidatorTest {
         assertThrows(IllegalArgumentException.class, () -> IocValidator.validateProviderMethod(method, null));
     }
 
-    @Managed
-    static class ProviderWithParams {
-        @Managed
-        public String getString(int x) {return x + "x"; }
-    }
-
-    @Test
-    public void testProviderWithParams() {
-        Method method = MethodUtils.getMatchingMethod(ProviderWithParams.class, "getString", Integer.class);
-        assertThrows(IllegalArgumentException.class, () -> IocValidator.validateProviderMethod(method, null));
-    }
-
+    //TODO: write tests for field validator
 }

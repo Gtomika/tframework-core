@@ -18,7 +18,7 @@ public class InvalidDependencyException extends TFrameworkRuntimeException {
             String dependencyName,
             String reason
     ) {
-        super(String.format("The managed entity '%s' has an illegal dependency: '%s'. Reason: %s",
+        super(String.format("The managed entity '%s' has an illegal or failed dependency: '%s'. Reason: %s",
                 managedEntityName, dependencyName, reason));
     }
 
@@ -33,7 +33,11 @@ public class InvalidDependencyException extends TFrameworkRuntimeException {
             String dependencyName,
             Exception cause
     ) {
-        super(String.format("The managed entity '%s' has an illegal dependency: '%s'.",
+        super(String.format("The managed entity '%s' has an illegal or failed dependency: '%s'.",
                 managedEntityName, dependencyName), cause);
+    }
+
+    public InvalidDependencyException(String cause) {
+        super(cause);
     }
 }

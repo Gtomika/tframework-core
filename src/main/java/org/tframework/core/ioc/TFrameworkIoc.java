@@ -72,8 +72,6 @@ public class TFrameworkIoc {
         managedEntityScanner.scanAndRegisterManagedEntities(rootClass);
         //discover the dependency relations between managed entities
         dependencyResolver.discoverDependencies();
-        //resolve them after discovery
-        dependencyResolver.resolveDependencies();
         log.info("TFramework IoC initialized!");
         return this;
     }

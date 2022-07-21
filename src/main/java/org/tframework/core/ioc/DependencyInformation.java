@@ -3,21 +3,22 @@ package org.tframework.core.ioc;
 import lombok.Builder;
 import lombok.Data;
 import org.tframework.core.ioc.constants.InjectionType;
+import org.tframework.core.ioc.containers.AbstractContainer;
+
+import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 
 /**
- * Collects information about a dependency in a managed entity. This does not contain
- * an actual instance of the dependency.
+ * Collects information about a dependency in a managed entity.
  */
 @Data
 @Builder
-public class DependencyInformation {
+public class DependencyInformation<T> {
 
     /**
-     * Name of the dependency, which is a name of a managed entity.
-     * For example, if managed entity 'A' has an {@link org.tframework.core.ioc.annotations.Injected}
-     * field of another managed entity 'B', then this will be the entity name of 'B'.
+     * Container of the dependency. Can be used to get instance of it.
      */
-    private final String dependencyEntityName;
+    private AbstractContainer<T> dependencyContainer;
 
     /**
      * Stores how the injection takes place.
@@ -25,16 +26,11 @@ public class DependencyInformation {
     private final InjectionType injectionType;
 
     /**
-     * Stores what is that name of the variable, which is annotated with
-     * {@link org.tframework.core.ioc.annotations.Injected}. Depending on the value of
-     * {@link #injectionType}, this can be a field of a constructor parameter.
+     * The field that has the {@link org.tframework.core.ioc.annotations.Injected} annotation. This will only
+     * have value if this dependency is injected to a field, when {@link #injectionType} is {@link InjectionType#FIELD_INJECTION}.
+     * Otherwise it will be null.
      */
-    private final String variableName;
-
-    /**
-     * Flag to store whether this dependency was resolved or not. Resolved means that
-     * an actual instance of the dependency was injected into the variable {@link #variableName}.
-     */
-    private boolean resolved;
+    @Nullable
+    private final Field injectedField;
 
 }

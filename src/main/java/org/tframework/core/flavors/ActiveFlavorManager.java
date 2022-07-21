@@ -31,7 +31,9 @@ public class ActiveFlavorManager {
      * such as the {@code TFRAMEWORK_ACTIVE_FLAVOR} environmental variable.
      */
     private void readActiveFlavors() {
-
+        activeFlavors.addAll(readActiveFlavorFromEnvironmentalVariable());
+        activeFlavors.addAll(readActiveFlavorsFromProperty());
+        log.info("The following flavors will be active: {}", activeFlavors);
     }
 
     /**

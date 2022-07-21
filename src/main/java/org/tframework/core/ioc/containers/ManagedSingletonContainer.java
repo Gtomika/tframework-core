@@ -1,7 +1,7 @@
 /* Licensed under Apache-2.0 2022. */
 package org.tframework.core.ioc.containers;
 
-import org.tframework.core.ioc.ManagedEntityConstructor;
+import org.tframework.core.ioc.DependencyResolver;
 import org.tframework.core.ioc.constants.ManagingType;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
@@ -62,7 +62,8 @@ public class ManagedSingletonContainer<T> extends AbstractContainer<T> {
     @Override
     public T grabInstance() throws NotConstructibleException {
         if(instance == null) {
-            instance = managedEntityConstructor.constructManagedEntity();
+            instance = managedEntityConstructor.constructManagedEntity(dependencyInformationList);
+            DependencyResolver.resolveAfterConstructDependencies(instance, name, dependencyInformationList);
         }
         return instance;
     }

@@ -7,6 +7,7 @@ import org.tframework.core.ioc.containers.AbstractContainer;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Parameter;
 
 /**
  * Collects information about a dependency in a managed entity.
@@ -28,9 +29,18 @@ public class DependencyInformation<T> {
     /**
      * The field that has the {@link org.tframework.core.ioc.annotations.Injected} annotation. This will only
      * have value if this dependency is injected to a field, when {@link #injectionType} is {@link InjectionType#FIELD_INJECTION}.
-     * Otherwise it will be null.
+     * Otherwise, it will be null.
      */
     @Nullable
     private final Field injectedField;
+
+    /**
+     * The parameter of the provider method ir constructor where this dependency must be injected. This will only
+     * have value if this dependency is injected to a parameter, when {@link #injectionType} is {@link InjectionType#PROVIDER_INJECTION}
+     * or {@link InjectionType#CONSTRUCTOR_INJECTION}.
+     * Otherwise, it will be null.
+     */
+    @Nullable
+    private final Parameter injectedParameter;
 
 }

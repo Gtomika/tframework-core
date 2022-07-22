@@ -2,6 +2,7 @@ package org.tframework.core.ioc.scan;
 
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.ApplicationContext;
+import org.tframework.core.ioc.IocUtils;
 import org.tframework.core.ioc.IocValidator;
 import org.tframework.core.ioc.ManagedEntitiesRepository;
 import org.tframework.core.ioc.annotations.Managed;
@@ -82,8 +83,7 @@ public abstract class ManagedEntityScanner {
             @Nullable Method providerMethod
     ) throws IocException {
         //was a custom name specified? if not, default to class name
-        String name = managedAnnotation.name().equals(Managed.DEFAULT_MANAGED_NAME)
-                ? managedEntityClass.getName() : managedAnnotation.name();
+        String name = IocUtils.getReferencedEntityName(managedEntityClass);
         IocValidator.validateEntityName(name);
         log.debug("Attempting to register managed entity with name '{}' and type '{}'", name, managedEntityClass.getName());
         //attempt to build and register container

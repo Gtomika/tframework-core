@@ -3,12 +3,16 @@ package org.tframework.core.ioc;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ClassUtils;
+import org.tframework.core.ioc.annotations.Injected;
 import org.tframework.core.ioc.annotations.Managed;
 
 import javax.annotation.Nullable;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
+import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -88,6 +92,7 @@ public class IocValidator {
      * @param injectedField The field to be validated.
      * @throws IllegalArgumentException If the field is not valid.
      */
+    //TODO unit test
     public static void validateInjectedField(Field injectedField) throws IllegalArgumentException {
         if(!injectedField.getDeclaringClass().isAnnotationPresent(Managed.class)) {
             throw new IllegalArgumentException(String.format("Field '%s' in class '%s' is annotated with @Inject but it isn't " +
@@ -100,4 +105,40 @@ public class IocValidator {
         }
     }
 
+    /**
+     * Validates a parameter that belongs to a provider method or a constructor used to create managed entities.
+     * For it to be valid, it must have no annotation, or exactly one of these annotations:
+     * <ul>
+     *     <li>{@link org.tframework.core.ioc.annotations.Injected}</li>
+     * </ul>
+     * @param parameter The parameter to be validated.
+     * @return If this parameter is valid and annotated, then returns the one valid annotation on it. If not annotated,
+     * null is returned.
+     * @throws IllegalArgumentException If the parameter is not valid.
+     */
+    //TODO unit test
+    @Nullable
+    public static Class<? extends Annotation> validateProviderOrConstructorParameter(Parameter parameter) throws IllegalArgumentException {
+        Annotation[] annotations = parameter.getAnnotations();
+        if(annotations.length == 0) return null;
+
+        List<Class<? extends Annotation>> watchedAnnotations = List.of(Injected.class);
+        int count = 0;
+        Class<? extends Annotation> foundAnnotation = null;
+        for(Annotation annotation: annotations) {
+            if(watchedAnnotations.contains(annotation.getClass())) {
+                foundAnnotation = annotation.getClass();
+                count++;
+            }
+        }
+
+        if(count == 0) { //all the annotations are not important here
+            return null;
+        } else if(count == 1) {
+            return foundAnnotation;
+        } else {
+            throw new IllegalArgumentException(String.format("Conflicting annotations found on parameter '%s'. Only one of these " +
+                    "is allowed: %s", parameter.getName(), watchedAnnotations));
+        }
+    }
 }

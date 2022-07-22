@@ -1,22 +1,23 @@
 package org.tframework.core.ioc;
 
-import com.google.common.graph.GraphBuilder;
-import com.google.common.graph.Graphs;
-import com.google.common.graph.MutableGraph;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.reflect.FieldUtils;
+import org.jgrapht.alg.cycle.CycleDetector;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleDirectedGraph;
 import org.tframework.core.ApplicationContext;
 import org.tframework.core.ioc.annotations.Injected;
-import org.tframework.core.ioc.annotations.Managed;
 import org.tframework.core.ioc.constants.ConstructionMethod;
 import org.tframework.core.ioc.constants.InjectionType;
 import org.tframework.core.ioc.containers.AbstractContainer;
 import org.tframework.core.ioc.exceptions.InvalidDependencyException;
 import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
 
-import java.lang.reflect.Field;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.*;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Investigates the managed entities and resolves the dependencies between them by creating
@@ -31,7 +32,7 @@ public class DependencyResolver {
      * <p>
      * Initialized with {@link #discoverDependencies()}.
      */
-    private final MutableGraph<String> dependencyGraph;
+    private final SimpleDirectedGraph<String, DefaultEdge> dependencyGraph;
 
     /**
      * Managed entity repository, which should already be initialized by the time the dependency resolver is created.
@@ -42,9 +43,7 @@ public class DependencyResolver {
      * Create a dependency resolver with an empty dependency graph.
      */
     protected DependencyResolver() {
-        dependencyGraph = GraphBuilder.directed()
-                .allowsSelfLoops(false)
-                .build();
+        dependencyGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
         repository = ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository();
     }
 
@@ -73,8 +72,21 @@ public class DependencyResolver {
      */
     private void discoverDependenciesOfEntity(AbstractContainer<?> container) throws InvalidDependencyException {
         discoverFieldInjectionDependencies(container);
-        discoverProviderMethodDependencies(container);
-        discoverConstructorDependencies(container);
+        var managedEntityConstructor = container.getManagedEntityConstructor();
+
+        if(managedEntityConstructor.getConstructionMethod() == ConstructionMethod.PROVIDER) {
+            discoverExecutableDependencies(container, managedEntityConstructor.getProviderMethod());
+        } else {
+            log.debug("Managed entity '{}' is not constructed with provider method, skipping discovering provider method parameter dependencies...",
+                    container.getName());
+        }
+
+        if(managedEntityConstructor.getConstructionMethod() == ConstructionMethod.PUBLIC_CONSTRUCTOR) {
+            discoverExecutableDependencies(container, managedEntityConstructor.getSelectedConstructor());
+        } else {
+            log.debug("Managed entity '{}' is not constructed with constructor, skipping discovering constructor parameter dependencies...",
+                    container.getName());
+        }
     }
 
     /**
@@ -92,7 +104,7 @@ public class DependencyResolver {
         for(Field injectedField: injectedFields) {
             log.debug("Checking the @Injected annotated field '{}' of managed entity '{}'", injectedField.getName(), container.getName());
             Injected injectedAnnotation = injectedField.getAnnotation(Injected.class);
-            String dependencyName = getDependencyEntityName(injectedField, injectedAnnotation);
+            String dependencyName = IocUtils.getReferencedEntityName(injectedField, injectedAnnotation);
             try {
                 IocValidator.validateInjectedField(injectedField);
                 var dependencyContainer = repository.grabManagedEntityContainer(dependencyName);
@@ -121,35 +133,47 @@ public class DependencyResolver {
     }
 
     /**
-     * Discovers all dependencies that are present in the provider method of the managed entity as parameters.
+     * Discovers all dependencies that are present in the provider method or selected constructor of the managed entity as parameters.
      * Parameters not annotated or ones annotated with {@link Injected} will be discovered and added to the {@code container}.
      * @param container The container.
+     * @param executable The provider method or the constructor.
      * @throws InvalidDependencyException If there is an illegal dependency relation or invalid parameter annotated.
      */
-    private void discoverProviderMethodDependencies(AbstractContainer<?> container) throws InvalidDependencyException {
-        if(container.getManagedEntityConstructor().getConstructionMethod() == ConstructionMethod.PROVIDER) {
-            //TODO: discover parameters of provider methods (the ones not annotated or annotated with @Injected)
-            //TODO: create implicit dependency the provided managed entity depends on the entity the provider is declared in
-            //TODO: because instance of it is needed to call provider.
-        } else {
-            log.debug("Managed entity '{}' is not constructed with provider method, skipping discovering provider method dependencies...",
-                    container.getName());
+    private void discoverExecutableDependencies(AbstractContainer<?> container, Executable executable) throws InvalidDependencyException {
+        for(Parameter parameter: executable.getParameters()) {
+            try {
+                Class<? extends Annotation> annotation = IocValidator.validateProviderOrConstructorParameter(parameter);
+                if(annotation == null || annotation == Injected.class) {
+                    String dependencyName = IocUtils.getReferencedEntityName(parameter);
+                    var dependencyContainer = repository.grabManagedEntityContainer(dependencyName);
+                    log.debug("Executable '{}': the parameter '{}' is referencing '{}' as dependency.",
+                            executable.getName(), parameter.getName(), dependencyName);
+                    //save in the graph
+                    addDependencyRelationToGraph(container.getName(), dependencyName);
+                    //save in dependencies of the container
+                    container.addDependency(
+                            DependencyInformation.builder()
+                                    .dependencyContainer(dependencyContainer)
+                                    .injectionType(executable instanceof Constructor ?
+                                            InjectionType.CONSTRUCTOR_INJECTION : InjectionType.PROVIDER_INJECTION)
+                                    .injectedParameter(parameter)
+                                    .build()
+                    );
+                } else {
+                    log.debug("Executable '{}': the parameter '{}' is not a dependency, ignoring...",
+                            executable.getName(), parameter.getName());
+                }
+            } catch (IllegalArgumentException | NoSuchManagedEntityException e) {
+                throw new InvalidDependencyException(container.getName(), parameter.getName(), e);
+            }
         }
-    }
-
-    /**
-     * Discovers all dependencies that are present in the constructor of the managed entity as parameters.
-     * Parameters not annotated or ones annotated with {@link Injected} will be discovered and added to the {@code container}.
-     * @param container The container.
-     * @throws InvalidDependencyException If there is an illegal dependency relation or invalid parameter annotated, or the constructor
-     * cannot be selected.
-     */
-    private void discoverConstructorDependencies(AbstractContainer<?> container) throws InvalidDependencyException {
-        if(container.getManagedEntityConstructor().getConstructionMethod() == ConstructionMethod.PUBLIC_CONSTRUCTOR) {
-            //TODO: discover parameters of constructor (the ones not annotated or annotated with @Injected)
-        } else {
-            log.debug("Managed entity '{}' is not constructed using constructor, skipping discovering constructor dependencies...",
-                    container.getName());
+        //create implicit dependency: the provided managed entity depends on the entity the provider is declared in
+        //because instance of it is needed to call provider.
+        if(executable instanceof Method) {
+            String declaringManagedEntityName = IocUtils.getReferencedEntityName(executable.getDeclaringClass());
+            addDependencyRelationToGraph(container.getName(), declaringManagedEntityName);
+            log.debug("Registering implicit dependency: '{}' depends on '{}' because the provider method of it " +
+                    "is declared in the managed entity '{}'.", container.getName(), declaringManagedEntityName, declaringManagedEntityName);
         }
     }
 
@@ -157,7 +181,7 @@ public class DependencyResolver {
      * Saves a managed entity (represented by name) to the dependency graph.
      */
     private void addManagedEntityToGraph(String entityName) {
-        boolean dependencyGraphModified = dependencyGraph.addNode(entityName);
+        boolean dependencyGraphModified = dependencyGraph.addVertex(entityName);
         if(dependencyGraphModified) log.debug("Node '{}' was added to the dependency graph.", entityName);
     }
 
@@ -168,19 +192,8 @@ public class DependencyResolver {
      * @param dependencyName Name of dependency.
      */
     private void addDependencyRelationToGraph(String managedEntityName, String dependencyName) {
-        boolean dependencyGraphModified = dependencyGraph.putEdge(dependencyName, managedEntityName);
-        if(dependencyGraphModified) log.debug("Edge '{}' -> '{}' was added to the dependency graph.", dependencyName, managedEntityName);
-    }
-
-    /**
-     * Calculates the name that the {@link Injected} annotation has. This will be by default the type of the
-     * field it was placed on, or if {@link Injected#name()} was specified, then this custom name.
-     * @param field The field the annotation was placed on.
-     * @param injected The annotation.
-     * @return The name of the injected entity.
-     */
-    private String getDependencyEntityName(Field field, Injected injected) {
-        return injected.name().equals(Managed.DEFAULT_MANAGED_NAME) ? field.getType().getName() : injected.name();
+        var newEdge = dependencyGraph.addEdge(dependencyName, managedEntityName);
+        if(newEdge != null) log.debug("Edge '{}' -> '{}' was added to the dependency graph.", dependencyName, managedEntityName);
     }
 
     /**
@@ -192,12 +205,14 @@ public class DependencyResolver {
 
     /**
      * Run checks on completed dependency graph.
-     * @throws InvalidDependencyException If the graph is invalid.
+     * @throws InvalidDependencyException If the graph is invalid. Details in exception message.
      */
     private void checkCompletedDependencyGraph() throws InvalidDependencyException {
-        if(Graphs.hasCycle(dependencyGraph)) {
-            //TODO: return in message the actual cycle. Guava cant do this. Find better graph library
-            throw new InvalidDependencyException("The dependency graph has circular dependencies!");
+        var cycleDetector = new CycleDetector<>(dependencyGraph);
+        Set<String> cycleNodes = cycleDetector.findCycles();
+        if(!cycleNodes.isEmpty()) {
+            throw new InvalidDependencyException(String.format("The dependency graph has circular dependencies! The following managed " +
+                    "entities form one or more cycles: %s. Refactor circular dependencies to fix this.", cycleNodes));
         }
     }
 
@@ -215,7 +230,7 @@ public class DependencyResolver {
             String managedEntityName,
             List<DependencyInformation<?>> dependencies
     ) throws InvalidDependencyException {
-        for(DependencyInformation dependency: dependencies) {
+        for(DependencyInformation<?> dependency: dependencies) {
             try {
                 AbstractContainer<?> dependencyContainer = dependency.getDependencyContainer();
                 Objects.requireNonNull(dependencyContainer);

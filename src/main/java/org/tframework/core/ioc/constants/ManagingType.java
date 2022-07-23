@@ -14,5 +14,10 @@ public enum ManagingType {
      * Manage as many instances as requested. Every time the class is injected or grabbed directly,
      * a new instance is constructed.
      */
-    MULTI_INSTANCE
+    MULTI_INSTANCE,
+
+    /**
+     * Managing type for properties, allowing them to be also injected, just as managed entities.
+     */
+    PROPERTY
 }

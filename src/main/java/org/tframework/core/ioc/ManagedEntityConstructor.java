@@ -2,12 +2,18 @@ package org.tframework.core.ioc;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.ApplicationContext;
 import org.tframework.core.ioc.annotations.Injected;
 import org.tframework.core.ioc.constants.ConstructionMethod;
+import org.tframework.core.ioc.exceptions.InvalidDependencyException;
+import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
+import org.tframework.core.properties.annotations.Property;
+import org.tframework.core.test.annotation.NeedsTesting;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Executable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -170,8 +176,8 @@ public class ManagedEntityConstructor<T> {
             throw new NotConstructibleException(managedEntity);
         }
         try {
-            //TODO pass parameters
-            return selectedConstructor.newInstance();
+            Object[] constructorParameters = getInstancesOfExecutableParameters(selectedConstructor, dependencies);
+            return selectedConstructor.newInstance(constructorParameters);
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
             throw new NotConstructibleException(managedEntity, e);
         }
@@ -190,11 +196,41 @@ public class ManagedEntityConstructor<T> {
             throw new NotConstructibleException(managedEntity);
         }
         try {
-            //TODO: get instance to invoke provider method on.
-            //TODO: pass parameters
-            return (T) providerMethod.invoke(null);
-        } catch (InvocationTargetException | IllegalAccessException e) {
+            Object providerDeclaringInstance = getInstanceOfProviderMethodDeclaringEntity(providerMethod);
+            Object[] providerMethodParameters = getInstancesOfExecutableParameters(providerMethod, dependencies);
+            return (T) providerMethod.invoke(providerDeclaringInstance, providerMethodParameters);
+        } catch (InvocationTargetException | IllegalAccessException | InvalidDependencyException | ClassCastException e) {
             throw new NotConstructibleException(managedEntity, e);
         }
+    }
+
+    /**
+     * Finds an instance of the class that declares the provider method. This is needed, because
+     * the provider method can't be static.
+     * @throws InvalidDependencyException If it was not possible ot return the instance.
+     */
+    @NeedsTesting
+    private Object getInstanceOfProviderMethodDeclaringEntity(Method providerMethod) throws InvalidDependencyException {
+        String declaringEntityName = IocUtils.getReferencedEntityName(providerMethod.getDeclaringClass());
+        try {
+            var declaringEntityContainer = ApplicationContext.getInstance().getTFrameworkIoc()
+                    .getManagedEntitiesRepository().grabManagedEntityContainer(declaringEntityName);
+            return declaringEntityContainer.grabInstance();
+        } catch (NoSuchManagedEntityException e) {
+            throw new InvalidDependencyException(providerMethod.getName(), declaringEntityName, e);
+        }
+    }
+
+    /**
+     * Finds the instances of parameters of a provider method or constructor
+     * @param executable The provider method or constructor.
+     * @param dependencies List of all dependencies. This method must select the ones needed for the parameters.
+     * @return The instances of the parameters, in the order they are expected by the method or constructor.
+     */
+    @NeedsTesting
+    private Object[] getInstancesOfExecutableParameters(Executable executable, List<DependencyInformation<?>> dependencies) {
+        Object[] parameterInstances = new Object[executable.getParameterCount()];
+        //TODO
+        return parameterInstances;
     }
 }

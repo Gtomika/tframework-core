@@ -1,27 +1,36 @@
 package org.tframework.core.ioc;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.reflect.FieldUtils;
 import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.SimpleDirectedGraph;
 import org.tframework.core.ApplicationContext;
+import org.tframework.core.exceptions.TFrameworkRuntimeException;
 import org.tframework.core.ioc.annotations.Injected;
+import org.tframework.core.ioc.annotations.InjectingAnnotations;
 import org.tframework.core.ioc.constants.ConstructionMethod;
 import org.tframework.core.ioc.constants.InjectionType;
 import org.tframework.core.ioc.containers.AbstractContainer;
 import org.tframework.core.ioc.exceptions.InvalidDependencyException;
 import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
+import org.tframework.core.properties.EnvironmentalVariableProperty;
+import org.tframework.core.properties.PropertyContainer;
+import org.tframework.core.properties.PropertyRepository;
+import org.tframework.core.properties.annotations.EnvironmentalVariable;
+import org.tframework.core.properties.annotations.Property;
+import org.tframework.core.properties.exceptions.NoSuchPropertyException;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * Investigates the managed entities and resolves the dependencies between them by creating
- * and injecting instances of managed entities.
+ * Investigates the managed entities and resolves the dependencies between them. Managed entities can depend on:
+ * <ul>
+ *     <li>Other managed entities.</li>
+ *     <li>Properties.</li>
+ * </ul>
  */
 @Slf4j
 public class DependencyResolver {
@@ -37,14 +46,21 @@ public class DependencyResolver {
     /**
      * Managed entity repository, which should already be initialized by the time the dependency resolver is created.
      */
-    private final ManagedEntitiesRepository repository;
+    private final ManagedEntitiesRepository managedEntitiesRepository;
+
+    /**
+     * Property repository from where the {@link org.tframework.core.properties.PropertyContainer}s can be
+     * extracted and saved as dependencies.
+     */
+    private final PropertyRepository propertyRepository;
 
     /**
      * Create a dependency resolver with an empty dependency graph.
      */
     protected DependencyResolver() {
         dependencyGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
-        repository = ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository();
+        managedEntitiesRepository = ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository();
+        propertyRepository = ApplicationContext.getInstance().getPropertyRepository();
     }
 
     /**
@@ -58,7 +74,7 @@ public class DependencyResolver {
      * The cause exception contains the details.
      */
     public void discoverDependencies() throws InvalidDependencyException {
-        for(AbstractContainer<?> container: repository.iterateManagedEntities()) {
+        for(AbstractContainer<?> container: managedEntitiesRepository.iterateManagedEntities()) {
             discoverDependenciesOfEntity(container);
         }
         checkCompletedDependencyGraph();
@@ -95,46 +111,115 @@ public class DependencyResolver {
      * @throws InvalidDependencyException If there is an illegal dependency relation or invalid field annotated.
      */
     private void discoverFieldInjectionDependencies(AbstractContainer<?> container) throws InvalidDependencyException {
-        List<Field> injectedFields = FieldUtils.getFieldsListWithAnnotation(container.getInstanceType(), Injected.class);
-        log.debug("Found {} fields in managed entity '{}' annotated with @Injected", injectedFields.size(), container.getName());
-        if(!injectedFields.isEmpty()) {
-            //this entity has at least some dependencies
-            addManagedEntityToGraph(container.getName());
-        }
-        for(Field injectedField: injectedFields) {
-            log.debug("Checking the @Injected annotated field '{}' of managed entity '{}'", injectedField.getName(), container.getName());
-            Injected injectedAnnotation = injectedField.getAnnotation(Injected.class);
-            String dependencyName = IocUtils.getReferencedEntityName(injectedField, injectedAnnotation);
-            try {
-                IocValidator.validateInjectedField(injectedField);
-                var dependencyContainer = repository.grabManagedEntityContainer(dependencyName);
-                log.debug("This dependency references the following managed entity: '{}'", dependencyName);
-                if(isSelfDependency(container.getName(), dependencyName)) {
-                    throw new InvalidDependencyException(container.getName(), dependencyName, "Cannot depend on itself.");
+        Field[] fields = container.getInstanceType().getDeclaredFields();
+        for(Field field: fields) {
+            log.debug("Checking the field '{}' of managed entity '{}' for injection", field.getName(), container.getName());
+            if(IocUtils.hasAtLeastOneInjectingAnnotation(field)) {
+                try {
+                    var injectingAnnotation = IocValidator.validateInjectedField(field);
+                    if(injectingAnnotation == null) continue;
+                    if(injectingAnnotation == Injected.class) {
+                        discoverFieldInjectedManagedEntity(container, field);
+                    } else if(injectingAnnotation == Property.class) {
+                        discoverFieldInjectedProperty(container, field);
+                    } else if(injectingAnnotation == EnvironmentalVariable.class) {
+                        discoverFieldInjectedEnvironmentalVariable(container, field);
+                    } else {
+                        log.error("Internal error: injecting annotation '{}' is not handled when discovering field dependencies.",
+                                injectingAnnotation.getName());
+                        throw new TFrameworkRuntimeException("Unhandled injecting annotation:" + injectingAnnotation.getName());
+                    }
+                } catch (IllegalArgumentException e) {
+                    log.error("Validation failed for injected field '{}' in managed entity '{}'.", field.getName(), container.getName());
+                    throw new InvalidDependencyException(container.getName(), field.getName(), e);
                 }
-                //save in the graph
-                addDependencyRelationToGraph(container.getName(), dependencyName);
-                //save in dependencies of the container
-                container.addDependency(
-                        DependencyInformation.builder()
-                                .dependencyContainer(dependencyContainer)
-                                .injectionType(InjectionType.FIELD_INJECTION)
-                                .injectedField(injectedField)
-                                .build()
-                );
-            } catch (NoSuchManagedEntityException e) {
-                log.error("This dependency references the managed entity with name '{}', but no such entity exists.", dependencyName);
-                throw new InvalidDependencyException(container.getName(), dependencyName, e);
-            } catch (IllegalArgumentException e) {
-                log.error("Validation failed for injected field '{}' in managed entity '{}'.", injectedField.getName(), container.getName());
-                throw new InvalidDependencyException(container.getName(), dependencyName, e);
+            } else {
+                log.debug("The field '{}' of the managed entity '{}' is not marked for injection, ignoring...",
+                        field.getName(), container.getName());
             }
         }
     }
 
     /**
+     * Register a managed entity dependency (injected to a field) to another managed entity.
+     * @param container The container or the managed entity with the field.
+     * @param injectedField The field where the dependency will be injected. Assumed to be annotated with {@link Injected}.
+     * @throws InvalidDependencyException If this dependency relation is not valid.
+     */
+    private void discoverFieldInjectedManagedEntity(AbstractContainer<?> container, Field injectedField) throws InvalidDependencyException {
+        String dependencyName = IocUtils.getReferencedEntityName(injectedField);
+        try {
+            var dependencyContainer = managedEntitiesRepository.grabManagedEntityContainer(dependencyName);
+            log.debug("This dependency references the following managed entity: '{}'", dependencyName);
+            if(isSelfDependency(container.getName(), dependencyName)) {
+                throw new InvalidDependencyException(container.getName(), dependencyName, "Cannot depend on itself.");
+            }
+            //save in the graph
+            addDependencyRelationToGraph(container.getName(), dependencyName);
+            //save in dependencies of the container
+            container.addDependency(
+                    DependencyInformation.builder()
+                            .dependencyContainer(dependencyContainer)
+                            .injectionType(InjectionType.FIELD_INJECTION)
+                            .injectedField(injectedField)
+                            .build()
+            );
+        } catch (NoSuchManagedEntityException e) {
+            log.error("This dependency references the managed entity with name '{}', but no such entity exists.", dependencyName);
+            throw new InvalidDependencyException(container.getName(), dependencyName, e);
+        } catch (IllegalArgumentException e) {
+            log.error("Invalid dependency in managed entity '{}', field '{}'", container.getName(), injectedField.getName());
+            throw new InvalidDependencyException(container.getName(), dependencyName, e);
+        }
+    }
+
+    /**
+     * Register a property dependency (injected to a field) to a managed entity.
+     * @param container The container or the managed entity with the field.
+     * @param injectedField The field where the property will be injected. Assumed to be annotated with {@link Property}.
+     * @throws InvalidDependencyException If this dependency relation is not valid.
+     */
+    private void discoverFieldInjectedProperty(AbstractContainer<?> container, Field injectedField) throws InvalidDependencyException {
+        String propertyName = injectedField.getAnnotation(Property.class).value();
+        try {
+            var propertyContainer = propertyRepository.grabPropertyContainer(propertyName);
+            log.debug("This dependency references the property '{}'.", propertyName);
+            container.addDependency(
+                    DependencyInformation.builder()
+                            .dependencyContainer(propertyContainer)
+                            .injectionType(InjectionType.FIELD_INJECTION)
+                            .injectedField(injectedField)
+                            .build()
+            );
+        } catch (NoSuchPropertyException e) {
+            log.error("This dependency references the property '{}', but no such property exists.", propertyName);
+            throw new InvalidDependencyException(container.getName(), injectedField.getName(), e);
+        }
+    }
+
+    /**
+     * Register an environmental variable dependency (injected to a field) to a managed entity.
+     * @param container The container or the managed entity with the field.
+     * @param injectedField The field where the variable will be injected. Assumed to be annotated with {@link EnvironmentalVariable}.
+     * @throws InvalidDependencyException If this dependency relation is not valid.
+     */
+    private void discoverFieldInjectedEnvironmentalVariable(AbstractContainer<?> container, Field injectedField) throws InvalidDependencyException {
+        String environmentalVariableName = injectedField.getAnnotation(EnvironmentalVariable.class).value();
+        log.debug("This dependency references the environmental variable '{}'.", environmentalVariableName);
+        EnvironmentalVariableProperty environmentalVariableProperty = new EnvironmentalVariableProperty(environmentalVariableName);
+        var propertyContainer = new PropertyContainer<>(environmentalVariableProperty);
+        container.addDependency(
+                DependencyInformation.<String>builder()
+                        .dependencyContainer(propertyContainer)
+                        .injectionType(InjectionType.FIELD_INJECTION)
+                        .injectedField(injectedField)
+                        .build()
+        );
+    }
+
+    /**
      * Discovers all dependencies that are present in the provider method or selected constructor of the managed entity as parameters.
-     * Parameters not annotated or ones annotated with {@link Injected} will be discovered and added to the {@code container}.
+     * Parameters not annotated or annotated with exactly one "injecting" annotation ({@link InjectingAnnotations#getInjectingAnnotations()}).
      * @param container The container.
      * @param executable The provider method or the constructor.
      * @throws InvalidDependencyException If there is an illegal dependency relation or invalid parameter annotated.
@@ -142,26 +227,17 @@ public class DependencyResolver {
     private void discoverExecutableDependencies(AbstractContainer<?> container, Executable executable) throws InvalidDependencyException {
         for(Parameter parameter: executable.getParameters()) {
             try {
-                Class<? extends Annotation> annotation = IocValidator.validateProviderOrConstructorParameter(parameter);
+                var annotation = IocValidator.validateProviderOrConstructorParameter(parameter);
                 if(annotation == null || annotation == Injected.class) {
-                    String dependencyName = IocUtils.getReferencedEntityName(parameter);
-                    var dependencyContainer = repository.grabManagedEntityContainer(dependencyName);
-                    log.debug("Executable '{}': the parameter '{}' is referencing '{}' as dependency.",
-                            executable.getName(), parameter.getName(), dependencyName);
-                    //save in the graph
-                    addDependencyRelationToGraph(container.getName(), dependencyName);
-                    //save in dependencies of the container
-                    container.addDependency(
-                            DependencyInformation.builder()
-                                    .dependencyContainer(dependencyContainer)
-                                    .injectionType(executable instanceof Constructor ?
-                                            InjectionType.CONSTRUCTOR_INJECTION : InjectionType.PROVIDER_INJECTION)
-                                    .injectedParameter(parameter)
-                                    .build()
-                    );
+                    discoverParameterInjectedManagedEntity(container, parameter, executable);
+                } else if(annotation == Property.class) {
+                    discoverParameterInjectedProperty(container, parameter, executable);
+                } else if(annotation == EnvironmentalVariable.class) {
+                    discoverParameterInjectedEnvironmentalVariable(container, parameter, executable);
                 } else {
-                    log.debug("Executable '{}': the parameter '{}' is not a dependency, ignoring...",
-                            executable.getName(), parameter.getName());
+                    log.error("Internal error: injecting annotation '{}' is not handled when discovering parameter dependencies.",
+                            annotation.getName());
+                    throw new TFrameworkRuntimeException("Unhandled injecting annotation:" + annotation.getName());
                 }
             } catch (IllegalArgumentException | NoSuchManagedEntityException e) {
                 throw new InvalidDependencyException(container.getName(), parameter.getName(), e);
@@ -175,6 +251,91 @@ public class DependencyResolver {
             log.debug("Registering implicit dependency: '{}' depends on '{}' because the provider method of it " +
                     "is declared in the managed entity '{}'.", container.getName(), declaringManagedEntityName, declaringManagedEntityName);
         }
+    }
+
+    /**
+     * Register a managed entity dependency (injected to a parameter) to another managed entity.
+     * @param container The container or the managed entity with the field.
+     * @param parameter The parameter where the dependency will be injected. Assumed to be annotated with {@link Injected}.
+     * @param executable The executable to which the parameter belongs.
+     * @throws InvalidDependencyException If this dependency relation is not valid.
+     */
+    private void discoverParameterInjectedManagedEntity(
+            AbstractContainer<?> container,
+            Parameter parameter,
+            Executable executable
+    ) throws InvalidDependencyException {
+        String dependencyName = IocUtils.getReferencedEntityName(parameter);
+        var dependencyContainer = managedEntitiesRepository.grabManagedEntityContainer(dependencyName);
+        log.debug("Executable '{}': the parameter '{}' is referencing '{}' as dependency.",
+                executable.getName(), parameter.getName(), dependencyName);
+        //save in the graph
+        addDependencyRelationToGraph(container.getName(), dependencyName);
+        //save in dependencies of the container
+        container.addDependency(
+                DependencyInformation.builder()
+                        .dependencyContainer(dependencyContainer)
+                        .injectionType(executable instanceof Constructor ?
+                                InjectionType.CONSTRUCTOR_INJECTION : InjectionType.PROVIDER_INJECTION)
+                        .injectedParameter(parameter)
+                        .build()
+        );
+    }
+
+    /**
+     * Register a property dependency (injected to a parameter) to another managed entity.
+     * @param container The container or the managed entity with the field.
+     * @param parameter The parameter where the dependency will be injected. Assumed to be annotated with {@link Property}.
+     * @param executable The executable to which the parameter belongs.
+     * @throws InvalidDependencyException If this dependency relation is not valid.
+     */
+    private void discoverParameterInjectedProperty(
+            AbstractContainer<?> container,
+            Parameter parameter,
+            Executable executable
+    ) throws InvalidDependencyException {
+        String propertyName = parameter.getAnnotation(Property.class).value();
+        try {
+            var propertyContainer = propertyRepository.grabPropertyContainer(propertyName);
+            log.debug("This dependency references the property '{}'.", propertyName);
+            container.addDependency(
+                    DependencyInformation.builder()
+                            .dependencyContainer(propertyContainer)
+                            .injectionType(executable instanceof Constructor ?
+                                    InjectionType.CONSTRUCTOR_INJECTION : InjectionType.PROVIDER_INJECTION)
+                            .injectedParameter(parameter)
+                            .build()
+            );
+        } catch (NoSuchPropertyException e) {
+            log.error("This dependency references the property '{}', but no such property exists.", propertyName);
+            throw new InvalidDependencyException(container.getName(), parameter.getName(), e);
+        }
+    }
+
+    /**
+     * Register an environmental variable dependency (injected to a parameter) to another managed entity.
+     * @param container The container or the managed entity with the field.
+     * @param parameter The parameter where the dependency will be injected. Assumed to be annotated with {@link EnvironmentalVariable}.
+     * @param executable The executable to which the parameter belongs.
+     * @throws InvalidDependencyException If this dependency relation is not valid.
+     */
+    private void discoverParameterInjectedEnvironmentalVariable(
+            AbstractContainer<?> container,
+            Parameter parameter,
+            Executable executable
+    ) throws InvalidDependencyException {
+        String environmentalVariableName = parameter.getAnnotation(EnvironmentalVariable.class).value();
+        log.debug("This dependency references the environmental variable '{}'.", environmentalVariableName);
+        EnvironmentalVariableProperty environmentalVariableProperty = new EnvironmentalVariableProperty(environmentalVariableName);
+        var propertyContainer = new PropertyContainer<>(environmentalVariableProperty);
+        container.addDependency(
+                DependencyInformation.<String>builder()
+                        .dependencyContainer(propertyContainer)
+                        .injectionType(executable instanceof Constructor ?
+                                InjectionType.CONSTRUCTOR_INJECTION : InjectionType.PROVIDER_INJECTION)
+                        .injectedParameter(parameter)
+                        .build()
+        );
     }
 
     /**
@@ -192,6 +353,12 @@ public class DependencyResolver {
      * @param dependencyName Name of dependency.
      */
     private void addDependencyRelationToGraph(String managedEntityName, String dependencyName) {
+        if(dependencyGraph.containsVertex(managedEntityName)) {
+            addManagedEntityToGraph(managedEntityName);
+        }
+        if(!dependencyGraph.containsVertex(dependencyName)) {
+            addManagedEntityToGraph(dependencyName);
+        }
         var newEdge = dependencyGraph.addEdge(dependencyName, managedEntityName);
         if(newEdge != null) log.debug("Edge '{}' -> '{}' was added to the dependency graph.", dependencyName, managedEntityName);
     }

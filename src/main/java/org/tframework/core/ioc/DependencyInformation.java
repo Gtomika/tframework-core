@@ -10,7 +10,12 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
 
 /**
- * Collects information about a dependency in a managed entity.
+ * Collects information about a dependency in a managed entity. This can be one of the following:
+ * <ul>
+ *     <li>Another managed entity.</li>
+ *     <li>A property.</li>
+ * </ul>
+ * It can be injected in multiple ways, see {@link InjectionType}.
  */
 @Data
 @Builder

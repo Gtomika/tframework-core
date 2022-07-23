@@ -7,6 +7,7 @@ import org.tframework.core.ioc.TFrameworkIoc;
 import org.tframework.core.ioc.annotations.Managed;
 import org.tframework.core.ioc.exceptions.MultipleManagedEntitiesException;
 import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
+import org.tframework.core.properties.PropertyRepository;
 
 /**
  * The singleton application context class, which stores information about the running TFramework
@@ -48,10 +49,17 @@ public class ApplicationContext {
     private final TFrameworkIoc tFrameworkIoc;
 
     /**
+     * Stores all application properties.
+     */
+    @Getter
+    private final PropertyRepository propertyRepository;
+
+    /**
      * Create application context.
      * @param rootClass The class annotated with {@link org.tframework.core.TFrameworkRoot}.
      */
     private ApplicationContext(Class<?> rootClass) {
+        propertyRepository = new PropertyRepository();
         tFrameworkIoc = TFrameworkIoc.createInstance(rootClass);
     }
 

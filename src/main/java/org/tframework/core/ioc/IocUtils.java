@@ -1,8 +1,11 @@
 package org.tframework.core.ioc;
 
 import org.tframework.core.ioc.annotations.Injected;
+import org.tframework.core.ioc.annotations.InjectingAnnotations;
 import org.tframework.core.ioc.annotations.Managed;
+import org.tframework.core.test.annotation.NeedsTesting;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -31,7 +34,7 @@ public class IocUtils {
      * @param parameter The parameter to be checked.
      * @return The name of the dependency entity.
      */
-    //TODO unit test
+    @NeedsTesting
     public static String getReferencedEntityName(Parameter parameter) {
         if(parameter.isAnnotationPresent(Injected.class)) {
             Injected injected = parameter.getAnnotation(Injected.class);
@@ -42,14 +45,19 @@ public class IocUtils {
     }
 
     /**
-     * Calculates the name that the {@link Injected} annotation has. This will be by default the type of the
-     * field it was placed on, or if {@link Injected#name()} was specified, then this custom name.
-     * @param field The field the annotation was placed on.
-     * @param injected The annotation.
-     * @return The name of the injected entity.
+     * Based on the annotation (or the lack of it) on a field, it will return which managed entity
+     * it references as a dependency.
+     * @param field The parameter to be checked.
+     * @return The name of the dependency entity.
      */
-    public static String getReferencedEntityName(Field field, Injected injected) {
-        return injected.name().equals(Managed.DEFAULT_MANAGED_NAME) ? field.getType().getName() : injected.name();
+    @NeedsTesting
+    public static String getReferencedEntityName(Field field) {
+        if(field.isAnnotationPresent(Injected.class)) {
+            Injected injected = field.getAnnotation(Injected.class);
+            return injected.name().equals(Managed.DEFAULT_MANAGED_NAME) ? field.getType().getName() : injected.name();
+        } else {
+            return field.getType().getName();
+        }
     }
 
     /**
@@ -57,7 +65,7 @@ public class IocUtils {
      * @param managedEntityClass Class that has the annotation.
      * @return The name of the managed entity.
      */
-    //TODO unit test
+    @NeedsTesting
     public static String getReferencedEntityName(Class<?> managedEntityClass) {
         if(managedEntityClass.isAnnotationPresent(Managed.class)) {
             Managed managedAnnotation = managedEntityClass.getAnnotation(Managed.class);
@@ -66,5 +74,19 @@ public class IocUtils {
         } else {
             return managedEntityClass.getName();
         }
+    }
+
+    /**
+     * Checks if the element has at least one of the injecting annotations: {@link InjectingAnnotations#getInjectingAnnotations()}.
+     * @param annotatedElement The element to be checked.
+     * @return True if there is at least one of the annotations present.
+     */
+    public static boolean hasAtLeastOneInjectingAnnotation(AnnotatedElement annotatedElement) {
+        for(var injectingAnnotation: InjectingAnnotations.getInjectingAnnotations()) {
+            if(annotatedElement.isAnnotationPresent(injectingAnnotation)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

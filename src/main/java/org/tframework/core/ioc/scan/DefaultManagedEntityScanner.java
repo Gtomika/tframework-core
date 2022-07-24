@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.tframework.core.TFramework;
 import org.tframework.core.TFrameworkRoot;
 import org.tframework.core.ioc.IocValidator;
 import org.tframework.core.ioc.annotations.Managed;
@@ -46,7 +47,8 @@ public class DefaultManagedEntityScanner extends ManagedEntityScanner {
      */
     @Override
     public void scanAndRegisterManagedEntities(Class<?> rootClass) throws IocException {
-        log.info("Scanning for managed entities in package '{}' and subpackages...", rootClass.getPackageName());
+        log.info("Scanning for managed entities in packages '{}' and '{}'...",
+                rootClass.getPackageName(), TFRAMEWORK_PACKAGES_PREFIX);
         //scan the class path for managed entities
         Reflections reflections = new Reflections(
                 new ConfigurationBuilder()
@@ -54,15 +56,15 @@ public class DefaultManagedEntityScanner extends ManagedEntityScanner {
         );
         //these are the CLASSES annotated by @Managed -> does not include provider fields
         var managedEntityClasses = reflections.getTypesAnnotatedWith(Managed.class);
-        log.info("Found {} class entities annotated with @Managed in the subpackages of '{}'",
-                managedEntityClasses.size(), rootClass.getPackageName());
+        log.info("Found {} class entities annotated with @Managed in the packages '{}' and '{}'",
+                managedEntityClasses.size(), rootClass.getPackageName(), TFRAMEWORK_PACKAGES_PREFIX);
         registerManagedEntities(managedEntityClasses);
         //need to find the managed entities defined as provider methods
         //they can only be in managed entities classes
         var providedEntities = reflections.getMethodsAnnotatedWith(Managed.class);
         providedEntities.forEach(pme -> IocValidator.validateProviderMethod(pme, null));
-        log.info("Found {} provided entities annotated with @Managed in the subpackages of '{}'",
-                providedEntities.size(), rootClass.getPackageName());
+        log.info("Found {} provided entities annotated with @Managed in the packages '{}' and '{}'",
+                providedEntities.size(), rootClass.getPackageName(), TFRAMEWORK_PACKAGES_PREFIX);
         registerProvidedEntities(providedEntities);
         //finally, register the ApplicationContext to make it injectable
         registerApplicationContext();

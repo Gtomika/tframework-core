@@ -7,10 +7,20 @@ plugins {
 }
 
 group 'org.tframework'
-version '0.0.1'
+version '0.0.1-SNAPSHOT'
 
 repositories {
 	mavenCentral()
+}
+
+java {
+	withSourcesJar()
+	withJavadocJar()
+}
+
+javadoc {
+	options.encoding = 'UTF-8'
+	options.addStringOption("charset", "UTF-8")
 }
 
 dependencies {

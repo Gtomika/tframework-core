@@ -5,17 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.ApplicationContext;
 import org.tframework.core.ioc.annotations.Injected;
 import org.tframework.core.ioc.constants.ConstructionMethod;
+import org.tframework.core.ioc.constants.InjectionType;
 import org.tframework.core.ioc.exceptions.InvalidDependencyException;
 import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
-import org.tframework.core.properties.annotations.Property;
+import org.tframework.core.properties.exceptions.PropertyException;
 import org.tframework.core.test.annotation.NeedsTesting;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Executable;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -176,6 +174,8 @@ public class ManagedEntityConstructor<T> {
             throw new NotConstructibleException(managedEntity);
         }
         try {
+            log.debug("Attempting to get instances of the parameters for the constructor of the managed entity with class '{}'.",
+                    managedEntity.getName());
             Object[] constructorParameters = getInstancesOfExecutableParameters(selectedConstructor, dependencies);
             return selectedConstructor.newInstance(constructorParameters);
         } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
@@ -196,7 +196,11 @@ public class ManagedEntityConstructor<T> {
             throw new NotConstructibleException(managedEntity);
         }
         try {
+            log.debug("Attempting to get an instance of the managed entity that declares the provider method '{}'",
+                    providerMethod.getName());
             Object providerDeclaringInstance = getInstanceOfProviderMethodDeclaringEntity(providerMethod);
+            log.debug("Attempting to get instances of the parameters for the provider method of the managed entity with class '{}'.",
+                    managedEntity.getName());
             Object[] providerMethodParameters = getInstancesOfExecutableParameters(providerMethod, dependencies);
             return (T) providerMethod.invoke(providerDeclaringInstance, providerMethodParameters);
         } catch (InvocationTargetException | IllegalAccessException | InvalidDependencyException | ClassCastException e) {
@@ -215,8 +219,12 @@ public class ManagedEntityConstructor<T> {
         try {
             var declaringEntityContainer = ApplicationContext.getInstance().getTFrameworkIoc()
                     .getManagedEntitiesRepository().grabManagedEntityContainer(declaringEntityName);
+            log.debug("The provider method '{}' is declared in the managed entity '{}'.",
+                    providerMethod.getName(), declaringEntityContainer.getName());
             return declaringEntityContainer.grabInstance();
         } catch (NoSuchManagedEntityException e) {
+            log.error("Internal error: Failed to get an instance of the managed entity that declares the provider method '{}'.",
+                    providerMethod.getName());
             throw new InvalidDependencyException(providerMethod.getName(), declaringEntityName, e);
         }
     }
@@ -226,11 +234,51 @@ public class ManagedEntityConstructor<T> {
      * @param executable The provider method or constructor.
      * @param dependencies List of all dependencies. This method must select the ones needed for the parameters.
      * @return The instances of the parameters, in the order they are expected by the method or constructor.
+     * @throws NotConstructibleException If the parameters cannot be constructed.
      */
     @NeedsTesting
-    private Object[] getInstancesOfExecutableParameters(Executable executable, List<DependencyInformation<?>> dependencies) {
+    private Object[] getInstancesOfExecutableParameters(
+            Executable executable,
+            List<DependencyInformation<?>> dependencies
+    ) throws NotConstructibleException {
         Object[] parameterInstances = new Object[executable.getParameterCount()];
-        //TODO
+        Parameter[] expectedParameters = executable.getParameters();
+
+        InjectionType injectionType = executable instanceof Constructor ? InjectionType.CONSTRUCTOR_INJECTION :
+                InjectionType.PROVIDER_INJECTION;
+        List<DependencyInformation<?>> parameterDependencies = dependencies.stream()
+                .filter(dependency -> dependency.getInjectionType() == injectionType)
+                .collect(Collectors.toList());
+
+        log.debug("Resolving parameters of executable '{}'. Expected parameter count is '{}', found '{}' dependencies that " +
+                "can be injected using '{}'.", executable.getName(), expectedParameters.length, parameterDependencies.size(), injectionType);
+
+        //all parameters must be accounted for
+        if(parameterInstances.length != parameterDependencies.size()) {
+            log.error("Internal error: mismatch of expected and resolved parameter count, executable '{}'", executable.getName());
+            throw new InvalidDependencyException(String.format("Internal error: the executable '%s' expects '%d' parameters, " +
+                    "but only '%d' have resolved dependencies.", executable.getName(), parameterInstances.length, parameterDependencies.size()));
+        }
+
+        for(int i = 0; i < parameterInstances.length; i++) {
+            try {
+                //check if this is the expected parameter
+                if(!expectedParameters[i].equals(parameterDependencies.get(i).getInjectedParameter())) {
+                    throw NotConstructibleException.customNotConstructibleException(String.format("Executable '%s', parameter " +
+                            "'%s': mismatch between provided and expected parameter.", executable.getName(), expectedParameters[i].getName()));
+                }
+                Object parameterInstance = parameterDependencies.get(i).getDependencyContainer().grabInstance();
+                parameterInstances[i] = parameterInstance;
+                log.debug("Executable '{}', resolved the parameter '{}' using an object of type '{}'",
+                        executable.getName(), expectedParameters[i].getName(), parameterInstance.getClass().getName());
+            } catch (PropertyException e) {
+                var exc = NotConstructibleException.customNotConstructibleException(String.format("Executable '%s', parameter " +
+                        "'%s': no instance for this parameter could be constructed.", executable.getName(), expectedParameters[i].getName()));
+                exc.initCause(e);
+                throw exc;
+            }
+        }
+
         return parameterInstances;
     }
 }

@@ -29,7 +29,6 @@ public final class TFramework {
         Class<?> rootClass = findClassAnnotatedWithTFrameworkRoot();
         log.info("Found root class: '{}'", rootClass.getName());
         ApplicationContext.initApplicationContext(rootClass);
-        log.info("Application context is initialized.");
     }
 
     /** Stops the TFramework application gracefully. */

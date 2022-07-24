@@ -141,17 +141,17 @@ public class IocValidator {
         Annotation[] annotations = annotatedElement.getAnnotations();
         if(annotations.length == 0) return null;
         int count = 0;
-        Class<? extends Annotation> foundAnnotation = null;
+        Annotation foundAnnotation = null;
         for(Annotation annotation: annotations) {
-            if(InjectingAnnotations.getInjectingAnnotations().contains(annotation.getClass())) {
-                foundAnnotation = annotation.getClass();
+            if(IocUtils.classListContainsAnnotation(InjectingAnnotations.getInjectingAnnotations(), annotation)) {
+                foundAnnotation = annotation;
                 count++;
             }
         }
         if(count == 0) { //all the annotations are not important here
             return null;
         } else if(count == 1) {
-            return foundAnnotation;
+            return foundAnnotation.annotationType();
         } else {
             throw new IllegalArgumentException(String.format("Conflicting annotations found on parameter '%s'. Only one of these " +
                     "is allowed: %s", annotatedElementName, InjectingAnnotations.getInjectingAnnotations()));
@@ -175,10 +175,10 @@ public class IocValidator {
         Annotation[] annotations = annotatedElement.getAnnotations();
         if(annotations.length == 0) return null;
         int count = 0;
-        Class<? extends Annotation> foundAnnotation = null;
+        Annotation foundAnnotation = null;
         for(Annotation annotation: annotations) {
-            if(InjectingAnnotations.getInjectingAnnotations().contains(annotation.getClass())) {
-                foundAnnotation = annotation.getClass();
+            if(IocUtils.classListContainsAnnotation(InjectingAnnotations.getInjectingAnnotations(), annotation)) {
+                foundAnnotation = annotation;
                 count++;
             }
         }
@@ -186,7 +186,7 @@ public class IocValidator {
             throw new IllegalArgumentException(String.format("No injecting annotation found on element '%s'. Exactly one of these must " +
                     "be present: %s", annotatedElementName, InjectingAnnotations.getInjectingAnnotations()));
         } else if(count == 1) {
-            return foundAnnotation;
+            return foundAnnotation.annotationType();
         } else {
             throw new IllegalArgumentException(String.format("Conflicting annotations found on element '%s'. Only one of these " +
                     "is allowed: %s", annotatedElementName, InjectingAnnotations.getInjectingAnnotations()));

@@ -69,7 +69,8 @@ public class TestUtils {
     @Test
     public void testInvokePrivateMethodPrimitiveReturnType() {
         TestClass testClass = new TestClass();
-        int result = invokePrivateMethod(testClass, "getTwo");
+        //use wrapper for primitives!
+        Integer result = invokePrivateMethod(testClass, "getTwo");
         assertEquals(2, result);
     }
 }

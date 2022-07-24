@@ -17,17 +17,15 @@ import org.tframework.core.ioc.scan.ManagedEntityScanner;
 public class TFrameworkIoc {
 
     /**
-     * Creates one initialized instance of {@link TFrameworkIoc}.
-     * @param rootClass The class annotated with {@link org.tframework.core.TFrameworkRoot}.
-     * @throws IocException If the IoC could not be initialized. See cause exceptions for details.
-     * @return The initialized instance.
+     * Creates one <b>uninitialized</b> instance of {@link TFrameworkIoc}.
+     * @return The instance.
      */
-    public static TFrameworkIoc createInstance(Class<?> rootClass) throws IocException {
+    public static TFrameworkIoc createInstance() {
         return new TFrameworkIoc(
             findManagedEntityScanner(),
             new ManagedEntitiesRepository(),
             new DependencyResolver()
-        ).initializeIoc(rootClass);
+        );
     }
 
     /**
@@ -68,7 +66,7 @@ public class TFrameworkIoc {
      * @return Itself for chained calls.
      */
     public TFrameworkIoc initializeIoc(Class<?> rootClass) throws IocException {
-        log.info("Initializing TFramework IoC...");
+        log.info("Initializing TFramework IoC with root class '{}'.", rootClass.getName());
         managedEntityScanner.scanAndRegisterManagedEntities(rootClass);
         //discover the dependency relations between managed entities
         dependencyResolver.discoverDependencies();

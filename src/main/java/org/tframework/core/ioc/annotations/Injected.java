@@ -16,7 +16,7 @@ import java.lang.annotation.Target;
  * {@link #name()}.
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.CONSTRUCTOR})
 public @interface Injected {
 
     /**

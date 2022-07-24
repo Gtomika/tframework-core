@@ -5,10 +5,12 @@ import org.tframework.core.ioc.annotations.InjectingAnnotations;
 import org.tframework.core.ioc.annotations.Managed;
 import org.tframework.core.test.annotation.NeedsTesting;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -84,6 +86,22 @@ public class IocUtils {
     public static boolean hasAtLeastOneInjectingAnnotation(AnnotatedElement annotatedElement) {
         for(var injectingAnnotation: InjectingAnnotations.getInjectingAnnotations()) {
             if(annotatedElement.isAnnotationPresent(injectingAnnotation)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Determines if the list of classes contains a given annotation.
+     * @return True if it is contained.
+     */
+    public static boolean classListContainsAnnotation(
+            List<Class<? extends Annotation>> classList,
+            Annotation annotation
+    ) {
+        for(Class<?> clazz: classList) {
+            if(annotation.annotationType().equals(clazz)) {
                 return true;
             }
         }

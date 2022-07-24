@@ -13,12 +13,13 @@ import org.tframework.core.ioc.constants.InjectionType;
 import org.tframework.core.ioc.containers.AbstractContainer;
 import org.tframework.core.ioc.exceptions.InvalidDependencyException;
 import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
+import org.tframework.core.ioc.exceptions.NotConstructibleException;
 import org.tframework.core.properties.EnvironmentalVariableProperty;
 import org.tframework.core.properties.PropertyContainer;
-import org.tframework.core.properties.PropertyRepository;
 import org.tframework.core.properties.annotations.EnvironmentalVariable;
 import org.tframework.core.properties.annotations.Property;
 import org.tframework.core.properties.exceptions.NoSuchPropertyException;
+import org.tframework.core.properties.exceptions.PropertyException;
 
 import java.lang.reflect.*;
 import java.util.List;
@@ -44,23 +45,13 @@ public class DependencyResolver {
     private final SimpleDirectedGraph<String, DefaultEdge> dependencyGraph;
 
     /**
-     * Managed entity repository, which should already be initialized by the time the dependency resolver is created.
-     */
-    private final ManagedEntitiesRepository managedEntitiesRepository;
-
-    /**
-     * Property repository from where the {@link org.tframework.core.properties.PropertyContainer}s can be
-     * extracted and saved as dependencies.
-     */
-    private final PropertyRepository propertyRepository;
-
-    /**
      * Create a dependency resolver with an empty dependency graph.
      */
     protected DependencyResolver() {
         dependencyGraph = new SimpleDirectedGraph<>(DefaultEdge.class);
-        managedEntitiesRepository = ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository();
-        propertyRepository = ApplicationContext.getInstance().getPropertyRepository();
+        //managed entity and property repositories cannot be fields -> application context
+        //is not yet initialized at construction time
+        log.debug("Dependency resolver has been constructed with empty dependency graph.");
     }
 
     /**
@@ -74,6 +65,8 @@ public class DependencyResolver {
      * The cause exception contains the details.
      */
     public void discoverDependencies() throws InvalidDependencyException {
+        var managedEntitiesRepository = ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository();
+        log.info("Starting to discover the dependencies of the managed entities...");
         for(AbstractContainer<?> container: managedEntitiesRepository.iterateManagedEntities()) {
             discoverDependenciesOfEntity(container);
         }
@@ -87,10 +80,13 @@ public class DependencyResolver {
      * @throws InvalidDependencyException If there is an illegal dependency relation.
      */
     private void discoverDependenciesOfEntity(AbstractContainer<?> container) throws InvalidDependencyException {
+        log.debug("Attempting to discover the field injected dependencies of the managed entity '{}'...", container.getName());
+
         discoverFieldInjectionDependencies(container);
         var managedEntityConstructor = container.getManagedEntityConstructor();
 
         if(managedEntityConstructor.getConstructionMethod() == ConstructionMethod.PROVIDER) {
+            log.debug("Attempting to discover the provider method injected dependencies of the managed entity '{}'...", container.getName());
             discoverExecutableDependencies(container, managedEntityConstructor.getProviderMethod());
         } else {
             log.debug("Managed entity '{}' is not constructed with provider method, skipping discovering provider method parameter dependencies...",
@@ -98,6 +94,7 @@ public class DependencyResolver {
         }
 
         if(managedEntityConstructor.getConstructionMethod() == ConstructionMethod.PUBLIC_CONSTRUCTOR) {
+            log.debug("Attempting to discover the constructor injected dependencies of the managed entity '{}'...", container.getName());
             discoverExecutableDependencies(container, managedEntityConstructor.getSelectedConstructor());
         } else {
             log.debug("Managed entity '{}' is not constructed with constructor, skipping discovering constructor parameter dependencies...",
@@ -147,6 +144,7 @@ public class DependencyResolver {
      * @throws InvalidDependencyException If this dependency relation is not valid.
      */
     private void discoverFieldInjectedManagedEntity(AbstractContainer<?> container, Field injectedField) throws InvalidDependencyException {
+        var managedEntitiesRepository = ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository();
         String dependencyName = IocUtils.getReferencedEntityName(injectedField);
         try {
             var dependencyContainer = managedEntitiesRepository.grabManagedEntityContainer(dependencyName);
@@ -180,6 +178,7 @@ public class DependencyResolver {
      * @throws InvalidDependencyException If this dependency relation is not valid.
      */
     private void discoverFieldInjectedProperty(AbstractContainer<?> container, Field injectedField) throws InvalidDependencyException {
+        var propertyRepository = ApplicationContext.getInstance().getPropertyRepository();
         String propertyName = injectedField.getAnnotation(Property.class).value();
         try {
             var propertyContainer = propertyRepository.grabPropertyContainer(propertyName);
@@ -265,6 +264,7 @@ public class DependencyResolver {
             Parameter parameter,
             Executable executable
     ) throws InvalidDependencyException {
+        var managedEntitiesRepository = ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository();
         String dependencyName = IocUtils.getReferencedEntityName(parameter);
         var dependencyContainer = managedEntitiesRepository.grabManagedEntityContainer(dependencyName);
         log.debug("Executable '{}': the parameter '{}' is referencing '{}' as dependency.",
@@ -296,6 +296,7 @@ public class DependencyResolver {
     ) throws InvalidDependencyException {
         String propertyName = parameter.getAnnotation(Property.class).value();
         try {
+            var propertyRepository = ApplicationContext.getInstance().getPropertyRepository();
             var propertyContainer = propertyRepository.grabPropertyContainer(propertyName);
             log.debug("This dependency references the property '{}'.", propertyName);
             container.addDependency(
@@ -353,12 +354,9 @@ public class DependencyResolver {
      * @param dependencyName Name of dependency.
      */
     private void addDependencyRelationToGraph(String managedEntityName, String dependencyName) {
-        if(dependencyGraph.containsVertex(managedEntityName)) {
-            addManagedEntityToGraph(managedEntityName);
-        }
-        if(!dependencyGraph.containsVertex(dependencyName)) {
-            addManagedEntityToGraph(dependencyName);
-        }
+        //vertexes will be only added if not already present
+        addManagedEntityToGraph(managedEntityName);
+        addManagedEntityToGraph(dependencyName);
         var newEdge = dependencyGraph.addEdge(dependencyName, managedEntityName);
         if(newEdge != null) log.debug("Edge '{}' -> '{}' was added to the dependency graph.", dependencyName, managedEntityName);
     }
@@ -384,7 +382,14 @@ public class DependencyResolver {
     }
 
     /**
-     * Utility method to resolve the dependencies of an {@link AbstractContainer} instance. It will
+     * Finds the amount of managed entities in the dependency graph.
+     */
+    public int getDependencyGraphSize() {
+        return dependencyGraph.vertexSet().size();
+    }
+
+    /**
+     * Utility method to resolve the dependencies of a managed entity instance. It will
      * inject all dependencies to the instance.
      * @param instance The instance whose dependencies must be injected.
      * @param managedEntityName Name of the entity to which the instance belongs.
@@ -408,7 +413,9 @@ public class DependencyResolver {
                     injectedField.setAccessible(true);
                     injectedField.set(instance, dependencyContainer.grabInstance());
                 }
-            } catch (IllegalArgumentException | IllegalAccessException e) {
+            } catch (IllegalArgumentException | IllegalAccessException | NotConstructibleException | PropertyException e) {
+                log.error("Managed entity '{}': An exception prevented injecting the dependency '{}'.", managedEntityName,
+                        dependency.getDependencyContainer().getName(), e);
                 throw new InvalidDependencyException(managedEntityName, dependency.getDependencyContainer().getName(), e);
             }
         }

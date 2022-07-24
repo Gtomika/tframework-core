@@ -1,10 +1,10 @@
 /* Licensed under Apache-2.0 2022. */
 package org.tframework.core.ioc;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.File;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.ioc.constants.ManagingType;
@@ -16,93 +16,72 @@ import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
 class ManagedEntitiesRepositoryTest {
 
     private ManagedEntitiesRepository managedEntitiesRepository;
-    private String testString;
+    private TestManagedClass testManagedClass;
 
     @BeforeEach
     public void init() {
         managedEntitiesRepository = new ManagedEntitiesRepository();
-        testString = RandomStringUtils.randomAlphabetic(20);
+        testManagedClass = new TestManagedClass();
 
         var container = createManagedSingletonContainer();
         managedEntitiesRepository.registerManagedEntityContainer(container);
     }
 
     @Test
-    public void testRegisterSingletonDuplicateName() {
+    public void testRegisterDuplicateName() {
         assertThrows(NameNotUniqueException.class, () ->
                 managedEntitiesRepository.registerManagedEntityContainer(createManagedSingletonContainer()));
     }
 
     @Test
-    public void testGrabSingleton() {
-        var receivedContainer = managedEntitiesRepository.grabManagedEntityContainer(String.class);
-        assertEquals(String.class.getName(), receivedContainer.getName());
+    public void testGrab() {
+        var receivedContainer = managedEntitiesRepository.grabManagedEntityContainer(TestManagedClass.class);
+        assertEquals(TestManagedClass.class.getName(), receivedContainer.getName());
         assertEquals(ManagingType.SINGLETON, receivedContainer.getManagingType());
-        assertEquals(testString, receivedContainer.grabInstance());
-        assertEquals(String.class, receivedContainer.getInstanceType());
+        assertEquals(testManagedClass, receivedContainer.grabInstance());
+        assertEquals(TestManagedClass.class, receivedContainer.getInstanceType());
     }
 
     @Test
-    public void testGrabNotExistingSingleton() {
-        assertThrows(NoSuchManagedEntityException.class, () -> managedEntitiesRepository.grabManagedEntityContainer(Integer.class));
+    public void testGrabNotExisting() {
+        assertThrows(NoSuchManagedEntityException.class,
+                () -> managedEntitiesRepository.grabManagedEntityContainer(Integer.class));
     }
 
     @Test
-    public void testGrabSingletonMultipleExists() {
-        var container = new ManagedSingletonContainer<>(
-            "String 2", String.class, testString
-        );
-        managedEntitiesRepository.registerManagedEntityContainer(container);
-
-        assertThrows(MultipleManagedEntitiesException.class, () -> managedEntitiesRepository.grabManagedEntityContainer(String.class));
-    }
-
-    @Test
-    public void testGetManagingTypeByClassSingleton() {
-        ManagingType type = managedEntitiesRepository.getManagingTypeByClass(String.class);
-        assertEquals(ManagingType.SINGLETON, type);
-    }
-
-    @Test
-    public void testGetManagingTypeByClassSingletonNotManagedClass() {
+    public void testGetManagingTypeByClassNotManagedClass() {
         assertThrows(NoSuchManagedEntityException.class,
                 () -> managedEntitiesRepository.getManagingTypeByClass(File.class));
     }
 
     @Test
-    public void testGetManagingTypeByClassSingletonMultipleManaged() {
+    public void testGetManagingTypeByClassMultipleManaged() {
         var container = new ManagedSingletonContainer<>(
-                "String 2", String.class, testString
+                "Test managed 2", TestManagedClass.class, testManagedClass
         );
         managedEntitiesRepository.registerManagedEntityContainer(container);
         assertThrows(MultipleManagedEntitiesException.class,
-                () -> managedEntitiesRepository.getManagingTypeByClass(String.class));
+                () -> managedEntitiesRepository.getManagingTypeByClass(TestManagedClass.class));
     }
 
     @Test
-    public void testGetManagingTypeByNameSingleton() {
-        ManagingType type = managedEntitiesRepository.getManagingTypeByName(String.class.getName());
+    public void testGetManagingTypeByName() {
+        ManagingType type = managedEntitiesRepository.getManagingTypeByName(TestManagedClass.class.getName());
         assertEquals(ManagingType.SINGLETON, type);
-    }
-
-    @Test
-    public void testGetManagingTypeByNameSingletonNoSuchName() {
-        assertThrows(NoSuchManagedEntityException.class,
-                () -> managedEntitiesRepository.getManagingTypeByName("Hello there"));
     }
 
     @Test
     public void testIterateAllEntities() {
         var allContainers = managedEntitiesRepository.iterateManagedEntities();
         for(var container: allContainers) {
-            assertEquals(testString, container.grabInstance().toString());
+            assertEquals(testManagedClass, container.grabInstance());
         }
     }
 
     @Test
     public void testGetManagedEntityByName() {
-        var container = managedEntitiesRepository.grabManagedEntityContainer(String.class.getName());
-        assertEquals(String.class.getName(), container.getName());
+        var container = managedEntitiesRepository.grabManagedEntityContainer(TestManagedClass.class.getName());
+        assertEquals(TestManagedClass.class.getName(), container.getName());
     }
 
     @Test
@@ -111,9 +90,13 @@ class ManagedEntitiesRepositoryTest {
                 () -> managedEntitiesRepository.grabManagedEntityContainer("hello there"));
     }
 
-    private ManagedSingletonContainer<String> createManagedSingletonContainer() {
+    static class TestManagedClass {
+        public TestManagedClass() {}
+    }
+
+    private ManagedSingletonContainer<TestManagedClass> createManagedSingletonContainer() {
         return new ManagedSingletonContainer<>(
-                String.class.getName(), String.class, testString
+                TestManagedClass.class.getName(), TestManagedClass.class, testManagedClass
         );
     }
 

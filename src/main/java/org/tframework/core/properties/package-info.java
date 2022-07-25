@@ -2,7 +2,13 @@
  * Contains the classes for the TFramework property system. To use this system, have
  * the file {@code properties.yaml} in the {@code src/main/resources} folder. This file contains
  * the application properties, both the global ones, and the flavor specified ones.
- * <p><p>
+ *
+ * <h2>Custom location for the properties file</h2>
+ * If you are storing the {@code properties.yaml} file in a custom location, the environmental variable
+ * {@code TFRAMEWORK_CORE_PROPERTIES_LOCATION} can be used to specify a path where the properties file
+ * can be found.
+ *
+ * <h2>Properties file format</h2>
  * This is the expected format of the {@code properties.yaml} file:
  * <pre><code>
  * global:
@@ -21,13 +27,13 @@
  * properties can also be defines and later used at runtime.
  *
  * <h2>Property naming</h2>
- * Custom property names can contain only lowercase english letters and dots, and should be similar to package names,
- * like {@code com.example.my.property=3}.
+ * Custom property names can contain only lowercase english letters, underscores and dots, and should be similar to package names,
+ * like {@code com.example.my_property=3}.
  *
  * <h2>Environmental variables</h2>
  * It is possible to reference environmental variables in the properties file, using the following syntax:
  * <pre><code>
- * my.custom.property = env(MY_CUSTOM_PROPERTY)
+ * my.custom.property = env-var(MY_CUSTOM_PROPERTY)
  * </code></pre>
  *
  * <h2>Using properties at runtime</h2>

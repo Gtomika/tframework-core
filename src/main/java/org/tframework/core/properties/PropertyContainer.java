@@ -6,12 +6,15 @@ import org.tframework.core.ioc.exceptions.NotConstructibleException;
 import org.tframework.core.properties.exceptions.PropertyException;
 
 /**
- * A container that hold a property. It can be used to get value of this property, and to
- * integrate properties into the IoC flow.
+ * A container that hold a property. It exists to integrate properties into the IoC flow and
+ * allow them to be injected.
  * @param <T> The type of the property.
  */
 public class PropertyContainer<T> extends AbstractContainer<T> {
 
+    /**
+     * The property held by this container.
+     */
     private Property<T> property;
 
     /**

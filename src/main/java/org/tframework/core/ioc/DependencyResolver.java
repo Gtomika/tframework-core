@@ -68,7 +68,11 @@ public class DependencyResolver {
         var managedEntitiesRepository = ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository();
         log.info("Starting to discover the dependencies of the managed entities...");
         for(AbstractContainer<?> container: managedEntitiesRepository.iterateManagedEntities()) {
-            discoverDependenciesOfEntity(container);
+            if(!container.isPreConstructed()) {
+                discoverDependenciesOfEntity(container);
+            } else {
+                log.debug("The managed entity '{}' is internal and pre-constructed, ignoring dependency discovery on it...", container.getName());
+            }
         }
         checkCompletedDependencyGraph();
         log.info("Dependency relations between managed entities have been discovered, and are in order.");

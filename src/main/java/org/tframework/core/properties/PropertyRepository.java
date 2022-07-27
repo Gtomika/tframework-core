@@ -2,7 +2,7 @@ package org.tframework.core.properties;
 
 import org.tframework.core.properties.exceptions.NoSuchPropertyException;
 import org.tframework.core.properties.exceptions.PropertyException;
-import org.tframework.core.test.annotation.NeedsTesting;
+import org.tframework.core.annotations.NeedsTesting;
 
 /**
  * Stores the properties of the application. {@link PropertyContainer}s can be extracted from it.

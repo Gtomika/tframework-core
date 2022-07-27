@@ -5,6 +5,7 @@ import org.tframework.core.ApplicationContext;
 import org.tframework.core.flavors.exceptions.FlavorException;
 import org.tframework.core.ioc.annotations.ManagePreConstructedSingleton;
 
+import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,6 +33,7 @@ public class ActiveFlavorManager {
     /**
      * Do not use this method, it exists only to fulfill requirements of {@link ManagePreConstructedSingleton}.
      */
+    @Nonnull
     private static ActiveFlavorManager getInstance() {
         return ApplicationContext.getInstance().getActiveFlavorManager();
     }

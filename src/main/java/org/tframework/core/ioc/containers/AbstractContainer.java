@@ -2,11 +2,13 @@ package org.tframework.core.ioc.containers;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.annotations.TFrameworkInternal;
 import org.tframework.core.ioc.DependencyInformation;
 import org.tframework.core.ioc.ManagedEntityConstructor;
 import org.tframework.core.ioc.constants.ManagingType;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -49,6 +51,13 @@ public abstract class AbstractContainer<T> {
     protected final List<DependencyInformation<?>> dependencyInformationList;
 
     /**
+     * Stores if the container has a pre-constructed instance.
+     */
+    @TFrameworkInternal
+    @Getter
+    private final boolean preConstructed;
+
+    /**
      * The default abstract container constructor.
      * @param managingType {@link ManagingType} of the managed entity.
      * @param name Name of the managed entity.
@@ -78,6 +87,29 @@ public abstract class AbstractContainer<T> {
         this.instanceType = instanceType;
         this.managedEntityConstructor = new ManagedEntityConstructor<T>(instanceType, providerMethod);
         this.dependencyInformationList = new ArrayList<>();
+        this.preConstructed = false;
+    }
+
+    /**
+     * Special constructor allowing to create abstract container where there is no need to use
+     * {@link ManagedEntityConstructor}, because there is already a pre-constructed instance.
+     * @param preConstructed Must always be true, it only exists to differentiate this container from the others.
+     * @throws IllegalArgumentException If {@code preConstructed} is not true.
+     */
+    @TFrameworkInternal
+    public AbstractContainer(
+            ManagingType managingType,
+            String name,
+            Class<T> instanceType,
+            boolean preConstructed
+    ) throws IllegalArgumentException {
+        if(!preConstructed) throw new IllegalArgumentException("'preConstructed' must be true");
+        this.managingType = managingType;
+        this.name = name;
+        this.instanceType = instanceType;
+        this.managedEntityConstructor = null;
+        this.dependencyInformationList = new ArrayList<>();
+        this.preConstructed = true;
     }
 
     /**

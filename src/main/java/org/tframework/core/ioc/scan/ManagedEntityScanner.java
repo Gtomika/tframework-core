@@ -168,4 +168,15 @@ public abstract class ManagedEntityScanner {
                 .registerManagedEntityContainer(container);
         log.debug("Registered the '{}' pre constructed singleton as managed entity.", clazz.getName());
     }
+
+    /**
+     * Checks a class and determines if it is already registered as a provided managed entity.
+     * @param managedEntityClass The class annotated with {@link Managed}.
+     * @param providedEntityNames The names of the detected provided entities.
+     * @return True if this managed entity is provided.
+     */
+    protected boolean isDetectedAsProvidedEntity(Class<?> managedEntityClass, Set<String> providedEntityNames) {
+        String name = IocUtils.getReferencedEntityName(managedEntityClass);
+        return providedEntityNames.contains(name);
+    }
 }

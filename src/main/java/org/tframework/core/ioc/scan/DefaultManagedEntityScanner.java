@@ -2,10 +2,11 @@ package org.tframework.core.ioc.scan;
 
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
+import org.reflections.scanners.Scanners;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
-import org.tframework.core.TFramework;
 import org.tframework.core.TFrameworkRoot;
+import org.tframework.core.ioc.IocUtils;
 import org.tframework.core.ioc.IocValidator;
 import org.tframework.core.ioc.annotations.ManagePreConstructedSingleton;
 import org.tframework.core.ioc.annotations.Managed;
@@ -59,23 +60,34 @@ public class DefaultManagedEntityScanner extends ManagedEntityScanner {
         registerPreConstructedSingletons(preConstructedSingletons);
         log.info("Scanning for managed entities in packages '{}' and '{}'...",
                 rootClass.getPackageName(), TFRAMEWORK_PACKAGES_PREFIX);
+
         //scan the class path for managed entities
         Reflections reflections = new Reflections(
                 new ConfigurationBuilder()
                         .setUrls(getScannedUrls(rootClass))
+                        .setScanners(Scanners.MethodsAnnotated, Scanners.TypesAnnotated)
         );
-        //these are the CLASSES annotated by @Managed -> does not include provider fields
-        var managedEntityClasses = reflections.getTypesAnnotatedWith(Managed.class);
-        log.info("Found {} class entities annotated with @Managed in the packages '{}' and '{}'",
-                managedEntityClasses.size(), rootClass.getPackageName(), TFRAMEWORK_PACKAGES_PREFIX);
-        registerManagedEntities(managedEntityClasses);
+
         //need to find the managed entities defined as provider methods
         //they can only be in managed entities classes
-        var providedEntities = reflections.getMethodsAnnotatedWith(Managed.class);
-        providedEntities.forEach(pme -> IocValidator.validateProviderMethod(pme, null));
+        var providerMethods = reflections.getMethodsAnnotatedWith(Managed.class);
+        providerMethods.forEach(pme -> IocValidator.validateProviderMethod(pme, null));
         log.info("Found {} provided entities annotated with @Managed in the packages '{}' and '{}'",
-                providedEntities.size(), rootClass.getPackageName(), TFRAMEWORK_PACKAGES_PREFIX);
-        registerProvidedEntities(providedEntities);
+                providerMethods.size(), rootClass.getPackageName(), TFRAMEWORK_PACKAGES_PREFIX);
+        registerProvidedEntities(providerMethods);
+
+        var providedEntityNames = providerMethods.stream()
+                .map(IocUtils::getProvidedEntityName)
+                .collect(Collectors.toSet());
+
+        //these are the CLASSES annotated by @Managed -> does not include provided entities, or it would cause duplicate name exception
+        var managedEntityClasses = reflections.getTypesAnnotatedWith(Managed.class)
+                .stream()
+                .filter(managedEntity -> !isDetectedAsProvidedEntity(managedEntity, providedEntityNames))
+                .collect(Collectors.toSet());
+        log.info("Found {} class entities (that are not provided) annotated with @Managed in the packages '{}' and '{}'",
+                managedEntityClasses.size(), rootClass.getPackageName(), TFRAMEWORK_PACKAGES_PREFIX);
+        registerManagedEntities(managedEntityClasses);
     }
 
 }

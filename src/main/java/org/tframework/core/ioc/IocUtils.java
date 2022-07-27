@@ -3,7 +3,7 @@ package org.tframework.core.ioc;
 import org.tframework.core.ioc.annotations.Injected;
 import org.tframework.core.ioc.annotations.InjectingAnnotations;
 import org.tframework.core.ioc.annotations.Managed;
-import org.tframework.core.test.annotation.NeedsTesting;
+import org.tframework.core.annotations.NeedsTesting;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
@@ -38,12 +38,7 @@ public class IocUtils {
      */
     @NeedsTesting
     public static String getReferencedEntityName(Parameter parameter) {
-        if(parameter.isAnnotationPresent(Injected.class)) {
-            Injected injected = parameter.getAnnotation(Injected.class);
-            return injected.name().equals(Managed.DEFAULT_MANAGED_NAME) ? parameter.getType().getName() : injected.name();
-        } else {
-            return parameter.getType().getName();
-        }
+        return getReferencedEntityName(parameter, parameter.getType().getName());
     }
 
     /**
@@ -54,12 +49,7 @@ public class IocUtils {
      */
     @NeedsTesting
     public static String getReferencedEntityName(Field field) {
-        if(field.isAnnotationPresent(Injected.class)) {
-            Injected injected = field.getAnnotation(Injected.class);
-            return injected.name().equals(Managed.DEFAULT_MANAGED_NAME) ? field.getType().getName() : injected.name();
-        } else {
-            return field.getType().getName();
-        }
+        return getReferencedEntityName(field, field.getType().getName());
     }
 
     /**
@@ -69,12 +59,34 @@ public class IocUtils {
      */
     @NeedsTesting
     public static String getReferencedEntityName(Class<?> managedEntityClass) {
-        if(managedEntityClass.isAnnotationPresent(Managed.class)) {
-            Managed managedAnnotation = managedEntityClass.getAnnotation(Managed.class);
+        return getReferencedEntityName(managedEntityClass, managedEntityClass.getName());
+    }
+
+    /**
+     * Based on the annotation (or the lack of it) on a method, it will return which managed entity
+     * it references as provider.
+     * @param method The method to be checked.
+     * @return The name of the provided entity.
+     */
+    @NeedsTesting
+    public static String getProvidedEntityName(Method method) {
+        return getReferencedEntityName(method, method.getReturnType().getName());
+    }
+
+    /**
+     * Determines the managed entity name based on the {@link Managed} annotation's {@link Managed#name()} value.
+     * @param annotatedElement The element with the {@link Managed} annotation.
+     * @param defaultName Fallback value if no specific name was given in {@link Managed#name()}.
+     * @return The referenced entity name.
+     */
+    @NeedsTesting
+    private static String getReferencedEntityName(AnnotatedElement annotatedElement, String defaultName) {
+        if(annotatedElement.isAnnotationPresent(Managed.class)) {
+            Managed managedAnnotation = annotatedElement.getAnnotation(Managed.class);
             return managedAnnotation.name().equals(Managed.DEFAULT_MANAGED_NAME)
-                    ? managedEntityClass.getName() : managedAnnotation.name();
+                    ? defaultName : managedAnnotation.name();
         } else {
-            return managedEntityClass.getName();
+            return defaultName;
         }
     }
 

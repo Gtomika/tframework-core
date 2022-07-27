@@ -10,7 +10,7 @@ import org.tframework.core.ioc.exceptions.InvalidDependencyException;
 import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
 import org.tframework.core.ioc.exceptions.NotConstructibleException;
 import org.tframework.core.properties.exceptions.PropertyException;
-import org.tframework.core.test.annotation.NeedsTesting;
+import org.tframework.core.annotations.NeedsTesting;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.*;

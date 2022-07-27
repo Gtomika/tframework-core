@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ClassUtils;
 import org.tframework.core.ioc.annotations.InjectingAnnotations;
 import org.tframework.core.ioc.annotations.Managed;
-import org.tframework.core.test.annotation.NeedsTesting;
+import org.tframework.core.annotations.NeedsTesting;
 
 import javax.annotation.Nullable;
 import java.lang.annotation.Annotation;

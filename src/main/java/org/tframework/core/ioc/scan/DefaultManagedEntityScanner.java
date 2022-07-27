@@ -7,6 +7,7 @@ import org.reflections.util.ConfigurationBuilder;
 import org.tframework.core.TFramework;
 import org.tframework.core.TFrameworkRoot;
 import org.tframework.core.ioc.IocValidator;
+import org.tframework.core.ioc.annotations.ManagePreConstructedSingleton;
 import org.tframework.core.ioc.annotations.Managed;
 import org.tframework.core.ioc.exceptions.IocException;
 
@@ -47,6 +48,15 @@ public class DefaultManagedEntityScanner extends ManagedEntityScanner {
      */
     @Override
     public void scanAndRegisterManagedEntities(Class<?> rootClass) throws IocException {
+        log.debug("Scanning for pre-constructed internal singletons in package '{}", TFRAMEWORK_PACKAGES_PREFIX);
+        //register pre-constructed singletons, this is internal to TFramework
+        Reflections internalReflections = new Reflections(
+                new ConfigurationBuilder()
+                        .forPackage(TFRAMEWORK_PACKAGES_PREFIX)
+        );
+        var preConstructedSingletons = internalReflections.getTypesAnnotatedWith(ManagePreConstructedSingleton.class);
+        log.debug("Found {} pre-constructed singletons to be registered.", preConstructedSingletons.size());
+        registerPreConstructedSingletons(preConstructedSingletons);
         log.info("Scanning for managed entities in packages '{}' and '{}'...",
                 rootClass.getPackageName(), TFRAMEWORK_PACKAGES_PREFIX);
         //scan the class path for managed entities
@@ -66,8 +76,6 @@ public class DefaultManagedEntityScanner extends ManagedEntityScanner {
         log.info("Found {} provided entities annotated with @Managed in the packages '{}' and '{}'",
                 providedEntities.size(), rootClass.getPackageName(), TFRAMEWORK_PACKAGES_PREFIX);
         registerProvidedEntities(providedEntities);
-        //finally, register the ApplicationContext to make it injectable
-        registerApplicationContext();
     }
 
 }

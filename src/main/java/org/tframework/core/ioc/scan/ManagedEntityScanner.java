@@ -1,10 +1,12 @@
 package org.tframework.core.ioc.scan;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.tframework.core.ApplicationContext;
 import org.tframework.core.ioc.IocUtils;
 import org.tframework.core.ioc.IocValidator;
 import org.tframework.core.ioc.ManagedEntitiesRepository;
+import org.tframework.core.ioc.annotations.ManagePreConstructedSingleton;
 import org.tframework.core.ioc.annotations.Managed;
 import org.tframework.core.ioc.containers.AbstractContainer;
 import org.tframework.core.ioc.containers.ManagedMultiInstanceContainer;
@@ -15,6 +17,7 @@ import org.tframework.core.ioc.exceptions.NotConstructibleException;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.util.Collection;
 import java.util.Set;
@@ -110,18 +113,59 @@ public abstract class ManagedEntityScanner {
     }
 
     /**
-     * Registers the {@link ApplicationContext} class as a manages singleton. This cannot be done
-     * with the {@link Managed} annotation, because the context is initialized and used before the
-     * managed entity scanning takes place.
+     * Registers the pre-constructed singletons annotated with {@link ManagePreConstructedSingleton}.
+     * @param preConstructedInstanceClasses Classes annotated with {@link ManagePreConstructedSingleton}.
+     * @throws IocException If registering of any entities failed.
      */
-    protected void registerApplicationContext() {
-        var contextContainer = new ManagedSingletonContainer<>(
-                ApplicationContext.class.getName(),
-                ApplicationContext.class,
-                ApplicationContext.getInstance()
+    protected void registerPreConstructedSingletons(Set<Class<?>> preConstructedInstanceClasses) throws IocException {
+        for(Class<?> clazz: preConstructedInstanceClasses) {
+            Object instance = obtainPreConstructedInstance(clazz);
+            registerPreConstructedSingleton(instance);
+        }
+    }
+
+    /**
+     * Gets the pre-constructed instance using the {@link ManagePreConstructedSingleton#GET_INSTANCE_METHOD_NAME}
+     * method of the class.
+     * @param preConstructedInstanceClass The annotated class.
+     * @return The instance.
+     * @throws IocException If this class has no method with name {@link ManagePreConstructedSingleton#GET_INSTANCE_METHOD_NAME}
+     * or it returns incorrect type or throws exception.
+     */
+    protected Object obtainPreConstructedInstance(Class<?> preConstructedInstanceClass) throws IocException {
+        Method instanceGetter = MethodUtils.getMatchingMethod(preConstructedInstanceClass,
+                ManagePreConstructedSingleton.GET_INSTANCE_METHOD_NAME);
+        if(instanceGetter == null || !Modifier.isStatic(instanceGetter.getModifiers())) {
+            throw new IocException(String.format("Pre-constructed singleton '%s': no static method found with name '%s', which has " +
+                    "no parameters.", preConstructedInstanceClass.getName(), ManagePreConstructedSingleton.GET_INSTANCE_METHOD_NAME));
+        }
+        log.debug("Pre-constructed singleton '{}': found expected method '{}'.", preConstructedInstanceClass.getName(),
+                ManagePreConstructedSingleton.GET_INSTANCE_METHOD_NAME);
+        try {
+            instanceGetter.setAccessible(true);
+            Object instance = instanceGetter.invoke(null);
+            log.debug("Successfully obtained pre-constructed instance of '{}'", preConstructedInstanceClass.getName());
+            return instance;
+        } catch (Exception e) {
+            throw new IocException(String.format("Pre-constructed singleton '%s': failed to get return value from method '%s'.",
+                    preConstructedInstanceClass.getName(), ManagePreConstructedSingleton.GET_INSTANCE_METHOD_NAME), e);
+        }
+    }
+
+    /**
+     * Registers a pre-constructed singleton annotated with {@link ManagePreConstructedSingleton}.
+     * @param instance The pre-constructed instance.
+     * @throws NameNotUniqueException If there is already a managed entity with name.
+     */
+    protected <T> void registerPreConstructedSingleton(T instance) throws NameNotUniqueException {
+        Class<T> clazz = (Class<T>)instance.getClass();
+        var container = new ManagedSingletonContainer<T>(
+                clazz.getName(),
+                clazz,
+                instance
         );
         ApplicationContext.getInstance().getTFrameworkIoc().getManagedEntitiesRepository()
-                .registerManagedEntityContainer(contextContainer);
-        log.debug("Registered the ApplicationContext as managed singleton.");
+                .registerManagedEntityContainer(container);
+        log.debug("Registered the '{}' pre constructed singleton as managed entity.", clazz.getName());
     }
 }

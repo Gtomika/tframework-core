@@ -4,9 +4,10 @@ package org.tframework.core;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.exceptions.TFrameworkRuntimeException;
+import org.tframework.core.flavors.ActiveFlavorManager;
 import org.tframework.core.ioc.TFrameworkIoc;
 import org.tframework.core.ioc.annotations.Injected;
-import org.tframework.core.ioc.annotations.Managed;
+import org.tframework.core.ioc.annotations.ManagePreConstructedSingleton;
 import org.tframework.core.ioc.exceptions.MultipleManagedEntitiesException;
 import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
 import org.tframework.core.properties.PropertyRepository;
@@ -16,11 +17,9 @@ import javax.annotation.Nonnull;
 /**
  * The singleton application context class, which stores information about the running TFramework
  * application, such as the managed classes.
- * <p>
- * This class will be managed by the framework, as if it was annotated with {@link Managed}. However, it is
- * initialized before the managed classes can be scanner, so cannot be managed by annotation.
  */
 @Slf4j
+@ManagePreConstructedSingleton
 public class ApplicationContext {
 
     /**
@@ -55,10 +54,10 @@ public class ApplicationContext {
     //------------ non-static ---------------------------------------------------------------------
 
     /**
-     * Contains data and operations related to the TFramework IoC.
+     * Stores active flavors.
      */
     @Getter
-    private final TFrameworkIoc tFrameworkIoc;
+    private final ActiveFlavorManager activeFlavorManager;
 
     /**
      * Stores all application properties.
@@ -67,10 +66,17 @@ public class ApplicationContext {
     private final PropertyRepository propertyRepository;
 
     /**
+     * Contains data and operations related to the TFramework IoC.
+     */
+    @Getter
+    private final TFrameworkIoc tFrameworkIoc;
+
+    /**
      * Create application context. It will be created in an initialized state.
      * @param rootClass The class annotated with {@link org.tframework.core.TFrameworkRoot}.
      */
     private ApplicationContext(Class<?> rootClass) {
+        activeFlavorManager = new ActiveFlavorManager();
         propertyRepository = new PropertyRepository();
         tFrameworkIoc = TFrameworkIoc.createInstance();
         log.info("The application context instance have been created with root class '{}'.", rootClass.getName());
@@ -83,6 +89,7 @@ public class ApplicationContext {
      */
     @Injected
     public ApplicationContext() {
+        activeFlavorManager = null;
         tFrameworkIoc = null;
         propertyRepository = null;
     }

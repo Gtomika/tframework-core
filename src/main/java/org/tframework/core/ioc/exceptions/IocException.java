@@ -9,6 +9,10 @@ import org.tframework.core.exceptions.TFrameworkRuntimeException;
  */
 public class IocException extends TFrameworkRuntimeException {
 
+    public IocException(String message) {
+        super(message);
+    }
+
     public IocException(String message, Throwable cause) {
         super(message, cause);
     }

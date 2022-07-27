@@ -4,6 +4,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.ioc.annotations.ManagePreConstructedSingleton;
 import org.tframework.core.ioc.exceptions.IocException;
 import org.tframework.core.ioc.scan.DefaultManagedEntityScanner;
 import org.tframework.core.ioc.scan.ManagedEntityScanner;
@@ -57,21 +58,22 @@ public class TFrameworkIoc {
     /**
      * Initialize the IoC, which includes:
      * <ul>
-     *     <li>Scanning for managed entities.</li>
+     *     <li>
+     *         Scanning for pre-constructed entities to be brought into the IoC
+     *         ({@link ManagePreConstructedSingleton}).
+     *     </li>
+     *     <li>Scanning for {@link org.tframework.core.ioc.annotations.Managed} entities.</li>
      *     <li>Discovering the dependency relations between them.</li>
-     *     <li>Injecting the dependencies.</li>
      * </ul>
      * @param rootClass The class annotated with {@link org.tframework.core.TFrameworkRoot}.
      * @throws IocException If the IoC could not be initialized. See cause exceptions for details.
-     * @return Itself for chained calls.
      */
-    public TFrameworkIoc initializeIoc(Class<?> rootClass) throws IocException {
+    public void initializeIoc(Class<?> rootClass) throws IocException {
         log.info("Initializing TFramework IoC with root class '{}'.", rootClass.getName());
         managedEntityScanner.scanAndRegisterManagedEntities(rootClass);
         //discover the dependency relations between managed entities
         dependencyResolver.discoverDependencies();
         log.info("TFramework IoC initialized!");
-        return this;
     }
 
 }

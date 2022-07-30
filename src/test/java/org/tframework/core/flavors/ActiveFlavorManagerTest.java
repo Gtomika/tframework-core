@@ -3,26 +3,25 @@ package org.tframework.core.flavors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Map;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junitpioneer.jupiter.SetEnvironmentVariable;
 import org.tframework.core.TestUtils;
 
+@SetEnvironmentVariable(key = ActiveFlavorManager.ACTIVE_FLAVOR_VAR_NAME, value = ActiveFlavorManagerTest.TEST_FLAVORS)
 class ActiveFlavorManagerTest {
 
-    private static final String TEST_FLAVORS = "debug,test,core";
+    public static final String TEST_FLAVORS = "debug,test,core";
 
     private ActiveFlavorManager activeFlavorManager;
 
     @BeforeEach
-    public void setUp() throws Exception {
-        TestUtils.setEnv(Map.of(
-                ActiveFlavorManager.ACTIVE_FLAVOR_VAR_NAME, TEST_FLAVORS
-        ));
+    public void setUp() {
         activeFlavorManager = new ActiveFlavorManager();
+        activeFlavorManager.readActiveFlavors();
     }
 
     @Test

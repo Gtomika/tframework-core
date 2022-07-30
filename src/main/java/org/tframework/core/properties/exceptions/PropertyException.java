@@ -11,4 +11,8 @@ public class PropertyException extends TFrameworkRuntimeException {
     public PropertyException(String propertyName, Throwable cause) {
         super(String.format("Error when processing property '%s'.", propertyName), cause);
     }
+
+    public PropertyException(String propertyName, String description, Throwable cause) {
+        super(String.format("Error when processing property '%s'. Details: %s", propertyName, description), cause);
+    }
 }

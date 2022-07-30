@@ -2,6 +2,7 @@ package org.tframework.core.flavors;
 
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.ApplicationContext;
+import org.tframework.core.annotations.TFrameworkInternal;
 import org.tframework.core.flavors.exceptions.FlavorException;
 import org.tframework.core.ioc.annotations.ManagePreConstructedSingleton;
 
@@ -34,6 +35,7 @@ public class ActiveFlavorManager {
      * Do not use this method, it exists only to fulfill requirements of {@link ManagePreConstructedSingleton}.
      */
     @Nonnull
+    @TFrameworkInternal
     private static ActiveFlavorManager getInstance() {
         return ApplicationContext.getInstance().getActiveFlavorManager();
     }
@@ -44,18 +46,18 @@ public class ActiveFlavorManager {
     private final Set<String> activeFlavors;
 
     /**
-     * Create an initial {@link ActiveFlavorManager}. It will read that active flavors.
+     * Create an initial, uninitialized {@link ActiveFlavorManager}.
      */
     public ActiveFlavorManager() {
         activeFlavors = new HashSet<>();
-        readActiveFlavors();
     }
 
     /**
      * On startup, finds the active flavors using the supported ways to set them,
      * such as the {@code TFRAMEWORK_ACTIVE_FLAVOR} environmental variable.
      */
-    private void readActiveFlavors() {
+    @TFrameworkInternal
+    public void readActiveFlavors() {
         activeFlavors.addAll(readActiveFlavorFromEnvironmentalVariable());
         log.info("The following flavors will be active: {}", activeFlavors);
     }

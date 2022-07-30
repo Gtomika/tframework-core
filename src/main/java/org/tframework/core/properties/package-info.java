@@ -22,19 +22,40 @@
  * Flavor specific properties will override the global ones if that flavor is active. If multiple flavors are active,
  * and they specify different values for the same property, this will raise an exception.
  *
- * <h2>Custom and builtin properties</h2>
- * The TFramework has multiple builtin properties that can be used to control some of its behaviour, but custom
- * properties can also be defines and later used at runtime.
- *
  * <h2>Property naming</h2>
  * Custom property names can contain only lowercase english letters, underscores and dots, and should be similar to package names,
- * like {@code com.example.my_property=3}.
+ * like {@code com.example.my_property: 3}.
+ *
+ * <h2>Supported types of properties</h2>
+ * The following types can be used as property values:
+ * <ul>
+ *     <li>String: the value will be interpreted as a string, if no other type matches it. For example {@code my.property: hello}.</li>
+ *     <li>Integer: for example {@code my.property: 3}.</li>
+ *     <li>Boolean: for example {@code my.property: false}.</li>
+ *     <li>Double: for example {@code my.property: 0.25}.</li>
+ *     <li>
+ *         List: for example
+ *         <pre><code>
+ *             my.property:
+ *               - first element
+ *               - second element
+ *         </code></pre>
+ *         Or by the compact YAML notation: {@code my.property: [first element, second element]}.
+ *         Note that all elements <b>will be interpreted as strings</b>! There is no type detection for the elements.
+ *     </li>
+ *     <li>
+ *         Any other conversion can be defined by implementing {@link org.tframework.core.properties.matchers.PropertyMatcher}
+ *         and annotating this class with {@link org.tframework.core.properties.annotations.PropertyMatcherImplementation}.
+ *     </li>
+ * </ul>
  *
  * <h2>Environmental variables</h2>
  * It is possible to reference environmental variables in the properties file, using the following syntax:
  * <pre><code>
- * my.custom.property = env-var(MY_CUSTOM_PROPERTY)
+ * my.custom.property: env-var(MY_CUSTOM_PROPERTY)
  * </code></pre>
+ * The values will be injected before processing. If a non-existent environmental variable is referenced, an exception
+ * will be raised.
  *
  * <h2>Using properties at runtime</h2>
  * //TODO document this

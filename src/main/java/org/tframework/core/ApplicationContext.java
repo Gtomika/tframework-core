@@ -11,6 +11,7 @@ import org.tframework.core.ioc.annotations.ManagePreConstructedSingleton;
 import org.tframework.core.ioc.exceptions.MultipleManagedEntitiesException;
 import org.tframework.core.ioc.exceptions.NoSuchManagedEntityException;
 import org.tframework.core.properties.PropertyRepository;
+import org.tframework.core.properties.PropertyScanner;
 
 import javax.annotation.Nonnull;
 
@@ -78,20 +79,9 @@ public class ApplicationContext {
     private ApplicationContext(Class<?> rootClass) {
         activeFlavorManager = new ActiveFlavorManager();
         propertyRepository = new PropertyRepository();
+        //create but do not yet initialize the IoC
         tFrameworkIoc = TFrameworkIoc.createInstance();
         log.info("The application context instance have been created with root class '{}'.", rootClass.getName());
-    }
-
-    /**
-     * Do not use this constructor. This only exists to "fool" the IoC into believing that there
-     * is a way to construct {@link ApplicationContext}. In reality, {@link ApplicationContext} is a
-     * special case which is pre-constructed.
-     */
-    @Injected
-    public ApplicationContext() {
-        activeFlavorManager = null;
-        tFrameworkIoc = null;
-        propertyRepository = null;
     }
 
     /**
@@ -99,13 +89,36 @@ public class ApplicationContext {
      * @param rootClass The class annotated with {@link org.tframework.core.TFrameworkRoot}.
      */
     private void initialize(Class<?> rootClass) {
-        //TODO initialize property repository
+        //flavors must be read first
+        activeFlavorManager.readActiveFlavors();
+        //then properties
+        PropertyScanner propertyScanner = new PropertyScanner(activeFlavorManager, propertyRepository);
+        propertyScanner.readProperties();
+        //only then the IoC
         tFrameworkIoc.initializeIoc(rootClass);
         log.info("The application context instance have been initialized with root class '{}'.", rootClass.getName());
     }
 
+    /**
+     * Gets a managed entity by type.
+     * @param managedEntityType The class of the managed entity.
+     * @return Instance of the entity.
+     * @throws NoSuchManagedEntityException If there is no managed entity with the specified type.
+     * @throws MultipleManagedEntitiesException If there are multiple entities with the specified type.
+     */
     public <T> T grab(Class<T> managedEntityType) throws NoSuchManagedEntityException, MultipleManagedEntitiesException {
         return tFrameworkIoc.getManagedEntitiesRepository()
                 .grabManagedEntityContainer(managedEntityType).grabInstance();
+    }
+
+    /**
+     * Gets a managed entity by name.
+     * @param managedEntityName The name of the managed entity.
+     * @return Instance of the entity.
+     * @throws NoSuchManagedEntityException If there is no managed entity with the specified name.
+     */
+    public <T> T grab(String managedEntityName) throws NoSuchManagedEntityException {
+        return (T)tFrameworkIoc.getManagedEntitiesRepository()
+                .grabManagedEntityContainer(managedEntityName).grabInstance();
     }
 }

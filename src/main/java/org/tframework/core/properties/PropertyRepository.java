@@ -1,11 +1,11 @@
 package org.tframework.core.properties;
 
-import org.tframework.core.properties.exceptions.NoSuchPropertyException;
-import org.tframework.core.properties.exceptions.PropertyException;
 import org.tframework.core.annotations.NeedsTesting;
+import org.tframework.core.properties.exceptions.NoSuchPropertyException;
+import org.tframework.core.properties.exceptions.PropertyRedefinitionException;
 
 /**
- * Stores the properties of the application. {@link PropertyContainer}s can be extracted from it.
+ * Stores the properties of the application. {@link Property}-s can be extracted from it.
  */
 @NeedsTesting
 public class PropertyRepository {
@@ -18,11 +18,11 @@ public class PropertyRepository {
         //TODO: initialize fields
     }
 
-    public <T> void registerPropertyContainer(PropertyContainer<T> propertyContainer) throws PropertyException {
+    public <T> void registerProperty(Property<T> property) throws PropertyRedefinitionException {
         //TODO
     }
 
-    public <T> PropertyContainer<T> grabPropertyContainer(String name) throws NoSuchPropertyException {
+    public <T> Property<T> grabProperty(String name) throws NoSuchPropertyException {
         //TODO
         return null;
     }

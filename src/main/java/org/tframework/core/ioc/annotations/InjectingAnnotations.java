@@ -3,8 +3,8 @@ package org.tframework.core.ioc.annotations;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.tframework.core.properties.annotations.EnvironmentalVariable;
-import org.tframework.core.properties.annotations.Property;
+import org.tframework.core.properties.annotations.InjectEnvironmentalVariable;
+import org.tframework.core.properties.annotations.InjectProperty;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
@@ -17,6 +17,6 @@ public class InjectingAnnotations {
      */
     @Getter
     public static final List<Class<? extends Annotation>> injectingAnnotations =
-            List.of(Injected.class, Property.class, EnvironmentalVariable.class);
+            List.of(Injected.class, InjectProperty.class, InjectEnvironmentalVariable.class);
 
 }

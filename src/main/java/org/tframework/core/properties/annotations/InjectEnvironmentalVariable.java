@@ -11,7 +11,7 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.FIELD, ElementType.PARAMETER})
-public @interface EnvironmentalVariable {
+public @interface InjectEnvironmentalVariable {
 
     /**
      * The name of the environmental variable to be injected.

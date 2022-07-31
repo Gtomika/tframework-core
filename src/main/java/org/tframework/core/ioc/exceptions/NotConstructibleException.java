@@ -33,4 +33,17 @@ public class NotConstructibleException extends TFrameworkRuntimeException {
     public static NotConstructibleException customNotConstructibleException(String customMessage) {
         return new NotConstructibleException(customMessage, 0);
     }
+
+    private NotConstructibleException(String customMessage, Throwable cause, int placeholder) {
+        super(customMessage, cause);
+    }
+
+    /**
+     * Can be used when no other constructor describes the reason of the exception.
+     * @param customMessage Reason for the exception.
+     * @param cause Causing exception.
+     */
+    public static NotConstructibleException customNotConstructibleException(String customMessage, Throwable cause) {
+        return new NotConstructibleException(customMessage, cause, 0);
+    }
 }

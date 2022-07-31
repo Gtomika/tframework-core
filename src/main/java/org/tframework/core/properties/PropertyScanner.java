@@ -11,10 +11,12 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 import org.tframework.core.flavors.ActiveFlavorManager;
 import org.tframework.core.properties.annotations.PropertyMatcherImplementation;
+import org.tframework.core.properties.containers.PropertyContainer;
 import org.tframework.core.properties.exceptions.PropertyException;
 import org.tframework.core.properties.exceptions.PropertyFileNotFoundException;
 import org.tframework.core.properties.exceptions.PropertyMatcherException;
 import org.tframework.core.properties.matchers.PropertyMatcher;
+import org.tframework.core.properties.matchers.StringMatcher;
 import org.tframework.core.properties.model.FullPropertiesData;
 
 import java.net.MalformedURLException;
@@ -135,6 +137,8 @@ public class PropertyScanner {
             for(Class<?> matcherClass: propertyMatcherClasses) {
                 matchers.add((PropertyMatcher<?>)ConstructorUtils.invokeConstructor(matcherClass));
             }
+            //the default matcher that matches everything must be at the end
+            matchers.add(ConstructorUtils.invokeConstructor(StringMatcher.class));
             log.debug("Constructed instances for {} property matchers.", matchers.size());
             return matchers;
         } catch (Exception e) {
@@ -165,9 +169,7 @@ public class PropertyScanner {
                 log.debug("The property '{}' is a single value, attempting to use matchers to determine its type.", propertyName);
                 property = createProperty(propertyName, (String) rawValue, propertyMatchers);
             }
-            propertyRepository.registerPropertyContainer(
-                    new PropertyContainer<>(property)
-            );
+            propertyRepository.registerProperty(property);
         }
     }
 

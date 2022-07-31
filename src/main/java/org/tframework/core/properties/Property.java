@@ -3,31 +3,35 @@ package org.tframework.core.properties;
 import lombok.Getter;
 
 /**
- * Core class of the property system, holds one property.
- * @param <T> The property's type.
+ * Holds a property name and value pair.
+ * @param <T> The type of the property.
  */
 public class Property<T> {
 
     /**
-     * Name of the property, as declared in the {@code properties.yaml} file.
-     * Must be unique between all properties.
+     * The property name.
      */
     @Getter
-    protected final String name;
+    private final String name;
 
     /**
-     * Value of the property.
+     * The property value
      */
     @Getter
-    protected final T value;
+    private final T value;
 
     /**
-     * Construct a property.
-     * @param name Property name, must be unique between all properties.
-     * @param value The value of the property.
+     * Type of the property.
+     */
+    @Getter
+    private final Class<T> propertyType;
+
+    /**
+     * Create property. The type will be determined automatically.
      */
     public Property(String name, T value) {
         this.name = name;
         this.value = value;
+        this.propertyType = (Class<T>) value.getClass();
     }
 }

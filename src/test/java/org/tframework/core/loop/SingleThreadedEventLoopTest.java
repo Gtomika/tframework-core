@@ -13,6 +13,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 @Slf4j
 class SingleThreadedEventLoopTest {
 
+    private static final int WAIT_TIME_MS = 50;
+
     private SingleThreadedEventLoop loop;
     private Dispatcher dispatcher;
 
@@ -36,7 +38,7 @@ class SingleThreadedEventLoopTest {
         loop.submit(event);
 
         loop.stop(false);
-        Thread.sleep(10);
+        Thread.sleep(WAIT_TIME_MS);
 
         assertEquals(1, loop.getProcessedEventsAmount().get());
     }
@@ -49,16 +51,17 @@ class SingleThreadedEventLoopTest {
         loop.submit(event);
 
         loop.stop(false);
-        Thread.sleep(10);
+        Thread.sleep(WAIT_TIME_MS);
 
         assertEquals(1, loop.getProcessedEventsAmount().get());
     }
 
     @Test
-    public void singleThreadedLoop_shouldNotAllowRestart() {
+    public void singleThreadedLoop_shouldNotAllowRestart() throws InterruptedException {
         loop.start();
 
         loop.stop(true);
+        Thread.sleep(WAIT_TIME_MS);
 
         assertThrows(IllegalStateException.class, loop::start);
         assertEquals(0, loop.getProcessedEventsAmount().get());
@@ -66,10 +69,11 @@ class SingleThreadedEventLoopTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    public void singleThreadedLoop_shouldNotAllowSubscriptionsAndEvents_inIllegalState(boolean startStop) {
+    public void singleThreadedLoop_shouldNotAllowSubscriptionsAndEvents_inIllegalState(boolean startStop) throws InterruptedException {
         if(startStop) {
             loop.start();
             loop.stop(true);
+            Thread.sleep(WAIT_TIME_MS);
         }
 
         Subscription subscription = new Subscription("test-subscription", "test-event", event -> {});

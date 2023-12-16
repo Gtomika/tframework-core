@@ -25,7 +25,7 @@ class SingleThreadedEventLoopTest {
     }
 
     @Test
-    public void singleThreadedLoop_shouldSubscribe_andDispatchEvent() throws Exception {
+    public void shouldSubscribe_andDispatchEvent() throws Exception {
         String testEventName = "test-event";
         loop.start();
 
@@ -44,7 +44,7 @@ class SingleThreadedEventLoopTest {
     }
 
     @Test
-    public void singleThreadedLoop_shouldNotDispatchEvent_whenNoSubscriptions() throws Exception {
+    public void shouldNotDispatchEvent_whenNoSubscriptions() throws Exception {
         loop.start();
 
         Event event = Event.create("test-event");
@@ -57,7 +57,7 @@ class SingleThreadedEventLoopTest {
     }
 
     @Test
-    public void singleThreadedLoop_shouldNotAllowRestart() throws InterruptedException {
+    public void shouldNotAllowRestart() throws InterruptedException {
         loop.start();
 
         loop.stop(true);
@@ -69,7 +69,7 @@ class SingleThreadedEventLoopTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    public void singleThreadedLoop_shouldNotAllowSubscriptionsAndEvents_inIllegalState(boolean startStop) throws InterruptedException {
+    public void shouldNotAllowSubscriptionsAndEvents_inIllegalState(boolean startStop) throws InterruptedException {
         if(startStop) {
             loop.start();
             loop.stop(true);

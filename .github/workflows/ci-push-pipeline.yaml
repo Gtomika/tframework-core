@@ -1,0 +1,56 @@
+name: Push CI pipeline
+run-name: CI on branch ${{ github.ref_name }} triggered by @${{ github.actor }}
+on:
+  # manual trigger
+  workflow_dispatch:
+  # push is also triggered when PR is merged
+  push:
+#    paths:
+#      - 'src/**'
+#      - '**.gradle'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: corretto
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Build with gradle
+        run: ./gradlew build
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: corretto
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Run unit tests with gradle
+        run: ./gradlew test
+
+  spotless-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: corretto
+          java-version: 21
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Spotless check with gradle
+        run: ./gradlew spotlessCheck

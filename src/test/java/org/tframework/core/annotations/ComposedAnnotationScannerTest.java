@@ -21,7 +21,7 @@ class ComposedAnnotationScannerTest {
            scanner.scan(Retention.class);
         });
         assertEquals(
-                "Composed annotation scanning is not supported for annotation '%s'".formatted(Retention.class.getName()),
+                actualException.getMessageTemplate().formatted(Retention.class.getName()),
                 actualException.getMessage()
         );
     }
@@ -34,7 +34,7 @@ class ComposedAnnotationScannerTest {
             scanner.scanOne(Retention.class);
         });
         assertEquals(
-                "Composed annotation scanning is not supported for annotation '%s'".formatted(Retention.class.getName()),
+                actualException.getMessageTemplate().formatted(Retention.class.getName()),
                 actualException.getMessage()
         );
     }
@@ -47,7 +47,7 @@ class ComposedAnnotationScannerTest {
             scanner.scanOneStrict(Retention.class);
         });
         assertEquals(
-                "Composed annotation scanning is not supported for annotation '%s'".formatted(Retention.class.getName()),
+                actualException.getMessageTemplate().formatted(Retention.class.getName()),
                 actualException.getMessage()
         );
     }
@@ -129,7 +129,7 @@ class ComposedAnnotationScannerTest {
 
         var repeatedAnnotationContainer = DirectlyPresentRepeated.class.getAnnotation(RepeatedTestAnnotationA.class);
         assertEquals(
-                "At most 1 annotation was allowed, but found %d: %s".formatted(2, Arrays.asList(repeatedAnnotationContainer.value())),
+                exception.getMessageTemplate().formatted(2, Arrays.asList(repeatedAnnotationContainer.value())),
                 exception.getMessage()
         );
     }
@@ -205,7 +205,7 @@ class ComposedAnnotationScannerTest {
 
         List<TestAnnotationA> composedAnnotationsExpectedInMessage = scanner.scan(TestAnnotationA.class);
         assertEquals(
-                "At most 1 annotation was allowed, but found %d: %s".formatted(2, composedAnnotationsExpectedInMessage),
+                exception.getMessageTemplate().formatted(2, composedAnnotationsExpectedInMessage),
                 exception.getMessage()
         );
     }

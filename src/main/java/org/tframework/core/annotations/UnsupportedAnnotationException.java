@@ -11,7 +11,14 @@ import java.lang.annotation.Annotation;
  */
 public class UnsupportedAnnotationException extends TFrameworkException {
 
+    public static final String TEMPLATE = "Composed annotation scanning is not supported for annotation '%s'";
+
     public UnsupportedAnnotationException(Class<? extends Annotation> annotationClass) {
-        super("Composed annotation scanning is not supported for annotation '%s'".formatted(annotationClass.getName()));
+        super(TEMPLATE.formatted(annotationClass.getName()));
+    }
+
+    @Override
+    public String getMessageTemplate() {
+        return TEMPLATE;
     }
 }

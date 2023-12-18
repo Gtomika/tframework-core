@@ -11,10 +11,15 @@ import java.util.List;
  */
 public class MultipleAnnotationsScannedException extends TFrameworkException {
 
+    public static final String TEMPLATE = "At most 1 annotation was allowed, but found %d: %s";
+
     public MultipleAnnotationsScannedException(List<? extends Annotation> scannedAnnotations) {
-        super("At most 1 annotation was allowed, but found %d: %s".formatted(
-                scannedAnnotations.size(), scannedAnnotations
-        ));
+        super(TEMPLATE.formatted(scannedAnnotations.size(), scannedAnnotations));
+    }
+
+    @Override
+    public String getMessageTemplate() {
+        return TEMPLATE;
     }
 
 }

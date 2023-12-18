@@ -1,9 +1,9 @@
+/* Licensed under Apache-2.0 2023. */
 package org.tframework.core.annotations;
-
-import org.tframework.core.exceptions.TFrameworkException;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
+import org.tframework.core.exceptions.TFrameworkException;
 
 /**
  * This exception is thrown when {@link ComposedAnnotationScanner} finds more than one

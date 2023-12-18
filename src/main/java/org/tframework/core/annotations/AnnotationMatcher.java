@@ -1,12 +1,12 @@
+/* Licensed under Apache-2.0 2023. */
 package org.tframework.core.annotations;
-
-import lombok.extern.slf4j.Slf4j;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Repeatable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * The annotation matcher implements a sort of 'extended equality' check between annotations, called annotation matching.

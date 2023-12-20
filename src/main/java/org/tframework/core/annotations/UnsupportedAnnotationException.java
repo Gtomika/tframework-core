@@ -2,7 +2,7 @@
 package org.tframework.core.annotations;
 
 import java.lang.annotation.Annotation;
-import org.tframework.core.exceptions.TFrameworkException;
+import org.tframework.core.TFrameworkException;
 
 /**
  * This exception is thrown when the composed annotation scanning encounters
@@ -11,7 +11,7 @@ import org.tframework.core.exceptions.TFrameworkException;
  */
 public class UnsupportedAnnotationException extends TFrameworkException {
 
-    public static final String TEMPLATE = "Composed annotation scanning is not supported for annotation '%s'";
+    private static final String TEMPLATE = "Composed annotation scanning is not supported for annotation '%s'";
 
     public UnsupportedAnnotationException(Class<? extends Annotation> annotationClass) {
         super(TEMPLATE.formatted(annotationClass.getName()));

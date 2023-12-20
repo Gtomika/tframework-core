@@ -13,12 +13,17 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class ComposedAnnotationScannerTest {
 
+    /*
+    This may not be the best approach, but instead of using a mock annotation matcher, I decided to
+    use a concrete implementation, to reduce mocking noise in these tests.
+     */
+    private final ExtendedAnnotationMatcher extendedAnnotationMatcher = new ExtendedAnnotationMatcher();
+    private final ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(extendedAnnotationMatcher);
+
     @Test
     public void scan_shouldThrowUnsupportedAnnotationException_whenAnnotationToFindIsInUnsupportedPackage() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(ComposedAnnotationScannerTest.class);
-
         UnsupportedAnnotationException actualException = assertThrows(UnsupportedAnnotationException.class, () -> {
-           scanner.scan(Retention.class);
+           scanner.scan(ComposedAnnotationScannerTest.class, Retention.class);
         });
         assertEquals(
                 actualException.getMessageTemplate().formatted(Retention.class.getName()),
@@ -28,10 +33,8 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scanOne_shouldThrowUnsupportedAnnotationException_whenAnnotationToFindIsInUnsupportedPackage() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(ComposedAnnotationScannerTest.class);
-
         UnsupportedAnnotationException actualException = assertThrows(UnsupportedAnnotationException.class, () -> {
-            scanner.scanOne(Retention.class);
+            scanner.scanOne(ComposedAnnotationScannerTest.class, Retention.class);
         });
         assertEquals(
                 actualException.getMessageTemplate().formatted(Retention.class.getName()),
@@ -41,10 +44,8 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scanOneStrict_shouldThrowUnsupportedAnnotationException_whenAnnotationToFindIsInUnsupportedPackage() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(ComposedAnnotationScannerTest.class);
-
         UnsupportedAnnotationException actualException = assertThrows(UnsupportedAnnotationException.class, () -> {
-            scanner.scanOneStrict(Retention.class);
+            scanner.scanOneStrict(ComposedAnnotationScannerTest.class, Retention.class);
         });
         assertEquals(
                 actualException.getMessageTemplate().formatted(Retention.class.getName()),
@@ -57,9 +58,7 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scan_shouldFindDirectlyPresentAnnotation() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(DirectlyPresent.class);
-
-        List<TestAnnotationA> composedAnnotations = scanner.scan(TestAnnotationA.class);
+        List<TestAnnotationA> composedAnnotations = scanner.scan(DirectlyPresent.class, TestAnnotationA.class);
 
         assertEquals(1, composedAnnotations.size());
         assertEquals("A on DirectlyPresent", composedAnnotations.getFirst().value());
@@ -67,9 +66,7 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scanOne_shouldFindDirectlyPresentAnnotation() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(DirectlyPresent.class);
-
-        Optional<TestAnnotationA> composedAnnotation = scanner.scanOne(TestAnnotationA.class);
+        Optional<TestAnnotationA> composedAnnotation = scanner.scanOne(DirectlyPresent.class, TestAnnotationA.class);
 
         assertTrue(composedAnnotation.isPresent());
         assertEquals("A on DirectlyPresent", composedAnnotation.get().value());
@@ -77,9 +74,7 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scanOneStrict_shouldFindDirectlyPresentAnnotation() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(DirectlyPresent.class);
-
-        Optional<TestAnnotationA> composedAnnotation = scanner.scanOneStrict(TestAnnotationA.class);
+        Optional<TestAnnotationA> composedAnnotation = scanner.scanOneStrict(DirectlyPresent.class, TestAnnotationA.class);
 
         assertTrue(composedAnnotation.isPresent());
         assertEquals("A on DirectlyPresent", composedAnnotation.get().value());
@@ -98,9 +93,7 @@ class ComposedAnnotationScannerTest {
     @ParameterizedTest
     @ValueSource(classes = {DirectlyPresentRepeated.class, DirectlyPresentRepeatedContaining.class})
     public void scan_shouldFindMultipleDirectlyPresentAnnotations(Class<?> testClass) {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(testClass);
-
-        List<TestAnnotationA> composedAnnotations = scanner.scan(TestAnnotationA.class);
+        List<TestAnnotationA> composedAnnotations = scanner.scan(testClass, TestAnnotationA.class);
 
         assertEquals(2, composedAnnotations.size());
         assertTrue(composedAnnotations.stream().anyMatch(a -> a.value().equals("A on DirectlyPresentRepeated #1")));
@@ -110,9 +103,7 @@ class ComposedAnnotationScannerTest {
     @ParameterizedTest
     @ValueSource(classes = {DirectlyPresentRepeated.class, DirectlyPresentRepeatedContaining.class})
     public void scanOne_shouldFindMultipleDirectlyPresentAnnotations(Class<?> testClass) {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(testClass);
-
-        Optional<TestAnnotationA> composedAnnotation = scanner.scanOne(TestAnnotationA.class);
+        Optional<TestAnnotationA> composedAnnotation = scanner.scanOne(testClass, TestAnnotationA.class);
 
         assertTrue(composedAnnotation.isPresent());
         //no guarantee which one is found first, so that is not checked
@@ -121,10 +112,8 @@ class ComposedAnnotationScannerTest {
     @ParameterizedTest
     @ValueSource(classes = {DirectlyPresentRepeated.class, DirectlyPresentRepeatedContaining.class})
     public void scanOneStrict_shouldThrowException_ifFoundMultipleDirectlyPresentAnnotations(Class<?> testClass) {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(testClass);
-
         MultipleAnnotationsScannedException exception = assertThrows(MultipleAnnotationsScannedException.class, () -> {
-            scanner.scanOneStrict(TestAnnotationA.class);
+            scanner.scanOneStrict(testClass, TestAnnotationA.class);
         });
 
         var repeatedAnnotationContainer = DirectlyPresentRepeated.class.getAnnotation(RepeatedTestAnnotationA.class);
@@ -140,9 +129,7 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scan_shouldFindComposedAnnotation_whenComposedOneLayer() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(ComposedPresentOneLayer.class);
-
-        List<TestAnnotationA> composedAnnotations = scanner.scan(TestAnnotationA.class);
+        List<TestAnnotationA> composedAnnotations = scanner.scan(ComposedPresentOneLayer.class, TestAnnotationA.class);
 
         assertEquals(1, composedAnnotations.size());
         assertEquals("A on B", composedAnnotations.getFirst().value());
@@ -150,9 +137,7 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scanOne_shouldFindComposedAnnotation_whenComposedOneLayer() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(ComposedPresentOneLayer.class);
-
-        Optional<TestAnnotationA> composedAnnotation = scanner.scanOne(TestAnnotationA.class);
+        Optional<TestAnnotationA> composedAnnotation = scanner.scanOne(ComposedPresentOneLayer.class, TestAnnotationA.class);
 
         assertTrue(composedAnnotation.isPresent());
         assertEquals("A on B", composedAnnotation.get().value());
@@ -160,9 +145,7 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scanOneStrict_shouldFindComposedAnnotation_whenComposedOneLayer() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(ComposedPresentOneLayer.class);
-
-        Optional<TestAnnotationA> composedAnnotation = scanner.scanOneStrict(TestAnnotationA.class);
+        Optional<TestAnnotationA> composedAnnotation = scanner.scanOneStrict(ComposedPresentOneLayer.class, TestAnnotationA.class);
 
         assertTrue(composedAnnotation.isPresent());
         assertEquals("A on B", composedAnnotation.get().value());
@@ -176,9 +159,7 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scan_shouldFindComposedAnnotation_whenComposedTwoLayers() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(ComposedPresentTwoLayers.class);
-
-        List<TestAnnotationA> composedAnnotations = scanner.scan(TestAnnotationA.class);
+        List<TestAnnotationA> composedAnnotations = scanner.scan(ComposedPresentTwoLayers.class, TestAnnotationA.class);
 
         assertEquals(2, composedAnnotations.size());
         assertTrue(composedAnnotations.stream().anyMatch(a -> a.value().equals("A on B")));
@@ -187,9 +168,7 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scanOne_shouldFindComposedAnnotation_whenComposedTwoLayers() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(ComposedPresentTwoLayers.class);
-
-        Optional<TestAnnotationA> composedAnnotation = scanner.scanOne(TestAnnotationA.class);
+        Optional<TestAnnotationA> composedAnnotation = scanner.scanOne(ComposedPresentTwoLayers.class, TestAnnotationA.class);
 
         assertTrue(composedAnnotation.isPresent());
         //no guarantee which one is found first, so that is not checked
@@ -197,13 +176,11 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scanOneStrict_shouldThrowException_whenFoundMultipleAnnotations_composedInTwoLayers() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(ComposedPresentTwoLayers.class);
-
         MultipleAnnotationsScannedException exception = assertThrows(MultipleAnnotationsScannedException.class, () -> {
-            scanner.scanOneStrict(TestAnnotationA.class);
+            scanner.scanOneStrict(ComposedPresentTwoLayers.class, TestAnnotationA.class);
         });
 
-        List<TestAnnotationA> composedAnnotationsExpectedInMessage = scanner.scan(TestAnnotationA.class);
+        List<TestAnnotationA> composedAnnotationsExpectedInMessage = scanner.scan(ComposedPresentTwoLayers.class, TestAnnotationA.class);
         assertEquals(
                 exception.getMessageTemplate().formatted(2, composedAnnotationsExpectedInMessage),
                 exception.getMessage()
@@ -216,9 +193,7 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void shouldFindComposedAnnotation_whenDirectlyPresentOnClass_andIsSelfAnnotation() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(DirectlyPresentSelfAnnotation.class);
-
-        List<TestSelfAnnotation> composedAnnotations = scanner.scan(TestSelfAnnotation.class);
+        List<TestSelfAnnotation> composedAnnotations = scanner.scan(DirectlyPresentSelfAnnotation.class, TestSelfAnnotation.class);
 
         assertEquals(1, composedAnnotations.size());
         assertEquals("TestSelfAnnotation on DirectlyPresentSelfAnnotation", composedAnnotations.getFirst().value());
@@ -229,10 +204,8 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void shouldFindComposedAnnotation_whenAnnotationIsCircular() {
-        ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(CircularAnnotations.class);
-
-        List<TestCircularAnnotationA> composedAnnotationsA = scanner.scan(TestCircularAnnotationA.class);
-        List<TestCircularAnnotationB> composedAnnotationsB = scanner.scan(TestCircularAnnotationB.class);
+        List<TestCircularAnnotationA> composedAnnotationsA = scanner.scan(CircularAnnotations.class, TestCircularAnnotationA.class);
+        List<TestCircularAnnotationB> composedAnnotationsB = scanner.scan(CircularAnnotations.class, TestCircularAnnotationB.class);
 
         assertEquals(1, composedAnnotationsA.size());
         assertEquals(1, composedAnnotationsB.size());

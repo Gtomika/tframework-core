@@ -3,7 +3,7 @@ package org.tframework.core.annotations;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
-import org.tframework.core.exceptions.TFrameworkException;
+import org.tframework.core.TFrameworkException;
 
 /**
  * This exception is thrown when {@link ComposedAnnotationScanner} finds more than one
@@ -11,7 +11,7 @@ import org.tframework.core.exceptions.TFrameworkException;
  */
 public class MultipleAnnotationsScannedException extends TFrameworkException {
 
-    public static final String TEMPLATE = "At most 1 annotation was allowed, but found %d: %s";
+    private static final String TEMPLATE = "At most 1 annotation was allowed, but found %d: %s";
 
     public MultipleAnnotationsScannedException(List<? extends Annotation> scannedAnnotations) {
         super(TEMPLATE.formatted(scannedAnnotations.size(), scannedAnnotations));

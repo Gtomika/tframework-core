@@ -26,18 +26,19 @@ import java.util.Set;
  * placed on each other), the scanning will stop at the first match.
  * @see AnnotationMatcher
  */
-public class ComposedAnnotationScanner {
+public class ComposedAnnotationScanner implements AnnotationScanner {
 
     private static final Set<String> UNSUPPORTED_PACKAGES = Set.of("java.lang.annotation");
 
-    private final Class<?> rootScannedClass;
+    private final AnnotationMatcher annotationMatcher;
 
     /**
-     * Create a composed annotation scanner that scans the specified class.
-     * @param scannedClass Class to scan.
+     * Creates a composed annotation scanner that uses the provided {@link AnnotationMatcher}.
+     * @param annotationMatcher {@link AnnotationMatcher} used to check 'equality' between the found
+     *                          annotation and the one to scan for.
      */
-    public ComposedAnnotationScanner(Class<?> scannedClass) {
-        this.rootScannedClass = scannedClass;
+    public ComposedAnnotationScanner(AnnotationMatcher annotationMatcher) {
+        this.annotationMatcher = annotationMatcher;
     }
 
     /**
@@ -48,24 +49,24 @@ public class ComposedAnnotationScanner {
      * @param <A> Type of {@code annotationToFind}.
      * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
      */
-    public <A extends Annotation> List<A> scan(Class<A> annotationToFind) {
+    public <A extends Annotation> List<A> scan(Class<?> scannedClass, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        return scan(rootScannedClass, annotationToFind, false);
+        return scan(scannedClass, annotationToFind, false);
     }
 
     /**
      * Scans the class (provided at construction time) for one composed annotation. Always the first matched
      * annotation is returned. If only one scanned annotation is needed, this method is a more performant
-     * choice than {@link #scan(Class)}. If you need to make sure that at most one annotation was found,
-     * use {@link #scanOneStrict(Class)} instead.
+     * choice than {@link #scan(Class, Class)}. If you need to make sure that at most one annotation was found,
+     * use {@link #scanOneStrict(Class, Class)} instead.
      * @param annotationToFind The annotation to composed scan for.
      * @return {@link Optional} with the annotation if found, or empty if not found.
-     * @param <A> <A> Type of {@code annotationToFind}.
+     * @param <A> Type of {@code annotationToFind}.
      * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
      */
-    public <A extends Annotation> Optional<A> scanOne(Class<A> annotationToFind) {
+    public <A extends Annotation> Optional<A> scanOne(Class<?> scannedClass, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        var scannedAnnotations = scan(rootScannedClass, annotationToFind, true);
+        var scannedAnnotations = scan(scannedClass, annotationToFind, true);
         if(!scannedAnnotations.isEmpty()) {
             return Optional.of(scannedAnnotations.getFirst());
         } else {
@@ -74,17 +75,17 @@ public class ComposedAnnotationScanner {
     }
 
     /**
-     * Scans the class (provided at construction time) for one composed annotation. Unlike {@link #scan(Class)},
+     * Scans the class (provided at construction time) for one composed annotation. Unlike {@link #scan(Class, Class)},
      * this method will raise an exception if multiple annotations are found.
      * @param annotationToFind The annotation to composed scan for.
      * @return {@link Optional} with the annotation if found, or empty if not found.
-     * @param <A> <A> Type of {@code annotationToFind}.
+     * @param <A> Type of {@code annotationToFind}.
      * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
      * @throws MultipleAnnotationsScannedException If more than one annotation was found during the scan.
      */
-    public <A extends Annotation> Optional<A> scanOneStrict(Class<A> annotationToFind) {
+    public <A extends Annotation> Optional<A> scanOneStrict(Class<?> scannedClass, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        var scannedAnnotations = scan(rootScannedClass, annotationToFind, false);
+        var scannedAnnotations = scan(scannedClass, annotationToFind, false);
         if(scannedAnnotations.size() == 1) {
             return Optional.of(scannedAnnotations.getFirst());
         } else if(scannedAnnotations.size() > 1) {
@@ -106,6 +107,17 @@ public class ComposedAnnotationScanner {
         return UNSUPPORTED_PACKAGES.contains(annotationClass.getPackageName());
     }
 
+    /**
+     * Checks if the class has at least one composed annotation.
+     * @param annotationToFind The annotation to check for.
+     * @return True only if at least one composed annotation was found.
+     * @param <A> Type of {@code annotationToFind}.
+     */
+    @Override
+    public <A extends Annotation> boolean hasAnnotation(Class<?> scannedClass, Class<A> annotationToFind) {
+        return scanOne(scannedClass, annotationToFind).isPresent();
+    }
+
     private <A extends Annotation> List<A> scan(
             Class<?> scannedClass,
             Class<A> annotationToFind,
@@ -120,9 +132,7 @@ public class ComposedAnnotationScanner {
                 continue;
             }
 
-            var matcher = new AnnotationMatcher<>(annotationToFind);
-            var matchResult = matcher.matches(annotationOnScannedClass);
-
+            var matchResult = annotationMatcher.matches(annotationToFind, annotationOnScannedClass);
             if(matchResult.matches()) {
                 //this annotation is what is scanned for, directly present on 'scannedClass' one or more times
                 var matchedAnnotations = matchResult.matchedAnnotations();

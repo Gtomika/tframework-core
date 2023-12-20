@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2022. */
-package org.tframework.core.exceptions;
+package org.tframework.core;
 
 /**
  *  Base class for all unchecked exceptions in TFramework. All exceptions declared in the framework

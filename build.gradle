@@ -8,21 +8,34 @@ plugins {
 group 'org.tframework'
 version '0.0.1'
 
+ext {
+	slf4jVersion = "1.7.25"
+	classGraphVersion = "4.8.165"
+	junitJupiterVersion = "5.8.2"
+	mockitoVersion = "5.8.0"
+	log4jVersion = "2.17.2"
+}
+
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-	//logging
-	implementation 'org.apache.logging.log4j:log4j-api:2.17.2'
-	implementation 'org.apache.logging.log4j:log4j-core:2.17.2'
-	implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.17.2'
+	implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+	implementation "io.github.classgraph:classgraph:${classGraphVersion}"
 
 	// testing
-	testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
-	testImplementation 'org.junit.jupiter:junit-jupiter-params:5.6.2'
-	testRuntimeOnly 'org.junit.jupiter:junit-jupiter-params:5.6.2'
+	testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+	testImplementation "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+	testRuntimeOnly "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+
+	testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+	testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+
+	testImplementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+	testImplementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+	testImplementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
 }
 
 test {

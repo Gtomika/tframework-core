@@ -4,6 +4,7 @@ package org.tframework.core.profiles;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -25,9 +26,9 @@ public class CLIProfileScanner implements ProfileScanner {
 
     /**
      * Create a CLI profile scanner.
-     * @param args Args, as provided in the {@code main} method.
+     * @param args Args, as provided in the {@code main} method. Must not be null.
      */
-    public CLIProfileScanner(String[] args) {
+    public CLIProfileScanner(@NonNull String[] args) {
         this.args = args;
     }
 

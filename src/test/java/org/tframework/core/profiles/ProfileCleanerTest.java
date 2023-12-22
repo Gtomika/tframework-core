@@ -3,7 +3,6 @@ package org.tframework.core.profiles;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class ProfileCleanerTest {
@@ -14,12 +13,6 @@ class ProfileCleanerTest {
     public void shouldCleanProfile() {
         String cleanedProfile = profileCleaner.clean(" P1   ");
         assertEquals("p1", cleanedProfile);
-    }
-
-    @Test
-    public void shouldCleanProfiles() {
-        var cleanedProfiles = profileCleaner.cleanAll(Set.of(" P1 ", "     P2 "));
-        assertEquals(Set.of("p1", "p2"), cleanedProfiles);
     }
 
 }

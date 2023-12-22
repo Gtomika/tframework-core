@@ -2,9 +2,6 @@
 package org.tframework.core.profiles;
 
 import java.util.Locale;
-import java.util.Set;
-import java.util.stream.Collectors;
-import lombok.NonNull;
 
 /**
  * The profile cleaner is responsible for creating a unified format
@@ -23,16 +20,6 @@ public class ProfileCleaner {
      */
     public String clean(String profile) {
         return profile.toLowerCase(Locale.ROOT).strip();
-    }
-
-    /**
-     * Applies {@link #clean(String)} to all profiles in the set.
-     * @return {@link Set} with the same amount of profiles as the input.
-     */
-    public Set<String> cleanAll(@NonNull Set<String> profiles) {
-        return profiles.stream()
-                .map(this::clean)
-                .collect(Collectors.toSet());
     }
 
 }

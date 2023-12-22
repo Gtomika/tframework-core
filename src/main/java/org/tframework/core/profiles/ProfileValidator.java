@@ -1,10 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.profiles;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
-import lombok.NonNull;
 
 /**
  * The profile validator ensures all profile names match the framework rules, which are:
@@ -30,25 +27,4 @@ public class ProfileValidator {
         }
     }
 
-    /**
-     * Applies {@link #validate(String)} to all profiles in the list.
-     * @param profiles Set of profiles to validate, must not be {@code null}.
-     * @throws InvalidProfileException If any of the profiles are invalid.
-     * Exception message includes all invalid profiles.
-     */
-    public void validateAll(@NonNull Set<String> profiles) {
-        Set<String> invalidProfiles = new HashSet<>();
-
-        for(String profile: profiles) {
-            try {
-                validate(profile);
-            } catch (InvalidProfileException e) {
-                invalidProfiles.add(profile == null ? "null" : profile);
-            }
-        }
-
-        if(!invalidProfiles.isEmpty()) {
-            throw new InvalidProfileException(invalidProfiles);
-        }
-    }
 }

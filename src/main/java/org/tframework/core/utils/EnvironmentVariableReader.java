@@ -3,12 +3,15 @@ package org.tframework.core.utils;
 
 import java.util.Optional;
 import java.util.function.Function;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 
 /**
  * Reader for fetching environment variables. Basically a wrapper for {@link System#getenv()},
  * except this throws {@link EnvironmentVariableNotFoundException} instead of returning null when no variable was found.
  * This class mainly exists so that code relying on environmental variables can be tested (by mocking this class).
  */
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for unit testing
 public class EnvironmentVariableReader {
 
     private final Function<String, String> variableExtractor;
@@ -18,11 +21,6 @@ public class EnvironmentVariableReader {
      */
     public EnvironmentVariableReader() {
         variableExtractor = System::getenv;
-    }
-
-    //for unit testing
-    protected EnvironmentVariableReader(Function<String, String> variableExtractor) {
-        this.variableExtractor = variableExtractor;
     }
 
     /**

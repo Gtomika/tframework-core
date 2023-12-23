@@ -4,6 +4,8 @@ package org.tframework.core.profiles;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.utils.EnvironmentVariableNotFoundException;
 import org.tframework.core.utils.EnvironmentVariableReader;
@@ -14,6 +16,7 @@ import org.tframework.core.utils.EnvironmentVariableReader;
  * a comma separated list of profiles.
  */
 @Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for testing
 public class EnvironmentProfileScanner implements ProfileScanner {
 
     public static final String TFRAMEWORK_PROFILES_VARIABLE_NAME = "TFRAMEWORK_PROFILES";
@@ -25,11 +28,6 @@ public class EnvironmentProfileScanner implements ProfileScanner {
      */
     public EnvironmentProfileScanner() {
         this.environmentReader = new EnvironmentVariableReader();
-    }
-
-    //for testing
-    protected EnvironmentProfileScanner(EnvironmentVariableReader environmentReader) {
-        this.environmentReader = environmentReader;
     }
 
     @Override

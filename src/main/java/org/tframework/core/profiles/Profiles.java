@@ -2,18 +2,19 @@
 package org.tframework.core.profiles;
 
 import java.util.Set;
+import lombok.NonNull;
 
 /**
- * This record is the result of the profile initialization process.
+ * Contains the profiles and some related utility methods.
  * @param profiles {@link Set} of profiles.
- * @see ProfileInitializationProcess
  */
 public record Profiles(Set<String> profiles) {
 
     /**
      * Checks if a profile is set.
+     * @param profile Non null profile to check: case sensitive.
      */
-    public boolean hasProfile(String profile) {
+    public boolean isProfileSet(@NonNull String profile) {
         return profiles.contains(profile);
     }
 

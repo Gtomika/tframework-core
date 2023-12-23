@@ -14,10 +14,10 @@ public class ProfileScanners {
 
     /**
      * Creates a list of {@link ProfileScanner}s that should be used when the framework initializes.
-     * @param input {@link TframeworkProfileScannersInput} record with all data required to construct the scanners.
+     * @param input {@link ProfileInitializationInput} record with all data required to construct the scanners.
      */
     @TFrameworkInternal
-    public static List<ProfileScanner> tframeworkProfileScanners(TframeworkProfileScannersInput input) {
+    public static List<ProfileScanner> tframeworkProfileScanners(ProfileInitializationInput input) {
         return List.of(
             new DefaultProfileScanner(),
             new EnvironmentProfileScanner(),

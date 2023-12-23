@@ -4,10 +4,13 @@ package org.tframework.core.profiles;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.Set;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -16,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ProfileInitializationProcessTest {
 
-    private final ProfileInitializationProcess profileInitializationProcess = new ProfileInitializationProcess();
+    private ProfileInitializationProcess profileInitializationProcess;
 
     @Mock
     private ProfileScanner scannerA;
@@ -24,21 +27,37 @@ class ProfileInitializationProcessTest {
     @Mock
     private ProfileScanner scannerB;
 
+    @Mock
+    private ProfileCleaner cleaner;
+
+    @Mock
+    private ProfileValidator validator;
+
+    @BeforeEach
+    public void setUp() {
+        profileInitializationProcess = new ProfileInitializationProcess(cleaner, validator);
+    }
+
     @Test
     public void shouldInitializeProfiles_whenAllValid() {
         when(scannerA.scan()).thenReturn(Set.of("A", "b"));
         when(scannerB.scan()).thenReturn(Set.of("b", "C"));
 
-        var input = ProfileInitializationInput.builder()
-                .profileScanners(List.of(scannerA, scannerB))
-                .build();
+        when(cleaner.clean("A")).thenReturn("a");
+        when(cleaner.clean("b")).thenReturn("b");
+        when(cleaner.clean("C")).thenReturn("c");
 
+        doNothing().when(validator).validate("a");
+        doNothing().when(validator).validate("b");
+        doNothing().when(validator).validate("c");
+
+        var input = List.of(scannerA, scannerB);
         Profiles profiles = profileInitializationProcess.initializeProfiles(input);
 
         assertEquals(Set.of("a", "b", "c"), profiles.profiles());
-        assertTrue(profiles.hasProfile("a"));
-        assertTrue(profiles.hasProfile("b"));
-        assertTrue(profiles.hasProfile("c"));
+        assertTrue(profiles.isProfileSet("a"));
+        assertTrue(profiles.isProfileSet("b"));
+        assertTrue(profiles.isProfileSet("c"));
     }
 
     @Test
@@ -47,10 +66,17 @@ class ProfileInitializationProcessTest {
         when(scannerA.scan()).thenReturn(Set.of("A", "b"));
         when(scannerB.scan()).thenReturn(Set.of(invalidProfile, "C"));
 
-        var input = ProfileInitializationInput.builder()
-                .profileScanners(List.of(scannerA, scannerB))
-                .build();
+        when(cleaner.clean("A")).thenReturn("a");
+        when(cleaner.clean("b")).thenReturn("b");
+        when(cleaner.clean("C")).thenReturn("c");
+        when(cleaner.clean(invalidProfile)).thenReturn(invalidProfile);
 
+        doNothing().when(validator).validate("a");
+        doNothing().when(validator).validate("b");
+        doNothing().when(validator).validate("c");
+        doThrow(new InvalidProfileException(invalidProfile)).when(validator).validate(invalidProfile);
+
+        var input = List.of(scannerA, scannerB);
         var exception = assertThrows(InvalidProfileException.class, () -> {
             profileInitializationProcess.initializeProfiles(input);
         });

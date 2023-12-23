@@ -63,17 +63,10 @@ class ProfileInitializationProcessTest {
     @Test
     public void shouldFailInitialization_whenProfilesAreInvalid() {
         String invalidProfile = "invalid_profile!!!";
-        when(scannerA.scan()).thenReturn(Set.of("A", "b"));
-        when(scannerB.scan()).thenReturn(Set.of(invalidProfile, "C"));
+        when(scannerA.scan()).thenReturn(Set.of(invalidProfile));
 
-        when(cleaner.clean("A")).thenReturn("a");
-        when(cleaner.clean("b")).thenReturn("b");
-        when(cleaner.clean("C")).thenReturn("c");
         when(cleaner.clean(invalidProfile)).thenReturn(invalidProfile);
 
-        doNothing().when(validator).validate("a");
-        doNothing().when(validator).validate("b");
-        doNothing().when(validator).validate("c");
         doThrow(new InvalidProfileException(invalidProfile)).when(validator).validate(invalidProfile);
 
         var input = List.of(scannerA, scannerB);

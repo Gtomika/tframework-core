@@ -9,7 +9,7 @@ import java.util.List;
  */
 public class FixedClassScanner implements ClassScanner {
 
-    private List<Class<?>> classes;
+    private final List<Class<?>> classes;
 
     /**
      * Create a scanner that will return the provided classes on scan.

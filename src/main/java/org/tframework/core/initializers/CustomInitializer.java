@@ -4,17 +4,16 @@ package org.tframework.core.initializers;
 import java.util.Set;
 
 /**
- * Initializers define tasks are run at application startup, after the core initialization process has finished.
- * This means that all framework functionalities are available here.
+ * Initializers define tasks are run at application startup.
  */
-public interface Initializer {
+public interface CustomInitializer {
 
     /**
-     * The method that will be executed at application startup.
-     * @throws Exception Any type of exception can be thrown from the initializer. An exception here means that
-     * the initialization process failed, and the application cannot start.
+     * The method that will be executed at application startup. Any type of runtime exception can be thrown
+     * from the initializer. An exception here means that the initialization process failed, and the
+     * application cannot start.
      */
-    void initialize() throws Exception;
+    void initialize();
 
     /**
      * Defines the other initializers that this one depends on. Use this method to set execution order between
@@ -27,7 +26,7 @@ public interface Initializer {
      * Initializers that have no dependency relationship can run in any order of each other, even parallel.
      * @return Set of initializer dependencies.
      */
-    default Set<Class<? extends Initializer>> dependsOn() {
+    default Set<Class<? extends CustomInitializer>> dependsOn() {
         return Set.of();
     }
 

@@ -11,25 +11,25 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class ProfileValidatorTest {
 
-	private final ProfileValidator profileValidator = new ProfileValidator();
+    private final ProfileValidator profileValidator = new ProfileValidator();
 
-	@ParameterizedTest
-	@NullSource
-	@ValueSource(strings = {"", "ABC", "üö", "123-456"})
-	public void shouldValidateProfile_andThrowException_ifNull(String profile) {
-		var exception = assertThrows(InvalidProfileException.class, () -> profileValidator.validate(profile));
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = {"", "ABC", "üö", "123-456"})
+    public void shouldValidateProfile_andThrowException_ifNull(String profile) {
+        var exception = assertThrows(InvalidProfileException.class, () -> profileValidator.validate(profile));
 
-		String expectedProfileInException = profile == null ? "null" : profile;
-		assertEquals(
-				exception.getMessageTemplate().formatted(expectedProfileInException, ProfileValidator.class.getName()),
-				exception.getMessage()
-		);
-	}
+        String expectedProfileInException = profile == null ? "null" : profile;
+        assertEquals(
+                exception.getMessageTemplate().formatted(expectedProfileInException, ProfileValidator.class.getName()),
+                exception.getMessage()
+        );
+    }
 
-	@ParameterizedTest
-	@ValueSource(strings = {"dev", "prod-db", "test"})
-	public void shouldValidateProfile_andAcceptIt_ifValid(String profile) {
-		assertDoesNotThrow(() -> profileValidator.validate(profile));
-	}
+    @ParameterizedTest
+    @ValueSource(strings = {"dev", "prod-db", "test"})
+    public void shouldValidateProfile_andAcceptIt_ifValid(String profile) {
+        assertDoesNotThrow(() -> profileValidator.validate(profile));
+    }
 
 }

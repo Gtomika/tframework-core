@@ -18,39 +18,39 @@ import java.util.concurrent.Executors;
  */
 public class PackageClassScanner implements ClassScanner {
 
-	private static final int THREAD_COUNT = 5;
+    private static final int THREAD_COUNT = 5;
 
-	private final Set<String> packageNames;
+    private final Set<String> packageNames;
 
-	/**
-	 * Create a package class scanner that will scan in one package.
-	 * @param packageName Valid package name.
-	 */
-	public PackageClassScanner(String packageName) {
-		this.packageNames = Set.of(packageName);
-	}
+    /**
+     * Create a package class scanner that will scan in one package.
+     * @param packageName Valid package name.
+     */
+    public PackageClassScanner(String packageName) {
+        this.packageNames = Set.of(packageName);
+    }
 
-	/**
-	 * Create a package class scanner that will scan in a list of packages.
-	 * @param packageNames Valid package names.
-	 */
-	public PackageClassScanner(Set<String> packageNames) {
-		this.packageNames = packageNames;
-	}
+    /**
+     * Create a package class scanner that will scan in a list of packages.
+     * @param packageNames Valid package names.
+     */
+    public PackageClassScanner(Set<String> packageNames) {
+        this.packageNames = packageNames;
+    }
 
-	/**
-	 * Performs the scan in the packages specified at construction time. If some classes could not
-	 * be loaded, they will not be returned.
-	 * @return List of classes in the packages.
-	 */
-	@Override
-	public List<Class<?>> scanClasses() {
-		ClassGraph classGraph = new ClassGraph()
-				.enableClassInfo()
-				.acceptPackages(packageNames.toArray(new String[] {}));
-		ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-		try(ScanResult scanResult = classGraph.scan(executor, THREAD_COUNT)) {
-			return scanResult.getAllClasses().loadClasses(true);
-		}
-	}
+    /**
+     * Performs the scan in the packages specified at construction time. If some classes could not
+     * be loaded, they will not be returned.
+     * @return List of classes in the packages.
+     */
+    @Override
+    public List<Class<?>> scanClasses() {
+        ClassGraph classGraph = new ClassGraph()
+                .enableClassInfo()
+                .acceptPackages(packageNames.toArray(new String[] {}));
+        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
+        try(ScanResult scanResult = classGraph.scan(executor, THREAD_COUNT)) {
+            return scanResult.getAllClasses().loadClasses(true);
+        }
+    }
 }

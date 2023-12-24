@@ -16,29 +16,29 @@ import org.tframework.core.utils.EnvironmentVariableReader;
 @ExtendWith(MockitoExtension.class)
 class EnvironmentProfileScannerTest {
 
-	@Mock
-	private EnvironmentVariableReader variableReader;
+    @Mock
+    private EnvironmentVariableReader variableReader;
 
-	@Test
-	public void shouldReturnProfilesList_whenProfilesVariableIsSet() {
-		when(variableReader.readVariable(TFRAMEWORK_PROFILES_VARIABLE_NAME))
-				.thenReturn("p1,p2");
+    @Test
+    public void shouldReturnProfilesList_whenProfilesVariableIsSet() {
+        when(variableReader.readVariable(TFRAMEWORK_PROFILES_VARIABLE_NAME))
+                .thenReturn("p1,p2");
 
-		EnvironmentProfileScanner scanner = new EnvironmentProfileScanner(variableReader);
-		Set<String> profiles = scanner.scan();
+        EnvironmentProfileScanner scanner = new EnvironmentProfileScanner(variableReader);
+        Set<String> profiles = scanner.scan();
 
-		assertEquals(Set.of("p1", "p2"), profiles);
-	}
+        assertEquals(Set.of("p1", "p2"), profiles);
+    }
 
-	@Test
-	public void shouldReturnEmptyList_whenProfileVariableIsNotSet() {
-		when(variableReader.readVariable(TFRAMEWORK_PROFILES_VARIABLE_NAME))
-				.thenThrow(new EnvironmentVariableNotFoundException(TFRAMEWORK_PROFILES_VARIABLE_NAME));
+    @Test
+    public void shouldReturnEmptyList_whenProfileVariableIsNotSet() {
+        when(variableReader.readVariable(TFRAMEWORK_PROFILES_VARIABLE_NAME))
+                .thenThrow(new EnvironmentVariableNotFoundException(TFRAMEWORK_PROFILES_VARIABLE_NAME));
 
-		EnvironmentProfileScanner scanner = new EnvironmentProfileScanner(variableReader);
-		Set<String> profiles = scanner.scan();
+        EnvironmentProfileScanner scanner = new EnvironmentProfileScanner(variableReader);
+        Set<String> profiles = scanner.scan();
 
-		assertEquals(Set.of(), profiles);
-	}
+        assertEquals(Set.of(), profiles);
+    }
 
 }

@@ -19,43 +19,43 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CLIProfileScanner implements ProfileScanner {
 
-	public static final String PROFILES_CLI_ARGUMENT = "tframework_profiles";
-	public static final String SEPARATOR = "=";
+    public static final String PROFILES_CLI_ARGUMENT = "tframework_profiles";
+    public static final String SEPARATOR = "=";
 
-	private final String[] args;
+    private final String[] args;
 
-	/**
-	 * Create a CLI profile scanner.
-	 * @param args Args, as provided in the {@code main} method. Must not be null.
-	 */
-	public CLIProfileScanner(@NonNull String[] args) {
-		this.args = args;
-	}
+    /**
+     * Create a CLI profile scanner.
+     * @param args Args, as provided in the {@code main} method. Must not be null.
+     */
+    public CLIProfileScanner(@NonNull String[] args) {
+        this.args = args;
+    }
 
-	@Override
-	public Set<String> scan() {
-		Set<String> profiles = new HashSet<>();
-		for(String arg: args) {
-			if(arg.startsWith(PROFILES_CLI_ARGUMENT + SEPARATOR)) {
-				log.debug("Found an argument that is a candidate for profile activation: '{}'", arg);
-				profiles.addAll(extractProfilesFromArgument(arg));
-			}
-		}
-		log.debug("The '{}' profile scanner will attempt to active the following profiles: {}",
-				CLIProfileScanner.class.getName(), profiles);
-		return profiles;
-	}
+    @Override
+    public Set<String> scan() {
+        Set<String> profiles = new HashSet<>();
+        for(String arg: args) {
+            if(arg.startsWith(PROFILES_CLI_ARGUMENT + SEPARATOR)) {
+                log.debug("Found an argument that is a candidate for profile activation: '{}'", arg);
+                profiles.addAll(extractProfilesFromArgument(arg));
+            }
+        }
+        log.debug("The '{}' profile scanner will attempt to active the following profiles: {}",
+                CLIProfileScanner.class.getName(), profiles);
+        return profiles;
+    }
 
-	/**
-	 * @param argument Must start with 'tframework_profiles='.
-	 */
-	private Set<String> extractProfilesFromArgument(String argument) {
-		String[] argParts = argument.split(SEPARATOR); //may contain more than one separator...
+    /**
+     * @param argument Must start with 'tframework_profiles='.
+     */
+    private Set<String> extractProfilesFromArgument(String argument) {
+        String[] argParts = argument.split(SEPARATOR); //may contain more than one separator...
 
-		StringBuilder profiles = new StringBuilder();
-		for(int i = 1; i < argParts.length; i++) {
-			profiles.append(argParts[i]);
-		}
-		return new HashSet<>(Arrays.asList(profiles.toString().split(",")));
-	}
+        StringBuilder profiles = new StringBuilder();
+        for(int i = 1; i < argParts.length; i++) {
+            profiles.append(argParts[i]);
+        }
+        return new HashSet<>(Arrays.asList(profiles.toString().split(",")));
+    }
 }

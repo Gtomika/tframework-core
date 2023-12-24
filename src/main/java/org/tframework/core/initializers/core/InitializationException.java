@@ -9,14 +9,14 @@ import org.tframework.core.TFrameworkException;
  */
 public class InitializationException extends TFrameworkException {
 
-	private static final String TEMPLATE = "Exception during framework initialization: '%s'";
+    private static final String TEMPLATE = "Exception during framework initialization: '%s'";
 
-	public InitializationException(Exception cause) {
-		super(TEMPLATE.formatted(cause.getClass().getName()), cause);
-	}
+    public InitializationException(Exception cause) {
+        super(TEMPLATE.formatted(cause.getClass().getName()), cause);
+    }
 
-	@Override
-	public String getMessageTemplate() {
-		return TEMPLATE;
-	}
+    @Override
+    public String getMessageTemplate() {
+        return TEMPLATE;
+    }
 }

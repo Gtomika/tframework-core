@@ -11,7 +11,7 @@ import java.util.List;
  * @param <A> Type of the matched annotation.
  */
 public record AnnotationMatchingResult<A extends Annotation>(
-	boolean matches,
-	List<A> matchedAnnotations
+    boolean matches,
+    List<A> matchedAnnotations
 ) {
 }

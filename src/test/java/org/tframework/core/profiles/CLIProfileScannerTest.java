@@ -11,31 +11,31 @@ import org.junit.jupiter.api.Test;
 
 class CLIProfileScannerTest {
 
-	@Test
-	public void shouldFindProfile_ifProvided() {
-		String[] args = {PROFILES_CLI_ARGUMENT + SEPARATOR + "dev,db", "otherArgXX"};
-		var cliProfileScanner = new CLIProfileScanner(args);
+    @Test
+    public void shouldFindProfile_ifProvided() {
+        String[] args = {PROFILES_CLI_ARGUMENT + SEPARATOR + "dev,db", "otherArgXX"};
+        var cliProfileScanner = new CLIProfileScanner(args);
 
-		var profiles = cliProfileScanner.scan();
-		assertEquals(Set.of("dev", "db"), profiles);
-	}
+        var profiles = cliProfileScanner.scan();
+        assertEquals(Set.of("dev", "db"), profiles);
+    }
 
-	@Test
-	public void shouldFindProfile_ifProvided_asMultipleArgs() {
-		String[] args = {PROFILES_CLI_ARGUMENT + SEPARATOR + "dev,db", "otherArgXX", PROFILES_CLI_ARGUMENT + SEPARATOR + "test"};
-		var cliProfileScanner = new CLIProfileScanner(args);
+    @Test
+    public void shouldFindProfile_ifProvided_asMultipleArgs() {
+        String[] args = {PROFILES_CLI_ARGUMENT + SEPARATOR + "dev,db", "otherArgXX", PROFILES_CLI_ARGUMENT + SEPARATOR + "test"};
+        var cliProfileScanner = new CLIProfileScanner(args);
 
-		var profiles = cliProfileScanner.scan();
-		assertEquals(Set.of("dev", "db", "test"), profiles);
-	}
+        var profiles = cliProfileScanner.scan();
+        assertEquals(Set.of("dev", "db", "test"), profiles);
+    }
 
-	@Test
-	public void shouldFindProfile_asEmptySet_ifArgsContainsNoProfiles() {
-		String[] args = {"otherArgXX"};
-		var cliProfileScanner = new CLIProfileScanner(args);
+    @Test
+    public void shouldFindProfile_asEmptySet_ifArgsContainsNoProfiles() {
+        String[] args = {"otherArgXX"};
+        var cliProfileScanner = new CLIProfileScanner(args);
 
-		var profiles = cliProfileScanner.scan();
-		assertTrue(profiles.isEmpty());
-	}
+        var profiles = cliProfileScanner.scan();
+        assertTrue(profiles.isEmpty());
+    }
 
 }

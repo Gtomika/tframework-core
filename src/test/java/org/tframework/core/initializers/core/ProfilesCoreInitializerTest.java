@@ -17,23 +17,23 @@ import org.tframework.core.profiles.Profiles;
 @ExtendWith(MockitoExtension.class)
 class ProfilesCoreInitializerTest {
 
-	@Mock
-	private ProfileInitializationProcess profileInitializationProcess;
+    @Mock
+    private ProfileInitializationProcess profileInitializationProcess;
 
-	@Test
-	public void shouldInitializeProfiles() {
-		var expectedProfiles = new Profiles(Set.of("a", "b"));
-		when(profileInitializationProcess.initializeProfiles(anyList()))
-				.thenReturn(expectedProfiles);
+    @Test
+    public void shouldInitializeProfiles() {
+        var expectedProfiles = new Profiles(Set.of("a", "b"));
+        when(profileInitializationProcess.initializeProfiles(anyList()))
+                .thenReturn(expectedProfiles);
 
-		ProfilesCoreInitializer initializer = new ProfilesCoreInitializer(profileInitializationProcess);
-		ProfileInitializationInput input = ProfileInitializationInput.builder()
-				.args(new String[]{"-someArg"})
-				.build();
+        ProfilesCoreInitializer initializer = new ProfilesCoreInitializer(profileInitializationProcess);
+        ProfileInitializationInput input = ProfileInitializationInput.builder()
+                .args(new String[]{"-someArg"})
+                .build();
 
-		var actualProfiles = initializer.initialize(input);
+        var actualProfiles = initializer.initialize(input);
 
-		assertEquals(expectedProfiles, actualProfiles);
-	}
+        assertEquals(expectedProfiles, actualProfiles);
+    }
 
 }

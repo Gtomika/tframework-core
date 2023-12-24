@@ -11,12 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class DefaultProfileScanner implements ProfileScanner {
 
-	public static final String DEFAULT_PROFILE_NAME = "default";
+    public static final String DEFAULT_PROFILE_NAME = "default";
 
-	@Override
-	public Set<String> scan() {
-		log.debug("The '{}' profile scanner will attempt to active the following profiles: {}",
-				DefaultProfileScanner.class.getName(), DEFAULT_PROFILE_NAME);
-		return Set.of(DEFAULT_PROFILE_NAME);
-	}
+    @Override
+    public Set<String> scan() {
+        log.debug("The '{}' profile scanner will attempt to active the following profiles: {}",
+                DefaultProfileScanner.class.getName(), DEFAULT_PROFILE_NAME);
+        return Set.of(DEFAULT_PROFILE_NAME);
+    }
 }

@@ -11,14 +11,14 @@ import org.tframework.core.TFrameworkException;
  */
 public class UnsupportedAnnotationException extends TFrameworkException {
 
-	private static final String TEMPLATE = "Composed annotation scanning is not supported for annotation '%s'";
+    private static final String TEMPLATE = "Composed annotation scanning is not supported for annotation '%s'";
 
-	public UnsupportedAnnotationException(Class<? extends Annotation> annotationClass) {
-		super(TEMPLATE.formatted(annotationClass.getName()));
-	}
+    public UnsupportedAnnotationException(Class<? extends Annotation> annotationClass) {
+        super(TEMPLATE.formatted(annotationClass.getName()));
+    }
 
-	@Override
-	public String getMessageTemplate() {
-		return TEMPLATE;
-	}
+    @Override
+    public String getMessageTemplate() {
+        return TEMPLATE;
+    }
 }

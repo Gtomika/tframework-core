@@ -7,5 +7,5 @@ import java.lang.annotation.RetentionPolicy;
 @TestAnnotationA("A on B")
 @Retention(RetentionPolicy.RUNTIME)
 @interface TestAnnotationB {
-	String value();
+    String value();
 }

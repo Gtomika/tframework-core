@@ -9,32 +9,32 @@ import org.junit.jupiter.api.Test;
 
 class EnvironmentVariableReaderTest {
 
-	private static final String TEST_VARIABLE_NAME = "TEST_VAR";
-	private static final String TEST_VARIABLE_VALUE = "TEST_VAR_NAME";
+    private static final String TEST_VARIABLE_NAME = "TEST_VAR";
+    private static final String TEST_VARIABLE_VALUE = "TEST_VAR_NAME";
 
-	@Test
-	public void shouldGetVariable_whenExists() {
-		var mockVariables = Map.of(TEST_VARIABLE_NAME, TEST_VARIABLE_VALUE);
-		var reader = new EnvironmentVariableReader(mockVariables::get);
+    @Test
+    public void shouldGetVariable_whenExists() {
+        var mockVariables = Map.of(TEST_VARIABLE_NAME, TEST_VARIABLE_VALUE);
+        var reader = new EnvironmentVariableReader(mockVariables::get);
 
-		String actualValue = reader.readVariable(TEST_VARIABLE_NAME);
+        String actualValue = reader.readVariable(TEST_VARIABLE_NAME);
 
-		assertEquals(TEST_VARIABLE_VALUE, actualValue);
-	}
+        assertEquals(TEST_VARIABLE_VALUE, actualValue);
+    }
 
-	@Test
-	public void shouldThrowVariableNotFoundException_whenDoesNotExist() {
-		Map<String, String> mockVariables = Map.of();
-		var reader = new EnvironmentVariableReader(mockVariables::get);
+    @Test
+    public void shouldThrowVariableNotFoundException_whenDoesNotExist() {
+        Map<String, String> mockVariables = Map.of();
+        var reader = new EnvironmentVariableReader(mockVariables::get);
 
-		var exception = assertThrows(EnvironmentVariableNotFoundException.class, () -> {
-			reader.readVariable(TEST_VARIABLE_NAME);
-		});
+        var exception = assertThrows(EnvironmentVariableNotFoundException.class, () -> {
+            reader.readVariable(TEST_VARIABLE_NAME);
+        });
 
-		assertEquals(
-				exception.getMessageTemplate().formatted(TEST_VARIABLE_NAME),
-				exception.getMessage()
-		);
-	}
+        assertEquals(
+                exception.getMessageTemplate().formatted(TEST_VARIABLE_NAME),
+                exception.getMessage()
+        );
+    }
 
 }

@@ -8,13 +8,13 @@ import org.junit.jupiter.api.Test;
 
 class FixedClassScannerTest {
 
-	@Test
-	public void shouldScanFixedClasses() {
-		List<Class<?>> classes = List.of(String.class, Integer.class);
-		var scanner = new FixedClassScanner(classes);
+    @Test
+    public void shouldScanFixedClasses() {
+        List<Class<?>> classes = List.of(String.class, Integer.class);
+        var scanner = new FixedClassScanner(classes);
 
-		var scannedClasses = scanner.scanClasses();
-		assertEquals(classes, scannedClasses);
-	}
+        var scannedClasses = scanner.scanClasses();
+        assertEquals(classes, scannedClasses);
+    }
 
 }

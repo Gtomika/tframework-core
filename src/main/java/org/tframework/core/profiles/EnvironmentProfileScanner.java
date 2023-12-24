@@ -19,32 +19,32 @@ import org.tframework.core.utils.EnvironmentVariableReader;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for testing
 public class EnvironmentProfileScanner implements ProfileScanner {
 
-	public static final String TFRAMEWORK_PROFILES_VARIABLE_NAME = "TFRAMEWORK_PROFILES";
+    public static final String TFRAMEWORK_PROFILES_VARIABLE_NAME = "TFRAMEWORK_PROFILES";
 
-	private final EnvironmentVariableReader environmentReader;
+    private final EnvironmentVariableReader environmentReader;
 
-	/**
-	 * Creates an environment profile scanner.
-	 */
-	public EnvironmentProfileScanner() {
-		this.environmentReader = new EnvironmentVariableReader();
-	}
+    /**
+     * Creates an environment profile scanner.
+     */
+    public EnvironmentProfileScanner() {
+        this.environmentReader = new EnvironmentVariableReader();
+    }
 
-	@Override
-	public Set<String> scan() {
-		try {
-			String profilesRaw = environmentReader.readVariable(TFRAMEWORK_PROFILES_VARIABLE_NAME);
-			log.debug("Value of '{}' environmental variable is: {}", TFRAMEWORK_PROFILES_VARIABLE_NAME, profilesRaw);
+    @Override
+    public Set<String> scan() {
+        try {
+            String profilesRaw = environmentReader.readVariable(TFRAMEWORK_PROFILES_VARIABLE_NAME);
+            log.debug("Value of '{}' environmental variable is: {}", TFRAMEWORK_PROFILES_VARIABLE_NAME, profilesRaw);
 
-			Set<String> profiles = new HashSet<>(Arrays.asList(profilesRaw.split(",")));
-			log.debug("The '{}' profile scanner will attempt to activate the following profiles: {}",
-					EnvironmentProfileScanner.class.getName(), profiles);
-			return profiles;
-		} catch (EnvironmentVariableNotFoundException e) {
-			log.debug("Environmental variable with name '{}' was not found." +
-					" The '{}' profile scanner will not active any profiles.",
-					EnvironmentProfileScanner.class.getName(), TFRAMEWORK_PROFILES_VARIABLE_NAME);
-			return Set.of();
-		}
-	}
+            Set<String> profiles = new HashSet<>(Arrays.asList(profilesRaw.split(",")));
+            log.debug("The '{}' profile scanner will attempt to activate the following profiles: {}",
+                    EnvironmentProfileScanner.class.getName(), profiles);
+            return profiles;
+        } catch (EnvironmentVariableNotFoundException e) {
+            log.debug("Environmental variable with name '{}' was not found." +
+                    " The '{}' profile scanner will not active any profiles.",
+                    EnvironmentProfileScanner.class.getName(), TFRAMEWORK_PROFILES_VARIABLE_NAME);
+            return Set.of();
+        }
+    }
 }

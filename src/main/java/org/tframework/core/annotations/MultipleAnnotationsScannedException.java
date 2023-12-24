@@ -11,15 +11,15 @@ import org.tframework.core.TFrameworkException;
  */
 public class MultipleAnnotationsScannedException extends TFrameworkException {
 
-	private static final String TEMPLATE = "At most 1 annotation was allowed, but found %d: %s";
+    private static final String TEMPLATE = "At most 1 annotation was allowed, but found %d: %s";
 
-	public MultipleAnnotationsScannedException(List<? extends Annotation> scannedAnnotations) {
-		super(TEMPLATE.formatted(scannedAnnotations.size(), scannedAnnotations));
-	}
+    public MultipleAnnotationsScannedException(List<? extends Annotation> scannedAnnotations) {
+        super(TEMPLATE.formatted(scannedAnnotations.size(), scannedAnnotations));
+    }
 
-	@Override
-	public String getMessageTemplate() {
-		return TEMPLATE;
-	}
+    @Override
+    public String getMessageTemplate() {
+        return TEMPLATE;
+    }
 
 }

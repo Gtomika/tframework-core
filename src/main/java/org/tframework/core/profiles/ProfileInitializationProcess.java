@@ -18,27 +18,27 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for testing
 public class ProfileInitializationProcess {
 
-	private final ProfileCleaner profileCleaner;
-	private final ProfileValidator profileValidator;
+    private final ProfileCleaner profileCleaner;
+    private final ProfileValidator profileValidator;
 
-	public ProfileInitializationProcess() {
-		this.profileCleaner = new ProfileCleaner();
-		this.profileValidator = new ProfileValidator();
-	}
+    public ProfileInitializationProcess() {
+        this.profileCleaner = new ProfileCleaner();
+        this.profileValidator = new ProfileValidator();
+    }
 
-	/**
-	 * Perform the initialization process that scans for, cleans and validates profiles.
-	 * @param profileScanners The {@link ProfileScanner}s used to detect profiles.
-	 * @return {@link Profiles} record with the set profiles.
-	 */
-	public Profiles initializeProfiles(@NonNull List<ProfileScanner> profileScanners) {
-		log.debug("The profile initialization process will use these profiles scanners: {}", profileScanners);
-		Set<String> profiles = ProfileMerger.merging(profileScanners)
-				.mergeAndStream()
-				.map(profileCleaner::clean)
-				.peek(profileValidator::validate)
-				.collect(Collectors.toSet());
-		return new Profiles(profiles);
-	}
+    /**
+     * Perform the initialization process that scans for, cleans and validates profiles.
+     * @param profileScanners The {@link ProfileScanner}s used to detect profiles.
+     * @return {@link Profiles} record with the set profiles.
+     */
+    public Profiles initializeProfiles(@NonNull List<ProfileScanner> profileScanners) {
+        log.debug("The profile initialization process will use these profiles scanners: {}", profileScanners);
+        Set<String> profiles = ProfileMerger.merging(profileScanners)
+                .mergeAndStream()
+                .map(profileCleaner::clean)
+                .peek(profileValidator::validate)
+                .collect(Collectors.toSet());
+        return new Profiles(profiles);
+    }
 
 }

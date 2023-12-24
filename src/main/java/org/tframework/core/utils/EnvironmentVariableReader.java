@@ -14,24 +14,24 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for unit testing
 public class EnvironmentVariableReader {
 
-	private final Function<String, String> variableExtractor;
+    private final Function<String, String> variableExtractor;
 
-	/**
-	 * Creates a variable reader.
-	 */
-	public EnvironmentVariableReader() {
-		variableExtractor = System::getenv;
-	}
+    /**
+     * Creates a variable reader.
+     */
+    public EnvironmentVariableReader() {
+        variableExtractor = System::getenv;
+    }
 
-	/**
-	 * Fetch a variable from the environment.
-	 * @param name Variable name to fetch.
-	 * @return The value of the variable, if it exists.
-	 * @throws EnvironmentVariableNotFoundException If a variable by this name does not exist.
-	 */
-	public String readVariable(String name) {
-		return Optional.ofNullable(variableExtractor.apply(name))
-				.orElseThrow(() -> new EnvironmentVariableNotFoundException(name));
-	}
+    /**
+     * Fetch a variable from the environment.
+     * @param name Variable name to fetch.
+     * @return The value of the variable, if it exists.
+     * @throws EnvironmentVariableNotFoundException If a variable by this name does not exist.
+     */
+    public String readVariable(String name) {
+        return Optional.ofNullable(variableExtractor.apply(name))
+                .orElseThrow(() -> new EnvironmentVariableNotFoundException(name));
+    }
 
 }

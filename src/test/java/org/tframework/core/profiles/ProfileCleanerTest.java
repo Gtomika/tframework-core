@@ -7,12 +7,12 @@ import org.junit.jupiter.api.Test;
 
 class ProfileCleanerTest {
 
-	private final ProfileCleaner profileCleaner = new ProfileCleaner();
+    private final ProfileCleaner profileCleaner = new ProfileCleaner();
 
-	@Test
-	public void shouldCleanProfile() {
-		String cleanedProfile = profileCleaner.clean(" P1   ");
-		assertEquals("p1", cleanedProfile);
-	}
+    @Test
+    public void shouldCleanProfile() {
+        String cleanedProfile = profileCleaner.clean(" P1   ");
+        assertEquals("p1", cleanedProfile);
+    }
 
 }

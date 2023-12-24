@@ -8,14 +8,14 @@ import org.tframework.core.TFrameworkException;
  */
 public class NotAnInterfaceException extends TFrameworkException {
 
-	private static final String TEMPLATE = "The class '%s' is not an interface";
+    private static final String TEMPLATE = "The class '%s' is not an interface";
 
-	public NotAnInterfaceException(Class<?> clazz) {
-		super(TEMPLATE.formatted(clazz.getName()));
-	}
+    public NotAnInterfaceException(Class<?> clazz) {
+        super(TEMPLATE.formatted(clazz.getName()));
+    }
 
-	@Override
-	public String getMessageTemplate() {
-		return TEMPLATE;
-	}
+    @Override
+    public String getMessageTemplate() {
+        return TEMPLATE;
+    }
 }

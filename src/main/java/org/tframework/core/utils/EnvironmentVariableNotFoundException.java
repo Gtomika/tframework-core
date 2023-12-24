@@ -5,14 +5,14 @@ import org.tframework.core.TFrameworkException;
 
 public class EnvironmentVariableNotFoundException extends TFrameworkException {
 
-	private static final String TEMPLATE = "The environmental variable with name '%s' does not exist";
+    private static final String TEMPLATE = "The environmental variable with name '%s' does not exist";
 
-	public EnvironmentVariableNotFoundException(String variableName) {
-		super(TEMPLATE.formatted(variableName));
-	}
+    public EnvironmentVariableNotFoundException(String variableName) {
+        super(TEMPLATE.formatted(variableName));
+    }
 
-	@Override
-	public String getMessageTemplate() {
-		return TEMPLATE;
-	}
+    @Override
+    public String getMessageTemplate() {
+        return TEMPLATE;
+    }
 }

@@ -7,15 +7,15 @@ package org.tframework.core.ioc;
  */
 public enum ManagedType {
 
-	/**
-	 * Manage only one instance of the entity, which will be injected to every place and returned by
-	 * every request.
-	 */
-	SINGLETON,
+    /**
+     * Manage only one instance of the entity, which will be injected to every place and returned by
+     * every request.
+     */
+    SINGLETON,
 
-	/**
-	 * Manage as many instances as requested. Every time the entity is injected or requested directly,
-	 * a new instance is constructed.
-	 */
-	CREATE_WHEN_REQUESTED
+    /**
+     * Manage as many instances as requested. Every time the entity is injected or requested directly,
+     * a new instance is constructed.
+     */
+    CREATE_WHEN_REQUESTED
 }

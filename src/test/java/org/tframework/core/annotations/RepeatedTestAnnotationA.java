@@ -6,5 +6,5 @@ import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
 @interface RepeatedTestAnnotationA {
-	TestAnnotationA[] value();
+    TestAnnotationA[] value();
 }

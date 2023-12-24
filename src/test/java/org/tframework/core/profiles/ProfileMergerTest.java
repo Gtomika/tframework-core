@@ -15,22 +15,22 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ProfileMergerTest {
 
-	@Mock
-	private ProfileScanner scannerA;
+    @Mock
+    private ProfileScanner scannerA;
 
-	@Mock
-	private ProfileScanner scannerB;
+    @Mock
+    private ProfileScanner scannerB;
 
-	@Test
-	public void shouldMergeProfiles() {
-		when(scannerA.scan()).thenReturn(Set.of("test", "demo"));
-		when(scannerB.scan()).thenReturn(Set.of("test", "db"));
+    @Test
+    public void shouldMergeProfiles() {
+        when(scannerA.scan()).thenReturn(Set.of("test", "demo"));
+        when(scannerB.scan()).thenReturn(Set.of("test", "db"));
 
-		Set<String> mergedProfiles = ProfileMerger.merging(List.of(scannerA, scannerB))
-				.mergeAndStream()
-				.collect(Collectors.toSet());
+        Set<String> mergedProfiles = ProfileMerger.merging(List.of(scannerA, scannerB))
+                .mergeAndStream()
+                .collect(Collectors.toSet());
 
-		assertEquals(Set.of("test", "demo", "db"), mergedProfiles);
-	}
+        assertEquals(Set.of("test", "demo", "db"), mergedProfiles);
+    }
 
 }

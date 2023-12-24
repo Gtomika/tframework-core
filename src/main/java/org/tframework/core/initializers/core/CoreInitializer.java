@@ -13,10 +13,10 @@ import org.tframework.core.initializers.CustomInitializer;
  */
 public interface CoreInitializer<Input, Output> {
 
-	/**
-	 * The method that will be executed during core initialization. Any type of exception can be thrown from the
-	 * initializer. An exception here means that the initialization process failed, and the application cannot start.
-	 */
-	Output initialize(Input input);
+    /**
+     * The method that will be executed during core initialization. Any type of exception can be thrown from the
+     * initializer. An exception here means that the initialization process failed, and the application cannot start.
+     */
+    Output initialize(Input input);
 
 }

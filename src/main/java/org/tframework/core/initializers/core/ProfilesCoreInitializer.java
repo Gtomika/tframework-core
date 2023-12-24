@@ -18,30 +18,30 @@ import org.tframework.core.utils.TimerUtils;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for testing
 public class ProfilesCoreInitializer implements CoreInitializer<ProfileInitializationInput, Profiles> {
 
-	private final ProfileInitializationProcess profileInitializationProcess;
+    private final ProfileInitializationProcess profileInitializationProcess;
 
-	/**
-	 * Creates a profiles initializer that will use the default process to set profiles.
-	 */
-	public ProfilesCoreInitializer() {
-		this.profileInitializationProcess = new ProfileInitializationProcess();
-	}
+    /**
+     * Creates a profiles initializer that will use the default process to set profiles.
+     */
+    public ProfilesCoreInitializer() {
+        this.profileInitializationProcess = new ProfileInitializationProcess();
+    }
 
-	/**
-	 * Perform profile initialization.
-	 * @param profileInitializationInput {@link ProfileInitializationInput} data required to start the initialization.
-	 * @return {@link Profiles} record with the set profiles.
-	 */
-	@Override
-	public Profiles initialize(ProfileInitializationInput profileInitializationInput) {
-		log.debug("Starting profiles initialization...");
-		Instant start = Instant.now();
+    /**
+     * Perform profile initialization.
+     * @param profileInitializationInput {@link ProfileInitializationInput} data required to start the initialization.
+     * @return {@link Profiles} record with the set profiles.
+     */
+    @Override
+    public Profiles initialize(ProfileInitializationInput profileInitializationInput) {
+        log.debug("Starting profiles initialization...");
+        Instant start = Instant.now();
 
-		var profileScanners = ProfileScanners.tframeworkProfileScanners(profileInitializationInput);
-		Profiles profiles = profileInitializationProcess.initializeProfiles(profileScanners);
+        var profileScanners = ProfileScanners.tframeworkProfileScanners(profileInitializationInput);
+        Profiles profiles = profileInitializationProcess.initializeProfiles(profileScanners);
 
-		log.info("The profile initialization completed in {} ms, and found the following profiles: {}",
-				TimerUtils.msBetween(start, Instant.now()), profiles.profiles());
-		return profiles;
-	}
+        log.info("The profile initialization completed in {} ms, and found the following profiles: {}",
+                TimerUtils.msBetween(start, Instant.now()), profiles.profiles());
+        return profiles;
+    }
 }

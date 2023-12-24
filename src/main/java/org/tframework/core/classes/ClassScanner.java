@@ -9,11 +9,11 @@ import java.util.List;
  */
 public interface ClassScanner {
 
-	/**
-	 * Find and collect the classes. This operation may take time, so the result should be
-	 * saved for future use instead of calling this again and again.
-	 * @return {@link List} of {@link Class} objects that this scanner found.
-	 */
-	List<Class<?>> scanClasses();
+    /**
+     * Find and collect the classes. This operation may take time, so the result should be
+     * saved for future use instead of calling this again and again.
+     * @return {@link List} of {@link Class} objects that this scanner found.
+     */
+    List<Class<?>> scanClasses();
 
 }

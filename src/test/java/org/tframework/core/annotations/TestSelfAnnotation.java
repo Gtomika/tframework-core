@@ -7,5 +7,5 @@ import java.lang.annotation.RetentionPolicy;
 @TestSelfAnnotation("TestSelfAnnotation on TestSelfAnnotation")
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TestSelfAnnotation {
-	String value();
+    String value();
 }

@@ -15,11 +15,11 @@ import java.util.Locale;
  */
 public class ProfileCleaner {
 
-	/**
-	 * Cleans the profile according to the rules specified at the class documentation.
-	 */
-	public String clean(String profile) {
-		return profile.toLowerCase(Locale.ROOT).strip();
-	}
+    /**
+     * Cleans the profile according to the rules specified at the class documentation.
+     */
+    public String clean(String profile) {
+        return profile.toLowerCase(Locale.ROOT).strip();
+    }
 
 }

@@ -8,5 +8,5 @@ import java.lang.annotation.RetentionPolicy;
 @TestAnnotationB("B on C")
 @Retention(RetentionPolicy.RUNTIME)
 @interface TestAnnotationC {
-	String value();
+    String value();
 }

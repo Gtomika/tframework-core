@@ -11,15 +11,15 @@ import org.tframework.core.TFrameworkException;
  */
 public class InvalidProfileException extends TFrameworkException {
 
-	private static final String TEMPLATE = "The profile '%s' has invalid name!" +
-			" Check '%s' documentation for the rules.";
+    private static final String TEMPLATE = "The profile '%s' has invalid name!" +
+            " Check '%s' documentation for the rules.";
 
-	public InvalidProfileException(@NonNull String profile) {
-		super(TEMPLATE.formatted(profile, ProfileValidator.class.getName()));
-	}
+    public InvalidProfileException(@NonNull String profile) {
+        super(TEMPLATE.formatted(profile, ProfileValidator.class.getName()));
+    }
 
-	@Override
-	public String getMessageTemplate() {
-		return TEMPLATE;
-	}
+    @Override
+    public String getMessageTemplate() {
+        return TEMPLATE;
+    }
 }

@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.initializers.core;
+package org.tframework.core.initializers;
 
 import org.tframework.core.TFrameworkException;
 

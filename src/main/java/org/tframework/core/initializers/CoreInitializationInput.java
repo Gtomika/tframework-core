@@ -1,7 +1,8 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.initializers.core;
+package org.tframework.core.initializers;
 
 import lombok.Builder;
+import org.tframework.core.TFrameworkInternal;
 
 /**
  * Contains the data required by the core initializer
@@ -9,5 +10,6 @@ import lombok.Builder;
  * @see CoreInitializationProcess
  */
 @Builder
+@TFrameworkInternal
 public record CoreInitializationInput(String[] args) {
 }

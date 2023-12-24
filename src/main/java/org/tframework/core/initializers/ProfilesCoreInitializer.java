@@ -1,10 +1,11 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.initializers.core;
+package org.tframework.core.initializers;
 
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.profiles.ProfileInitializationProcess;
 import org.tframework.core.profiles.ProfileScanners;
@@ -15,6 +16,7 @@ import org.tframework.core.utils.TimerUtils;
  * The profiles {@link CoreInitializer} scans for, cleans and validates profiles at application startup.
  */
 @Slf4j
+@TFrameworkInternal
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for testing
 public class ProfilesCoreInitializer implements CoreInitializer<ProfileInitializationInput, Profiles> {
 

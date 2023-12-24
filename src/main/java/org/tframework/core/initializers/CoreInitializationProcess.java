@@ -1,11 +1,12 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.initializers.core;
+package org.tframework.core.initializers;
 
 import java.time.Instant;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.Application;
+import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.profiles.Profiles;
 import org.tframework.core.utils.TimerUtils;
@@ -14,6 +15,7 @@ import org.tframework.core.utils.TimerUtils;
  * The process that bootstraps the framework is described by this class.
  */
 @Slf4j
+@TFrameworkInternal
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for tests only
 public class CoreInitializationProcess {
 
@@ -34,9 +36,7 @@ public class CoreInitializationProcess {
         Instant start = Instant.now();
 
         try {
-            //initialize the profiles, they are required by following steps
-            var profileInitializationInput = new ProfileInitializationInput(coreInput.args());
-            Profiles profiles = profilesInitializer.initialize(profileInitializationInput);
+            Profiles profiles = initProfiles(coreInput);
 
             Application application = Application.builder()
                     .profiles(profiles)
@@ -48,6 +48,13 @@ public class CoreInitializationProcess {
         } finally {
             log.info("The core initialization completed in {} ms.", TimerUtils.msBetween(start, Instant.now()));
         }
+    }
+
+    private Profiles initProfiles(CoreInitializationInput coreInput) {
+        var profileInput = ProfileInitializationInput.builder()
+                .args(coreInput.args())
+                .build();
+        return profilesInitializer.initialize(profileInput);
     }
 
 }

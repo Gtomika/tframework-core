@@ -1,7 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.initializers.core;
+package org.tframework.core.initializers;
 
-import org.tframework.core.initializers.CustomInitializer;
+import org.tframework.core.TFrameworkInternal;
 
 /**
  * The core initializers define tasks that must be run before all else during application startup, and are
@@ -11,6 +11,7 @@ import org.tframework.core.initializers.CustomInitializer;
  * @param <Output> Type of the output that this initializer produces.
  * @see CustomInitializer
  */
+@TFrameworkInternal
 public interface CoreInitializer<Input, Output> {
 
     /**

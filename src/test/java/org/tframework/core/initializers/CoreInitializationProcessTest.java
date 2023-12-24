@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.initializers.core;
+package org.tframework.core.initializers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -13,11 +13,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.Application;
-import org.tframework.core.initializers.CoreInitializationInput;
-import org.tframework.core.initializers.CoreInitializationProcess;
-import org.tframework.core.initializers.CoreInitializationResult;
-import org.tframework.core.initializers.InitializationException;
-import org.tframework.core.initializers.ProfilesCoreInitializer;
 import org.tframework.core.profiles.InvalidProfileException;
 import org.tframework.core.profiles.Profiles;
 

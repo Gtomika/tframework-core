@@ -19,65 +19,65 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class ProfileInitializationProcessTest {
 
-    private ProfileInitializationProcess profileInitializationProcess;
+	private ProfileInitializationProcess profileInitializationProcess;
 
-    @Mock
-    private ProfileScanner scannerA;
+	@Mock
+	private ProfileScanner scannerA;
 
-    @Mock
-    private ProfileScanner scannerB;
+	@Mock
+	private ProfileScanner scannerB;
 
-    @Mock
-    private ProfileCleaner cleaner;
+	@Mock
+	private ProfileCleaner cleaner;
 
-    @Mock
-    private ProfileValidator validator;
+	@Mock
+	private ProfileValidator validator;
 
-    @BeforeEach
-    public void setUp() {
-        profileInitializationProcess = new ProfileInitializationProcess(cleaner, validator);
-    }
+	@BeforeEach
+	public void setUp() {
+		profileInitializationProcess = new ProfileInitializationProcess(cleaner, validator);
+	}
 
-    @Test
-    public void shouldInitializeProfiles_whenAllValid() {
-        when(scannerA.scan()).thenReturn(Set.of("A", "b"));
-        when(scannerB.scan()).thenReturn(Set.of("b", "C"));
+	@Test
+	public void shouldInitializeProfiles_whenAllValid() {
+		when(scannerA.scan()).thenReturn(Set.of("A", "b"));
+		when(scannerB.scan()).thenReturn(Set.of("b", "C"));
 
-        when(cleaner.clean("A")).thenReturn("a");
-        when(cleaner.clean("b")).thenReturn("b");
-        when(cleaner.clean("C")).thenReturn("c");
+		when(cleaner.clean("A")).thenReturn("a");
+		when(cleaner.clean("b")).thenReturn("b");
+		when(cleaner.clean("C")).thenReturn("c");
 
-        doNothing().when(validator).validate("a");
-        doNothing().when(validator).validate("b");
-        doNothing().when(validator).validate("c");
+		doNothing().when(validator).validate("a");
+		doNothing().when(validator).validate("b");
+		doNothing().when(validator).validate("c");
 
-        var input = List.of(scannerA, scannerB);
-        Profiles profiles = profileInitializationProcess.initializeProfiles(input);
+		var input = List.of(scannerA, scannerB);
+		Profiles profiles = profileInitializationProcess.initializeProfiles(input);
 
-        assertEquals(Set.of("a", "b", "c"), profiles.profiles());
-        assertTrue(profiles.isProfileSet("a"));
-        assertTrue(profiles.isProfileSet("b"));
-        assertTrue(profiles.isProfileSet("c"));
-    }
+		assertEquals(Set.of("a", "b", "c"), profiles.profiles());
+		assertTrue(profiles.isProfileSet("a"));
+		assertTrue(profiles.isProfileSet("b"));
+		assertTrue(profiles.isProfileSet("c"));
+	}
 
-    @Test
-    public void shouldFailInitialization_whenProfilesAreInvalid() {
-        String invalidProfile = "invalid_profile!!!";
-        when(scannerA.scan()).thenReturn(Set.of(invalidProfile));
+	@Test
+	public void shouldFailInitialization_whenProfilesAreInvalid() {
+		String invalidProfile = "invalid_profile!!!";
+		when(scannerA.scan()).thenReturn(Set.of(invalidProfile));
 
-        when(cleaner.clean(invalidProfile)).thenReturn(invalidProfile);
+		when(cleaner.clean(invalidProfile)).thenReturn(invalidProfile);
 
-        doThrow(new InvalidProfileException(invalidProfile)).when(validator).validate(invalidProfile);
+		doThrow(new InvalidProfileException(invalidProfile)).when(validator).validate(invalidProfile);
 
-        var input = List.of(scannerA, scannerB);
-        var exception = assertThrows(InvalidProfileException.class, () -> {
-            profileInitializationProcess.initializeProfiles(input);
-        });
+		var input = List.of(scannerA, scannerB);
+		var exception = assertThrows(InvalidProfileException.class, () -> {
+			profileInitializationProcess.initializeProfiles(input);
+		});
 
-        assertEquals(
-                exception.getMessageTemplate().formatted(invalidProfile, ProfileValidator.class.getName()),
-                exception.getMessage()
-        );
-    }
+		assertEquals(
+				exception.getMessageTemplate().formatted(invalidProfile, ProfileValidator.class.getName()),
+				exception.getMessage()
+		);
+	}
 
 }

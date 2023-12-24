@@ -9,17 +9,17 @@ import java.util.List;
  */
 public class FixedClassScanner implements ClassScanner {
 
-    private final List<Class<?>> classes;
+	private final List<Class<?>> classes;
 
-    /**
-     * Create a scanner that will return the provided classes on scan.
-     */
-    public FixedClassScanner(List<Class<?>> classes) {
-        this.classes = classes;
-    }
+	/**
+	 * Create a scanner that will return the provided classes on scan.
+	 */
+	public FixedClassScanner(List<Class<?>> classes) {
+		this.classes = classes;
+	}
 
-    @Override
-    public List<Class<?>> scanClasses() {
-        return List.copyOf(classes);
-    }
+	@Override
+	public List<Class<?>> scanClasses() {
+		return List.copyOf(classes);
+	}
 }

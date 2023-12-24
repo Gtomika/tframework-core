@@ -12,11 +12,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class TimerUtils {
 
-    /**
-     * Calculates the amount of milliseconds between two {@link Instant}s.
-     */
-    public static long msBetween(Instant start, Instant end) {
-        return Duration.between(start, end).toMillis();
-    }
+	/**
+	 * Calculates the amount of milliseconds between two {@link Instant}s.
+	 */
+	public static long msBetween(Instant start, Instant end) {
+		return Duration.between(start, end).toMillis();
+	}
 
 }

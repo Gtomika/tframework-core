@@ -1,6 +1,6 @@
 plugins {
 	id 'java-library'
-	id 'jvm-test-suite'
+	id 'jacoco'
 	id "com.diffplug.spotless" version "6.23.3"
 	id "io.freefair.lombok" version "8.4"
 }
@@ -42,24 +42,45 @@ test {
 	useJUnitPlatform()
 	testLogging.showStandardStreams = true
 	testLogging.exceptionFormat = 'full'
+	finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
 //spotless check configuration
 spotless {
-
 	format 'misc', {
 		// define the files to apply `misc` to
 		target '*.gradle', '*.md', '.gitignore'
-
 		// define the steps to apply to those files
 		trimTrailingWhitespace()
 		indentWithTabs()
 		endWithNewline()
 	}
-
 	java {
 		importOrder()
 		removeUnusedImports()
+		trimTrailingWhitespace()
+		indentWithTabs()
+		endWithNewline()
 		licenseHeader '/* Licensed under Apache-2.0 $YEAR. */'
+	}
+}
+
+jacocoTestReport {
+	reports {
+		xml.required = false
+		csv.required = false
+		html.required = true
+		html.outputLocation = layout.buildDirectory.dir('jacoco-report-html')
+	}
+	finalizedBy jacocoTestCoverageVerification //coverage is checked after report is generated
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.75
+			}
+		}
 	}
 }

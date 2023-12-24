@@ -14,11 +14,11 @@ import java.util.Set;
  */
 public interface ProfileScanner {
 
-    /**
-     * Scan for the profiles.
-     * @return A {@link Set} with the detected profiles. This must not be null: of no profiles were found, empty set
-     * should be returned.
-     */
-    Set<String> scan();
+	/**
+	 * Scan for the profiles.
+	 * @return A {@link Set} with the detected profiles. This must not be null: of no profiles were found, empty set
+	 * should be returned.
+	 */
+	Set<String> scan();
 
 }

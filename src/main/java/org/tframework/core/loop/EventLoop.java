@@ -3,11 +3,11 @@ package org.tframework.core.loop;
 
 public interface EventLoop {
 
-    void start();
+	void start();
 
-    void stop(boolean force);
+	void stop(boolean force);
 
-    void submit(Event event);
+	void submit(Event event);
 
-    void subscribe(Subscription subscription);
+	void subscribe(Subscription subscription);
 }

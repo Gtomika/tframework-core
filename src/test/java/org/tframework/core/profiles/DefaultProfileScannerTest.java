@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test;
 
 class DefaultProfileScannerTest {
 
-    @Test
-    public void shouldScanDefaultProfile() {
-        DefaultProfileScanner scanner = new DefaultProfileScanner();
-        Set<String> profiles = scanner.scan();
+	@Test
+	public void shouldScanDefaultProfile() {
+		DefaultProfileScanner scanner = new DefaultProfileScanner();
+		Set<String> profiles = scanner.scan();
 
-        assertEquals(Set.of(DefaultProfileScanner.DEFAULT_PROFILE_NAME), profiles);
-    }
+		assertEquals(Set.of(DefaultProfileScanner.DEFAULT_PROFILE_NAME), profiles);
+	}
 
 }

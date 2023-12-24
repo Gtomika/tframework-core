@@ -7,27 +7,27 @@ package org.tframework.core;
  */
 public abstract class TFrameworkException extends RuntimeException {
 
-    /**
-     * Create an exception with a message.
-     * @param message Message that should come from {@link #getMessageTemplate()} with formatting applied.
-     */
-    public TFrameworkException(String message) {
-        super(message);
-    }
+	/**
+	 * Create an exception with a message.
+	 * @param message Message that should come from {@link #getMessageTemplate()} with formatting applied.
+	 */
+	public TFrameworkException(String message) {
+		super(message);
+	}
 
-    /**
-     * Create an exception with a message and a cause.
-     * @param message Message that should come from {@link #getMessageTemplate()} with formatting applied.
-     * @param cause Another exception that was the direct cause of this one.
-     */
-    public TFrameworkException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	/**
+	 * Create an exception with a message and a cause.
+	 * @param message Message that should come from {@link #getMessageTemplate()} with formatting applied.
+	 * @param cause Another exception that was the direct cause of this one.
+	 */
+	public TFrameworkException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    /**
-     * Gets the message template of the exception. This must have the same rules as defined by
-     * {@link String#format(String, Object...)}. It is allowed to have no placeholders in the template.
-     */
-    public abstract String getMessageTemplate();
+	/**
+	 * Gets the message template of the exception. This must have the same rules as defined by
+	 * {@link String#format(String, Object...)}. It is allowed to have no placeholders in the template.
+	 */
+	public abstract String getMessageTemplate();
 
 }

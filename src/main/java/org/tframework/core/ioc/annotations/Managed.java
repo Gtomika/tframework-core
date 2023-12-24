@@ -18,20 +18,20 @@ import org.tframework.core.ioc.ManagedType;
 @Target(ElementType.TYPE)
 public @interface Managed {
 
-    String UNSPECIFIED_ENTITY_NAME = "";
+	String UNSPECIFIED_ENTITY_NAME = "";
 
-    /**
-     * Decides the management type of this class. Default is {@link ManagedType#SINGLETON}.
-     * @see ManagedType
-     */
-    ManagedType type() default ManagedType.SINGLETON;
+	/**
+	 * Decides the management type of this class. Default is {@link ManagedType#SINGLETON}.
+	 * @see ManagedType
+	 */
+	ManagedType type() default ManagedType.SINGLETON;
 
-    /**
-     * Name for the managed entity. A default value will be derived from the class of the entity.
-     * For example, in case of managing a String, the default name is 'java.lang.String'. This means that custom
-     * names must be defined when multiple entities with the same class are used.
-     * <p>
-     * Names must be unique for each managed entity. Only allowed to contain letters and the '-' character.
-     */
-    String name() default UNSPECIFIED_ENTITY_NAME;
+	/**
+	 * Name for the managed entity. A default value will be derived from the class of the entity.
+	 * For example, in case of managing a String, the default name is 'java.lang.String'. This means that custom
+	 * names must be defined when multiple entities with the same class are used.
+	 * <p>
+	 * Names must be unique for each managed entity. Only allowed to contain letters and the '-' character.
+	 */
+	String name() default UNSPECIFIED_ENTITY_NAME;
 }

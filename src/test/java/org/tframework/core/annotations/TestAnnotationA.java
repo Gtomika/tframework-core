@@ -8,5 +8,5 @@ import java.lang.annotation.RetentionPolicy;
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(RepeatedTestAnnotationA.class)
 @interface TestAnnotationA {
-    String value();
+	String value();
 }

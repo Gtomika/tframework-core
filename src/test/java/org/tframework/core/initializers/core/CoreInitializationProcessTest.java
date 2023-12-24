@@ -19,59 +19,59 @@ import org.tframework.core.profiles.Profiles;
 @ExtendWith(MockitoExtension.class)
 class CoreInitializationProcessTest {
 
-    private CoreInitializationProcess coreInitializationProcess;
+	private CoreInitializationProcess coreInitializationProcess;
 
-    @Mock
-    private ProfilesCoreInitializer profilesCoreInitializer;
+	@Mock
+	private ProfilesCoreInitializer profilesCoreInitializer;
 
-    @BeforeEach
-    public void setUp() {
-        coreInitializationProcess = new CoreInitializationProcess(
-                profilesCoreInitializer
-        );
-    }
+	@BeforeEach
+	public void setUp() {
+		coreInitializationProcess = new CoreInitializationProcess(
+				profilesCoreInitializer
+		);
+	}
 
-    @Test
-    public void shouldPerformCoreInitialization() {
-        var expectedResult = new CoreInitializationResult(
-                Application.builder()
-                        .profiles(new Profiles(Set.of("a, b")))
-                        .build()
-        );
+	@Test
+	public void shouldPerformCoreInitialization() {
+		var expectedResult = new CoreInitializationResult(
+				Application.builder()
+						.profiles(new Profiles(Set.of("a, b")))
+						.build()
+		);
 
-        when(profilesCoreInitializer.initialize(any())).thenReturn(expectedResult.application().profiles());
+		when(profilesCoreInitializer.initialize(any())).thenReturn(expectedResult.application().profiles());
 
-        CoreInitializationInput input = CoreInitializationInput.builder()
-                .args(new String[]{"testArg"})
-                .build();
+		CoreInitializationInput input = CoreInitializationInput.builder()
+				.args(new String[]{"testArg"})
+				.build();
 
-        var actualResult = coreInitializationProcess.performCoreInitialization(input);
+		var actualResult = coreInitializationProcess.performCoreInitialization(input);
 
-        assertEquals(expectedResult, actualResult);
-    }
+		assertEquals(expectedResult, actualResult);
+	}
 
-    @Test
-    public void shouldThrowInitializationException_whenACoreInitializerThrowsException() {
-        var cause = new InvalidProfileException("invalid!");
-        when(profilesCoreInitializer.initialize(any()))
-                .thenThrow(cause);
+	@Test
+	public void shouldThrowInitializationException_whenACoreInitializerThrowsException() {
+		var cause = new InvalidProfileException("invalid!");
+		when(profilesCoreInitializer.initialize(any()))
+				.thenThrow(cause);
 
-        CoreInitializationInput input = CoreInitializationInput.builder()
-                .args(new String[]{"testArg"})
-                .build();
+		CoreInitializationInput input = CoreInitializationInput.builder()
+				.args(new String[]{"testArg"})
+				.build();
 
-        var exception = assertThrows(InitializationException.class, () -> {
-            coreInitializationProcess.performCoreInitialization(input);
-        });
+		var exception = assertThrows(InitializationException.class, () -> {
+			coreInitializationProcess.performCoreInitialization(input);
+		});
 
-        assertEquals(
-                exception.getMessageTemplate().formatted(cause.getClass().getName()),
-                exception.getMessage()
-        );
-        assertEquals(
-                cause.getMessage(),
-                exception.getCause().getMessage()
-        );
-    }
+		assertEquals(
+				exception.getMessageTemplate().formatted(cause.getClass().getName()),
+				exception.getMessage()
+		);
+		assertEquals(
+				cause.getMessage(),
+				exception.getCause().getMessage()
+		);
+	}
 
 }

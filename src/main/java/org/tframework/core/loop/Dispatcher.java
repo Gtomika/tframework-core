@@ -3,10 +3,10 @@ package org.tframework.core.loop;
 
 public interface Dispatcher {
 
-    void registerSubscription(Subscription subscription);
+	void registerSubscription(Subscription subscription);
 
-    void dispatchEvent(Event event);
+	void dispatchEvent(Event event);
 
-    void showdown();
+	void showdown();
 
 }

@@ -10,12 +10,12 @@ import lombok.NonNull;
  */
 public record Profiles(Set<String> profiles) {
 
-    /**
-     * Checks if a profile is set.
-     * @param profile Non null profile to check: case sensitive.
-     */
-    public boolean isProfileSet(@NonNull String profile) {
-        return profiles.contains(profile);
-    }
+	/**
+	 * Checks if a profile is set.
+	 * @param profile Non null profile to check: case sensitive.
+	 */
+	public boolean isProfileSet(@NonNull String profile) {
+		return profiles.contains(profile);
+	}
 
 }

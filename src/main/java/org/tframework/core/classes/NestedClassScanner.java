@@ -10,22 +10,22 @@ import java.util.List;
  */
 public class NestedClassScanner implements ClassScanner {
 
-    private final Class<?> classToScan;
+	private final Class<?> classToScan;
 
-    /**
-     * Create a scanner that will scan for the nested classes inside {@code classToScan}.
-     */
-    public NestedClassScanner(Class<?> classToScan) {
-        this.classToScan = classToScan;
-    }
+	/**
+	 * Create a scanner that will scan for the nested classes inside {@code classToScan}.
+	 */
+	public NestedClassScanner(Class<?> classToScan) {
+		this.classToScan = classToScan;
+	}
 
-    /**
-     * Use reflection to detect and return the nested classes of the one provided at construction time.
-     */
-    @Override
-    public List<Class<?>> scanClasses() {
-        return Arrays.stream(classToScan.getNestMembers())
-                .filter(clazz -> !clazz.equals(classToScan))
-                .toList();
-    }
+	/**
+	 * Use reflection to detect and return the nested classes of the one provided at construction time.
+	 */
+	@Override
+	public List<Class<?>> scanClasses() {
+		return Arrays.stream(classToScan.getNestMembers())
+				.filter(clazz -> !clazz.equals(classToScan))
+				.toList();
+	}
 }

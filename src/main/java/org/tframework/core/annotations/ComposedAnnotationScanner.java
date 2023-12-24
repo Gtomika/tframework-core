@@ -28,137 +28,137 @@ import java.util.Set;
  */
 public class ComposedAnnotationScanner implements AnnotationScanner {
 
-    private static final Set<String> UNSUPPORTED_PACKAGES = Set.of("java.lang.annotation");
+	private static final Set<String> UNSUPPORTED_PACKAGES = Set.of("java.lang.annotation");
 
-    private final AnnotationMatcher annotationMatcher;
+	private final AnnotationMatcher annotationMatcher;
 
-    /**
-     * Creates a composed annotation scanner that uses the provided {@link AnnotationMatcher}.
-     * @param annotationMatcher {@link AnnotationMatcher} used to check 'equality' between the found
-     *                          annotation and the one to scan for.
-     */
-    public ComposedAnnotationScanner(AnnotationMatcher annotationMatcher) {
-        this.annotationMatcher = annotationMatcher;
-    }
+	/**
+	 * Creates a composed annotation scanner that uses the provided {@link AnnotationMatcher}.
+	 * @param annotationMatcher {@link AnnotationMatcher} used to check 'equality' between the found
+	 *                          annotation and the one to scan for.
+	 */
+	public ComposedAnnotationScanner(AnnotationMatcher annotationMatcher) {
+		this.annotationMatcher = annotationMatcher;
+	}
 
-    /**
-     * Scans the class (provided at construction time) for composed annotations.
-     * @param annotationToFind The annotation to composed scan for.
-     * @return List of annotations that were found in the scan. This is a list, because a composed annotation can be present
-     * multiple times on the scanned class.
-     * @param <A> Type of {@code annotationToFind}.
-     * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
-     */
-    public <A extends Annotation> List<A> scan(Class<?> scannedClass, Class<A> annotationToFind) {
-        checkIfUnsupported(annotationToFind);
-        return scan(scannedClass, annotationToFind, false);
-    }
+	/**
+	 * Scans the class (provided at construction time) for composed annotations.
+	 * @param annotationToFind The annotation to composed scan for.
+	 * @return List of annotations that were found in the scan. This is a list, because a composed annotation can be present
+	 * multiple times on the scanned class.
+	 * @param <A> Type of {@code annotationToFind}.
+	 * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
+	 */
+	public <A extends Annotation> List<A> scan(Class<?> scannedClass, Class<A> annotationToFind) {
+		checkIfUnsupported(annotationToFind);
+		return scan(scannedClass, annotationToFind, false);
+	}
 
-    /**
-     * Scans the class (provided at construction time) for one composed annotation. Always the first matched
-     * annotation is returned. If only one scanned annotation is needed, this method is a more performant
-     * choice than {@link #scan(Class, Class)}. If you need to make sure that at most one annotation was found,
-     * use {@link #scanOneStrict(Class, Class)} instead.
-     * @param annotationToFind The annotation to composed scan for.
-     * @return {@link Optional} with the annotation if found, or empty if not found.
-     * @param <A> Type of {@code annotationToFind}.
-     * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
-     */
-    public <A extends Annotation> Optional<A> scanOne(Class<?> scannedClass, Class<A> annotationToFind) {
-        checkIfUnsupported(annotationToFind);
-        var scannedAnnotations = scan(scannedClass, annotationToFind, true);
-        if(!scannedAnnotations.isEmpty()) {
-            return Optional.of(scannedAnnotations.getFirst());
-        } else {
-            return Optional.empty();
-        }
-    }
+	/**
+	 * Scans the class (provided at construction time) for one composed annotation. Always the first matched
+	 * annotation is returned. If only one scanned annotation is needed, this method is a more performant
+	 * choice than {@link #scan(Class, Class)}. If you need to make sure that at most one annotation was found,
+	 * use {@link #scanOneStrict(Class, Class)} instead.
+	 * @param annotationToFind The annotation to composed scan for.
+	 * @return {@link Optional} with the annotation if found, or empty if not found.
+	 * @param <A> Type of {@code annotationToFind}.
+	 * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
+	 */
+	public <A extends Annotation> Optional<A> scanOne(Class<?> scannedClass, Class<A> annotationToFind) {
+		checkIfUnsupported(annotationToFind);
+		var scannedAnnotations = scan(scannedClass, annotationToFind, true);
+		if(!scannedAnnotations.isEmpty()) {
+			return Optional.of(scannedAnnotations.getFirst());
+		} else {
+			return Optional.empty();
+		}
+	}
 
-    /**
-     * Scans the class (provided at construction time) for one composed annotation. Unlike {@link #scan(Class, Class)},
-     * this method will raise an exception if multiple annotations are found.
-     * @param annotationToFind The annotation to composed scan for.
-     * @return {@link Optional} with the annotation if found, or empty if not found.
-     * @param <A> Type of {@code annotationToFind}.
-     * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
-     * @throws MultipleAnnotationsScannedException If more than one annotation was found during the scan.
-     */
-    public <A extends Annotation> Optional<A> scanOneStrict(Class<?> scannedClass, Class<A> annotationToFind) {
-        checkIfUnsupported(annotationToFind);
-        var scannedAnnotations = scan(scannedClass, annotationToFind, false);
-        if(scannedAnnotations.size() == 1) {
-            return Optional.of(scannedAnnotations.getFirst());
-        } else if(scannedAnnotations.size() > 1) {
-            throw new MultipleAnnotationsScannedException(scannedAnnotations);
-        } else {
-            return Optional.empty();
-        }
-    }
+	/**
+	 * Scans the class (provided at construction time) for one composed annotation. Unlike {@link #scan(Class, Class)},
+	 * this method will raise an exception if multiple annotations are found.
+	 * @param annotationToFind The annotation to composed scan for.
+	 * @return {@link Optional} with the annotation if found, or empty if not found.
+	 * @param <A> Type of {@code annotationToFind}.
+	 * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
+	 * @throws MultipleAnnotationsScannedException If more than one annotation was found during the scan.
+	 */
+	public <A extends Annotation> Optional<A> scanOneStrict(Class<?> scannedClass, Class<A> annotationToFind) {
+		checkIfUnsupported(annotationToFind);
+		var scannedAnnotations = scan(scannedClass, annotationToFind, false);
+		if(scannedAnnotations.size() == 1) {
+			return Optional.of(scannedAnnotations.getFirst());
+		} else if(scannedAnnotations.size() > 1) {
+			throw new MultipleAnnotationsScannedException(scannedAnnotations);
+		} else {
+			return Optional.empty();
+		}
+	}
 
-    /**
-     * Checks if the annotation is unsupported for composed annotation scanning. The following annotations are unsupported:
-     * <ul>
-     *      <li>Annotations in package {@code java.lang.annotation}.</li>
-     * </ul>
-     * @param annotationClass The annotation to check.
-     * @return True only of the {@code annotationClass} is unsupported.
-     */
-    public boolean isUnsupportedAnnotation(Class<? extends Annotation> annotationClass) {
-        return UNSUPPORTED_PACKAGES.contains(annotationClass.getPackageName());
-    }
+	/**
+	 * Checks if the annotation is unsupported for composed annotation scanning. The following annotations are unsupported:
+	 * <ul>
+	 *      <li>Annotations in package {@code java.lang.annotation}.</li>
+	 * </ul>
+	 * @param annotationClass The annotation to check.
+	 * @return True only of the {@code annotationClass} is unsupported.
+	 */
+	public boolean isUnsupportedAnnotation(Class<? extends Annotation> annotationClass) {
+		return UNSUPPORTED_PACKAGES.contains(annotationClass.getPackageName());
+	}
 
-    /**
-     * Checks if the class has at least one composed annotation.
-     * @param annotationToFind The annotation to check for.
-     * @return True only if at least one composed annotation was found.
-     * @param <A> Type of {@code annotationToFind}.
-     */
-    @Override
-    public <A extends Annotation> boolean hasAnnotation(Class<?> scannedClass, Class<A> annotationToFind) {
-        return scanOne(scannedClass, annotationToFind).isPresent();
-    }
+	/**
+	 * Checks if the class has at least one composed annotation.
+	 * @param annotationToFind The annotation to check for.
+	 * @return True only if at least one composed annotation was found.
+	 * @param <A> Type of {@code annotationToFind}.
+	 */
+	@Override
+	public <A extends Annotation> boolean hasAnnotation(Class<?> scannedClass, Class<A> annotationToFind) {
+		return scanOne(scannedClass, annotationToFind).isPresent();
+	}
 
-    private <A extends Annotation> List<A> scan(
-            Class<?> scannedClass,
-            Class<A> annotationToFind,
-            boolean stopOnFirstFind
-    ) {
-        List<A> composedAnnotations = new LinkedList<>();
+	private <A extends Annotation> List<A> scan(
+			Class<?> scannedClass,
+			Class<A> annotationToFind,
+			boolean stopOnFirstFind
+	) {
+		List<A> composedAnnotations = new LinkedList<>();
 
-        for(Annotation annotationOnScannedClass: scannedClass.getAnnotations()) {
+		for(Annotation annotationOnScannedClass: scannedClass.getAnnotations()) {
 
-            //all unsupported annotations will be skipped
-            if(isUnsupportedAnnotation(annotationOnScannedClass.annotationType())) {
-                continue;
-            }
+			//all unsupported annotations will be skipped
+			if(isUnsupportedAnnotation(annotationOnScannedClass.annotationType())) {
+				continue;
+			}
 
-            var matchResult = annotationMatcher.matches(annotationToFind, annotationOnScannedClass);
-            if(matchResult.matches()) {
-                //this annotation is what is scanned for, directly present on 'scannedClass' one or more times
-                var matchedAnnotations = matchResult.matchedAnnotations();
-                if(stopOnFirstFind && !matchedAnnotations.isEmpty()) {
-                    composedAnnotations.add(matchedAnnotations.getFirst());
-                    break;
-                }
-                composedAnnotations.addAll(matchedAnnotations);
-            } else {
-                //this annotation on 'scannedClass' is a different one, must check annotations on it
-                var result = scan(annotationOnScannedClass.annotationType(), annotationToFind, stopOnFirstFind);
-                if(stopOnFirstFind && !result.isEmpty()) {
-                    composedAnnotations.add(result.getFirst());
-                    break;
-                }
-                composedAnnotations.addAll(result);
-            }
+			var matchResult = annotationMatcher.matches(annotationToFind, annotationOnScannedClass);
+			if(matchResult.matches()) {
+				//this annotation is what is scanned for, directly present on 'scannedClass' one or more times
+				var matchedAnnotations = matchResult.matchedAnnotations();
+				if(stopOnFirstFind && !matchedAnnotations.isEmpty()) {
+					composedAnnotations.add(matchedAnnotations.getFirst());
+					break;
+				}
+				composedAnnotations.addAll(matchedAnnotations);
+			} else {
+				//this annotation on 'scannedClass' is a different one, must check annotations on it
+				var result = scan(annotationOnScannedClass.annotationType(), annotationToFind, stopOnFirstFind);
+				if(stopOnFirstFind && !result.isEmpty()) {
+					composedAnnotations.add(result.getFirst());
+					break;
+				}
+				composedAnnotations.addAll(result);
+			}
 
-        }
-        return composedAnnotations;
-    }
+		}
+		return composedAnnotations;
+	}
 
-    private void checkIfUnsupported(Class<? extends Annotation> annotationToFind) {
-        if(isUnsupportedAnnotation(annotationToFind)) {
-            throw new UnsupportedAnnotationException(annotationToFind);
-        }
-    }
+	private void checkIfUnsupported(Class<? extends Annotation> annotationToFind) {
+		if(isUnsupportedAnnotation(annotationToFind)) {
+			throw new UnsupportedAnnotationException(annotationToFind);
+		}
+	}
 
 }

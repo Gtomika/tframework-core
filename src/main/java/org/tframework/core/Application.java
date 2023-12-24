@@ -10,6 +10,6 @@ import org.tframework.core.profiles.Profiles;
  */
 @Builder
 public record Application(
-        Profiles profiles
+		Profiles profiles
 ) {
 }

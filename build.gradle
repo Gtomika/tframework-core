@@ -1,65 +1,86 @@
 plugins {
-	id 'java-library'
-	id 'jvm-test-suite'
-	id "com.diffplug.spotless" version "6.23.3"
-	id "io.freefair.lombok" version "8.4"
+    id 'java-library'
+    id 'jacoco'
+    id "com.diffplug.spotless" version "6.23.3"
+    id "io.freefair.lombok" version "8.4"
 }
 
 group 'org.tframework'
 version '0.0.1'
 
 ext {
-	slf4jVersion = "1.7.25"
-	classGraphVersion = "4.8.165"
-	junitJupiterVersion = "5.8.2"
-	mockitoVersion = "5.8.0"
-	log4jVersion = "2.17.2"
+    slf4jVersion = "1.7.25"
+    classGraphVersion = "4.8.165"
+    junitJupiterVersion = "5.8.2"
+    mockitoVersion = "5.8.0"
+    log4jVersion = "2.17.2"
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation "org.slf4j:slf4j-api:${slf4jVersion}"
-	implementation "io.github.classgraph:classgraph:${classGraphVersion}"
+    implementation "org.slf4j:slf4j-api:${slf4jVersion}"
+    implementation "io.github.classgraph:classgraph:${classGraphVersion}"
 
-	// testing
-	testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-	testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
-	testImplementation "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
-	testRuntimeOnly "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+    // testing
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
 
-	testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-	testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
+    testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
 
-	testImplementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
-	testImplementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
-	testImplementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+    testImplementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+    testImplementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+    testImplementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
 }
 
 test {
-	useJUnitPlatform()
-	testLogging.showStandardStreams = true
-	testLogging.exceptionFormat = 'full'
+    useJUnitPlatform()
+    testLogging.showStandardStreams = true
+    testLogging.exceptionFormat = 'full'
+    finalizedBy jacocoTestReport // report is always generated after tests run
 }
 
 //spotless check configuration
 spotless {
+    format 'misc', {
+        // define the files to apply `misc` to
+        target '*.gradle', '*.md', '.gitignore'
+        // define the steps to apply to those files
+        trimTrailingWhitespace()
+        indentWithSpaces(4)
+        endWithNewline()
+    }
+    java {
+        importOrder()
+        removeUnusedImports()
+        trimTrailingWhitespace()
+        indentWithSpaces(4)
+        endWithNewline()
+        licenseHeader '/* Licensed under Apache-2.0 $YEAR. */'
+    }
+}
 
-	format 'misc', {
-		// define the files to apply `misc` to
-		target '*.gradle', '*.md', '.gitignore'
+jacocoTestReport {
+    reports {
+        xml.required = false
+        csv.required = false
+        html.required = true
+        html.outputLocation = layout.buildDirectory.dir('jacoco-report-html')
+    }
+    finalizedBy jacocoTestCoverageVerification //coverage is checked after report is generated
+}
 
-		// define the steps to apply to those files
-		trimTrailingWhitespace()
-		indentWithTabs()
-		endWithNewline()
-	}
-
-	java {
-		importOrder()
-		removeUnusedImports()
-		licenseHeader '/* Licensed under Apache-2.0 $YEAR. */'
-	}
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.75
+            }
+        }
+    }
 }

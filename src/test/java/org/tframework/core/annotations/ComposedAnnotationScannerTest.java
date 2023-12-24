@@ -23,7 +23,7 @@ class ComposedAnnotationScannerTest {
     @Test
     public void scan_shouldThrowUnsupportedAnnotationException_whenAnnotationToFindIsInUnsupportedPackage() {
         UnsupportedAnnotationException actualException = assertThrows(UnsupportedAnnotationException.class, () -> {
-           scanner.scan(ComposedAnnotationScannerTest.class, Retention.class);
+        scanner.scan(ComposedAnnotationScannerTest.class, Retention.class);
         });
         assertEquals(
                 actualException.getMessageTemplate().formatted(Retention.class.getName()),

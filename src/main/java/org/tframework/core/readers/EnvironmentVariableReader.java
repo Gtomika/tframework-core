@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.utils;
+package org.tframework.core.readers;
 
 import java.util.Optional;
 import java.util.function.Function;
@@ -14,13 +14,13 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for unit testing
 public class EnvironmentVariableReader {
 
-    private final Function<String, String> variableExtractor;
+    private final Function<String, String> variableAccessor;
 
     /**
      * Creates a variable reader.
      */
     public EnvironmentVariableReader() {
-        variableExtractor = System::getenv;
+        variableAccessor = System::getenv;
     }
 
     /**
@@ -30,7 +30,7 @@ public class EnvironmentVariableReader {
      * @throws EnvironmentVariableNotFoundException If a variable by this name does not exist.
      */
     public String readVariable(String name) {
-        return Optional.ofNullable(variableExtractor.apply(name))
+        return Optional.ofNullable(variableAccessor.apply(name))
                 .orElseThrow(() -> new EnvironmentVariableNotFoundException(name));
     }
 

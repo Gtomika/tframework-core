@@ -28,7 +28,7 @@ public class CLIProfileScanner implements ProfileScanner {
      * Create a CLI profile scanner.
      * @param args Args, as provided in the {@code main} method. Must not be null.
      */
-    public CLIProfileScanner(@NonNull String[] args) {
+    CLIProfileScanner(@NonNull String[] args) {
         this.args = args;
     }
 

@@ -10,8 +10,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.utils.EnvironmentVariableNotFoundException;
-import org.tframework.core.utils.EnvironmentVariableReader;
+import org.tframework.core.readers.EnvironmentVariableNotFoundException;
+import org.tframework.core.readers.EnvironmentVariableReader;
 
 @ExtendWith(MockitoExtension.class)
 class EnvironmentProfileScannerTest {

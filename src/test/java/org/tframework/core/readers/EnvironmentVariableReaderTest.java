@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.utils;
+package org.tframework.core.readers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

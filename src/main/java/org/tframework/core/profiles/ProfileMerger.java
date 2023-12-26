@@ -3,20 +3,20 @@ package org.tframework.core.profiles;
 
 import java.util.List;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * The profile merger combines the output of several {@link ProfileScanner}s.
+ * The profile merger combines the output of several {@link ProfileScanner}s. Use
+ * {@link #merging(List)} to create a profile merger that combines output of the given scanners.
  */
 @Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ProfileMerger {
 
     private final List<ProfileScanner> profileScanners;
-
-    private ProfileMerger(@NonNull List<ProfileScanner> profileScanners) {
-        this.profileScanners = profileScanners;
-    }
 
     /**
      * Performs the merge of the given {@link ProfileScanner}s.
@@ -39,7 +39,7 @@ public class ProfileMerger {
     /**
      * Creates a {@link ProfileMerger} that combines the outputs of the given {@link ProfileScanner}s.
      */
-    public static ProfileMerger merging(@NonNull List<ProfileScanner> profileScanners) {
+    static ProfileMerger merging(@NonNull List<ProfileScanner> profileScanners) {
         return new ProfileMerger(profileScanners);
     }
 

@@ -2,6 +2,8 @@
 package org.tframework.core.profiles;
 
 import java.util.regex.Pattern;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * The profile validator ensures all profile names match the framework rules, which are:
@@ -10,6 +12,7 @@ import java.util.regex.Pattern;
  *     <li>Only lower case english letters and the dash ('-') character is allowed.</li>
  * </ul>
  */
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class ProfileValidator {
 
     private static final Pattern PROFILE_REGEX = Pattern.compile("[a-z\\-]+");

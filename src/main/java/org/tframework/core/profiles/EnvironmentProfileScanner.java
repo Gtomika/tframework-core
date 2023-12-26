@@ -7,8 +7,8 @@ import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.utils.EnvironmentVariableNotFoundException;
-import org.tframework.core.utils.EnvironmentVariableReader;
+import org.tframework.core.readers.EnvironmentVariableNotFoundException;
+import org.tframework.core.readers.EnvironmentVariableReader;
 
 /**
  * This {@link ProfileScanner} implementation checks the system variables for profiles. The environmental
@@ -16,19 +16,12 @@ import org.tframework.core.utils.EnvironmentVariableReader;
  * a comma separated list of profiles.
  */
 @Slf4j
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for testing
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class EnvironmentProfileScanner implements ProfileScanner {
 
     public static final String TFRAMEWORK_PROFILES_VARIABLE_NAME = "TFRAMEWORK_PROFILES";
 
     private final EnvironmentVariableReader environmentReader;
-
-    /**
-     * Creates an environment profile scanner.
-     */
-    public EnvironmentProfileScanner() {
-        this.environmentReader = new EnvironmentVariableReader();
-    }
 
     @Override
     public Set<String> scan() {

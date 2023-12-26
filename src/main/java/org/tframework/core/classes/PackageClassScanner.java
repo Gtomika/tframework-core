@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
 /**
  * A {@link ClassScanner} implementation that scans for classes in packages. The {@link ClassGraph} library
@@ -16,27 +19,13 @@ import java.util.concurrent.Executors;
  *     <li>Both outer and inner classes are found.</li>
  * </ul>
  */
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class PackageClassScanner implements ClassScanner {
 
     private static final int THREAD_COUNT = 5;
 
     private final Set<String> packageNames;
-
-    /**
-     * Create a package class scanner that will scan in one package.
-     * @param packageName Valid package name.
-     */
-    public PackageClassScanner(String packageName) {
-        this.packageNames = Set.of(packageName);
-    }
-
-    /**
-     * Create a package class scanner that will scan in a list of packages.
-     * @param packageNames Valid package names.
-     */
-    public PackageClassScanner(Set<String> packageNames) {
-        this.packageNames = packageNames;
-    }
 
     /**
      * Performs the scan in the packages specified at construction time. If some classes could not

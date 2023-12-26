@@ -2,6 +2,8 @@
 package org.tframework.core.profiles;
 
 import java.util.Set;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -9,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@value DEFAULT_PROFILE_NAME} profile.
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class DefaultProfileScanner implements ProfileScanner {
 
     public static final String DEFAULT_PROFILE_NAME = "default";

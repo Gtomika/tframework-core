@@ -16,19 +16,12 @@ import org.tframework.core.readers.EnvironmentVariableReader;
  * a comma separated list of profiles.
  */
 @Slf4j
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for testing
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class EnvironmentProfileScanner implements ProfileScanner {
 
     public static final String TFRAMEWORK_PROFILES_VARIABLE_NAME = "TFRAMEWORK_PROFILES";
 
     private final EnvironmentVariableReader environmentReader;
-
-    /**
-     * Creates an environment profile scanner.
-     */
-    public EnvironmentProfileScanner() {
-        this.environmentReader = new EnvironmentVariableReader();
-    }
 
     @Override
     public Set<String> scan() {

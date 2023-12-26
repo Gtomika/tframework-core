@@ -2,7 +2,6 @@
 package org.tframework.core.initializers;
 
 import java.time.Instant;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.Application;
@@ -16,14 +15,10 @@ import org.tframework.core.utils.TimerUtils;
  */
 @Slf4j
 @TFrameworkInternal
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for tests only
+@RequiredArgsConstructor
 public class CoreInitializationProcess {
 
     private final ProfilesCoreInitializer profilesInitializer;
-
-    public CoreInitializationProcess() {
-        profilesInitializer = new ProfilesCoreInitializer();
-    }
 
     /**
      * Perform the core initialization.

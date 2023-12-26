@@ -10,6 +10,7 @@ import org.tframework.core.TFrameworkInternal;
  * @param <Input> Type of the input required by this initializer.
  * @param <Output> Type of the output that this initializer produces.
  * @see CustomInitializer
+ * @see CoreInitializationFactory
  */
 @TFrameworkInternal
 public interface CoreInitializer<Input, Output> {

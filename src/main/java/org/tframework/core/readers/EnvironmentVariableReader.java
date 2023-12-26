@@ -10,18 +10,12 @@ import lombok.RequiredArgsConstructor;
  * Reader for fetching environment variables. Basically a wrapper for {@link System#getenv()},
  * except this throws {@link EnvironmentVariableNotFoundException} instead of returning null when no variable was found.
  * This class mainly exists so that code relying on environmental variables can be tested (by mocking this class).
+ * @see ReadersFactory
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for unit testing
 public class EnvironmentVariableReader {
 
     private final Function<String, String> variableAccessor;
-
-    /**
-     * Creates a variable reader.
-     */
-    public EnvironmentVariableReader() {
-        variableAccessor = System::getenv;
-    }
 
     /**
      * Fetch a variable from the environment.

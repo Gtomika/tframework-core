@@ -3,20 +3,19 @@ package org.tframework.core.readers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.tframework.core.utils.ResourceTestUtils.TEST_RESOURCE_CONTENT;
+import static org.tframework.core.utils.ResourceTestUtils.TEST_RESOURCE_NAME;
 
 import org.junit.jupiter.api.Test;
 
 class ResourceFileReaderTest {
 
-    private static final String RESOURCE_NAME = "text.txt";
-
     @Test
     public void shouldReadResourceFile_ifAccessorFindsIt() {
-        String expectedContent = "this is a test";
-        var resourceReader = new ResourceFileReader(name -> expectedContent);
+        var resourceReader = new ResourceFileReader(name -> TEST_RESOURCE_CONTENT);
 
-        var actualContent = resourceReader.readResourceFile(RESOURCE_NAME);
-        assertEquals(expectedContent, actualContent);
+        var actualContent = resourceReader.readResourceFile(TEST_RESOURCE_NAME);
+        assertEquals(TEST_RESOURCE_CONTENT, actualContent);
     }
 
     @Test
@@ -24,11 +23,11 @@ class ResourceFileReaderTest {
         var resourceReader = new ResourceFileReader(name -> null);
 
         var exception = assertThrows(ResourceNotFoundException.class, () -> {
-            resourceReader.readResourceFile(RESOURCE_NAME);
+            resourceReader.readResourceFile(TEST_RESOURCE_NAME);
         });
 
         assertEquals(
-                exception.getMessageTemplate().formatted(RESOURCE_NAME),
+                exception.getMessageTemplate().formatted(TEST_RESOURCE_NAME),
                 exception.getMessage()
         );
     }

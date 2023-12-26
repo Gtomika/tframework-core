@@ -5,7 +5,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.tframework.core.utils.ClassLoaderUtils;
 
 /**
  * Reader for fetching files from the resources.
@@ -14,13 +13,6 @@ import org.tframework.core.utils.ClassLoaderUtils;
 public class ResourceFileReader {
 
     private final Function<String, String> resourceAccessor;
-
-    /**
-     * Creates a resource file reader.
-     */
-    public ResourceFileReader() {
-        this.resourceAccessor = resourceName -> ClassLoaderUtils.getResourceAsString(resourceName, this.getClass());
-    }
 
     /**
      * Reads the contents of the resource file into a string.

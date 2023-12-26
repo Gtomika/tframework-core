@@ -4,6 +4,8 @@ package org.tframework.core.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.tframework.core.utils.ResourceTestUtils.TEST_RESOURCE_CONTENT;
+import static org.tframework.core.utils.ResourceTestUtils.TEST_RESOURCE_NAME;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -14,9 +16,6 @@ import org.tframework.core.TFramework;
 import org.tframework.core.readers.ResourceNotFoundException;
 
 class ClassLoaderUtilsTest {
-
-    private static final String TEST_RESOURCE_NAME = "test.txt";
-    private static final String TEST_RESOURCE_CONTENT = "This is a test";
 
     @Test
     public void shouldLoadResourceAsString_whenPresentInResourcesFolder() {

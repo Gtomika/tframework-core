@@ -1,8 +1,10 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.readers;
 
+import java.util.function.Function;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.tframework.core.utils.ClassLoaderUtils;
 
 /**
  * Factory methods for the readers in this package.
@@ -15,6 +17,16 @@ public final class ReadersFactory {
      */
     public static EnvironmentVariableReader createEnvironmentVariableReader() {
         return new EnvironmentVariableReader(System::getenv);
+    }
+
+    /**
+     * Creates a {@link ResourceFileReader} to access application resources.
+     */
+    public static ResourceFileReader createResourceFileReader() {
+        Function<String, String> resourceAccessor = (String resourceName) -> {
+            return ClassLoaderUtils.getResourceAsString(resourceName, ResourceFileReader.class);
+        };
+        return new ResourceFileReader(resourceAccessor);
     }
 
 }

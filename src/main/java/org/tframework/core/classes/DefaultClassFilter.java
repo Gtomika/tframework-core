@@ -3,11 +3,14 @@ package org.tframework.core.classes;
 
 import java.lang.annotation.Annotation;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import org.tframework.core.annotations.AnnotationScanner;
 
 /**
  * A reasonable default implementation for {@link ClassFilter}.
  */
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class DefaultClassFilter implements ClassFilter {
 
     @Override

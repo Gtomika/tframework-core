@@ -15,16 +15,11 @@ import lombok.extern.slf4j.Slf4j;
  * @see Profiles
  */
 @Slf4j
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for testing
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ProfileInitializationProcess {
 
     private final ProfileCleaner profileCleaner;
     private final ProfileValidator profileValidator;
-
-    public ProfileInitializationProcess() {
-        this.profileCleaner = new ProfileCleaner();
-        this.profileValidator = new ProfileValidator();
-    }
 
     /**
      * Perform the initialization process that scans for, cleans and validates profiles.

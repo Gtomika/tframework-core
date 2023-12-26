@@ -2,6 +2,8 @@
 package org.tframework.core.profiles;
 
 import java.util.Locale;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 /**
  * The profile cleaner is responsible for creating a unified format
@@ -11,8 +13,8 @@ import java.util.Locale;
  *     <li>Stripping leading and trailing whitespace characters.</li>
  * </ul>
  * This class will not validate, raise exceptions or remove any profiles from its input.
- * @see ProfileValidator
  */
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class ProfileCleaner {
 
     /**

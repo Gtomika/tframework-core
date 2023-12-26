@@ -6,6 +6,7 @@ import java.util.List;
 /**
  * The class scanner is responsible for finding classes. How and where the scan
  * looks is implementation dependent.
+ * @see ClassScannersFactory
  */
 public interface ClassScanner {
 

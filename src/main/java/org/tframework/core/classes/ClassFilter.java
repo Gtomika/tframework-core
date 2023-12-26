@@ -8,7 +8,7 @@ import org.tframework.core.annotations.AnnotationScanner;
 /**
  * The class filter is responsible for selecting classes that match certain criteria. The class
  * filter does not search for classes, only filters, usually the classes are provided by a {@link ClassScanner}.
- * @see ClassScanner
+ * @see ClassFiltersFactory
  */
 public interface ClassFilter {
 

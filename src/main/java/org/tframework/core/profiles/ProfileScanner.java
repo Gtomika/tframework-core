@@ -8,9 +8,7 @@ import java.util.Set;
  * which is implementation dependent: can be environmental variables, command line arguments, etc.
  * The scanner implementations should not attempt to clean or validate or process the profiles,
  * these are the responsibilities of other components.
- * @see ProfileCleaner
- * @see ProfileValidator
- * @see ProfileMerger
+ * @see ProfileScannersFactory
  */
 public interface ProfileScanner {
 

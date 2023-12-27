@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.Application;
 import org.tframework.core.profiles.InvalidProfileException;
-import org.tframework.core.profiles.Profiles;
+import org.tframework.core.profiles.ProfilesContainer;
 
 @ExtendWith(MockitoExtension.class)
 class CoreInitializationProcessTest {
@@ -35,11 +35,11 @@ class CoreInitializationProcessTest {
     public void shouldPerformCoreInitialization() {
         var expectedResult = new CoreInitializationResult(
                 Application.builder()
-                        .profiles(new Profiles(Set.of("a, b")))
+                        .profiles(new ProfilesContainer(Set.of("a, b")))
                         .build()
         );
 
-        when(profilesCoreInitializer.initialize(any())).thenReturn(expectedResult.application().profiles());
+        when(profilesCoreInitializer.initialize(any())).thenReturn(expectedResult.application().profilesContainer());
 
         CoreInitializationInput input = CoreInitializationInput.builder()
                 .args(new String[]{"testArg"})

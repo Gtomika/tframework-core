@@ -8,7 +8,7 @@ import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.profiles.ProfileInitializationProcess;
 import org.tframework.core.profiles.ProfileScannersFactory;
-import org.tframework.core.profiles.Profiles;
+import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.utils.TimerUtils;
 
 /**
@@ -18,25 +18,25 @@ import org.tframework.core.utils.TimerUtils;
 @Slf4j
 @TFrameworkInternal
 @RequiredArgsConstructor
-public class ProfilesCoreInitializer implements CoreInitializer<ProfileInitializationInput, Profiles> {
+public class ProfilesCoreInitializer implements CoreInitializer<ProfileInitializationInput, ProfilesContainer> {
 
     private final ProfileInitializationProcess profileInitializationProcess;
 
     /**
      * Perform profile initialization.
      * @param profileInitializationInput {@link ProfileInitializationInput} data required to start the initialization.
-     * @return {@link Profiles} record with the set profiles.
+     * @return {@link ProfilesContainer} record with the set profiles.
      */
     @Override
-    public Profiles initialize(ProfileInitializationInput profileInitializationInput) {
+    public ProfilesContainer initialize(ProfileInitializationInput profileInitializationInput) {
         log.debug("Starting profiles initialization...");
         Instant start = Instant.now();
 
         var profileScanners = ProfileScannersFactory.tframeworkProfileScanners(profileInitializationInput);
-        Profiles profiles = profileInitializationProcess.initializeProfiles(profileScanners);
+        ProfilesContainer profilesContainer = profileInitializationProcess.initializeProfiles(profileScanners);
 
         log.info("The profile initialization completed in {} ms, and found the following profiles: {}",
-                TimerUtils.msBetween(start, Instant.now()), profiles.profiles());
-        return profiles;
+                TimerUtils.msBetween(start, Instant.now()), profilesContainer.profiles());
+        return profilesContainer;
     }
 }

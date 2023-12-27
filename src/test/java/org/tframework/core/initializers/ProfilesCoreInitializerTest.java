@@ -12,7 +12,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.profiles.ProfileInitializationProcess;
-import org.tframework.core.profiles.Profiles;
+import org.tframework.core.profiles.ProfilesContainer;
 
 @ExtendWith(MockitoExtension.class)
 class ProfilesCoreInitializerTest {
@@ -22,7 +22,7 @@ class ProfilesCoreInitializerTest {
 
     @Test
     public void shouldInitializeProfiles() {
-        var expectedProfiles = new Profiles(Set.of("a", "b"));
+        var expectedProfiles = new ProfilesContainer(Set.of("a", "b"));
         when(profileInitializationProcess.initializeProfiles(anyList()))
                 .thenReturn(expectedProfiles);
 

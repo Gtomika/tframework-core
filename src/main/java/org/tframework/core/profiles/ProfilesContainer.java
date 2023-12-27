@@ -8,7 +8,7 @@ import lombok.NonNull;
  * Contains the profiles and some related utility methods.
  * @param profiles {@link Set} of profiles.
  */
-public record Profiles(Set<String> profiles) {
+public record ProfilesContainer(Set<String> profiles) {
 
     /**
      * Checks if a profile is set.

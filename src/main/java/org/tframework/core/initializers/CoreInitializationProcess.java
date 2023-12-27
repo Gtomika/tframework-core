@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.Application;
 import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.profiles.ProfileInitializationInput;
-import org.tframework.core.profiles.Profiles;
+import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.utils.TimerUtils;
 
 /**
@@ -31,10 +31,10 @@ public class CoreInitializationProcess {
         Instant start = Instant.now();
 
         try {
-            Profiles profiles = initProfiles(coreInput);
+            ProfilesContainer profilesContainer = initProfiles(coreInput);
 
             Application application = Application.builder()
-                    .profiles(profiles)
+                    .profiles(profilesContainer)
                     .build();
             return new CoreInitializationResult(application);
         } catch (Exception e) {
@@ -45,7 +45,7 @@ public class CoreInitializationProcess {
         }
     }
 
-    private Profiles initProfiles(CoreInitializationInput coreInput) {
+    private ProfilesContainer initProfiles(CoreInitializationInput coreInput) {
         var profileInput = ProfileInitializationInput.builder()
                 .args(coreInput.args())
                 .build();

@@ -17,7 +17,7 @@ class ComposedAnnotationScannerTest {
     This may not be the best approach, but instead of using a mock annotation matcher, I decided to
     use a concrete implementation, to reduce mocking noise in these tests.
      */
-    private final ExtendedAnnotationMatcher extendedAnnotationMatcher = new ExtendedAnnotationMatcher();
+    private final ExtendedAnnotationMatcher extendedAnnotationMatcher = AnnotationMatchersFactory.createExtendedAnnotationMatcher();
     private final ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(extendedAnnotationMatcher);
 
     @Test

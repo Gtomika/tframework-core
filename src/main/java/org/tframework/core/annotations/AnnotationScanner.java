@@ -6,10 +6,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Interface for classes that can detect ("scan") annotations on a provided class. To check if the detected
- * annotation match the annotation to scan for, implementation should use {@link AnnotationMatcher}s. All
- * implementations should be stateless.
- * @see AnnotationMatcher
+ * Interface for classes that can detect ("scan") annotations on a provided class.
+ * @see AnnotationScannersFactory
  */
 public interface AnnotationScanner {
 

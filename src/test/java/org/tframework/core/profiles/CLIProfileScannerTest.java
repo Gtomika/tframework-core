@@ -3,8 +3,8 @@ package org.tframework.core.profiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.tframework.core.profiles.CLIProfileScanner.PROFILES_CLI_ARGUMENT;
-import static org.tframework.core.profiles.CLIProfileScanner.SEPARATOR;
+import static org.tframework.core.profiles.CLIProfileScanner.PROFILES_CLI_ARGUMENT_KEY;
+import static org.tframework.core.utils.CliUtils.CLI_KEY_VALUE_SEPARATOR;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;
@@ -13,7 +13,7 @@ class CLIProfileScannerTest {
 
     @Test
     public void shouldFindProfile_ifProvided() {
-        String[] args = {PROFILES_CLI_ARGUMENT + SEPARATOR + "dev,db", "otherArgXX"};
+        String[] args = {PROFILES_CLI_ARGUMENT_KEY + CLI_KEY_VALUE_SEPARATOR + "dev,db", "otherArgXX"};
         var cliProfileScanner = new CLIProfileScanner(args);
 
         var profiles = cliProfileScanner.scan();
@@ -22,7 +22,8 @@ class CLIProfileScannerTest {
 
     @Test
     public void shouldFindProfile_ifProvided_asMultipleArgs() {
-        String[] args = {PROFILES_CLI_ARGUMENT + SEPARATOR + "dev,db", "otherArgXX", PROFILES_CLI_ARGUMENT + SEPARATOR + "test"};
+        String[] args = {PROFILES_CLI_ARGUMENT_KEY + CLI_KEY_VALUE_SEPARATOR + "dev,db", "otherArgXX",
+                PROFILES_CLI_ARGUMENT_KEY + CLI_KEY_VALUE_SEPARATOR + "test"};
         var cliProfileScanner = new CLIProfileScanner(args);
 
         var profiles = cliProfileScanner.scan();

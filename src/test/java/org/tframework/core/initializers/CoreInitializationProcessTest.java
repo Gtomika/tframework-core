@@ -35,7 +35,7 @@ class CoreInitializationProcessTest {
     public void shouldPerformCoreInitialization() {
         var expectedResult = new CoreInitializationResult(
                 Application.builder()
-                        .profiles(new ProfilesContainer(Set.of("a, b")))
+                        .profilesContainer(new ProfilesContainer(Set.of("a, b")))
                         .build()
         );
 

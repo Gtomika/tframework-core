@@ -34,7 +34,7 @@ public class CoreInitializationProcess {
             ProfilesContainer profilesContainer = initProfiles(coreInput);
 
             Application application = Application.builder()
-                    .profiles(profilesContainer)
+                    .profilesContainer(profilesContainer)
                     .build();
             return new CoreInitializationResult(application);
         } catch (Exception e) {

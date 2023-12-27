@@ -103,4 +103,19 @@ public final class ClassLoaderUtils {
         }
     }
 
+    /**
+     * Checks if the given class is available on the classpath.
+     * @param className Class to check.
+     * @param callingClass Class that this method was called from.
+     * @return True only if {@code className} was found.
+     */
+    public static boolean isClassAvailable(String className, Class<?> callingClass) {
+        try {
+            loadClass(className, callingClass);
+            return true;
+        } catch (ClassNotFoundException e) {
+            return false;
+        }
+    }
+
 }

@@ -15,6 +15,7 @@ public interface YamlParser {
      * @param yaml Valid YAML string.
      * @return Map where the keys are the top level YAML elements, and the values are whatever these
      * elements have. These may be strings, numbers, lists, or nested maps.
+     * @throws YamlParsingException If the parsing failed.
      */
     Map<String, Object> parseYaml(String yaml);
 

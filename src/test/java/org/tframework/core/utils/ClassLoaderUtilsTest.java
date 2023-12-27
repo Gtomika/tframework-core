@@ -2,8 +2,10 @@
 package org.tframework.core.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.tframework.core.utils.ResourceTestUtils.TEST_RESOURCE_CONTENT;
 import static org.tframework.core.utils.ResourceTestUtils.TEST_RESOURCE_NAME;
 
@@ -16,6 +18,8 @@ import org.tframework.core.TFramework;
 import org.tframework.core.readers.ResourceNotFoundException;
 
 class ClassLoaderUtilsTest {
+
+    public static final String MADE_UP_CLASS = "some.cool.package.CoolClass";
 
     @Test
     public void shouldLoadResourceAsString_whenPresentInResourcesFolder() {
@@ -52,10 +56,19 @@ class ClassLoaderUtilsTest {
 
     @Test
     public void shouldThrowClassNotFoundException_whenClassNotFound() {
-        String madeUpClass = "some.cool.package.CoolClass";
         assertThrows(ClassNotFoundException.class, () -> {
-            ClassLoaderUtils.loadClass(madeUpClass, this.getClass());
+            ClassLoaderUtils.loadClass(MADE_UP_CLASS, this.getClass());
         });
+    }
+
+    @Test
+    public void shouldReturnTrue_whenClassIsAvailable() {
+        assertTrue(ClassLoaderUtils.isClassAvailable(TFramework.class.getName(), this.getClass()));
+    }
+
+    @Test
+    public void shouldReturnFalse_whenClassIsNotAvailable() {
+        assertFalse(ClassLoaderUtils.isClassAvailable(MADE_UP_CLASS, this.getClass()));
     }
 
 }

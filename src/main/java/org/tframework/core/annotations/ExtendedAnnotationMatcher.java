@@ -6,6 +6,8 @@ import java.lang.annotation.Repeatable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  * @see AnnotationMatchingResult
  */
 @Slf4j
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class ExtendedAnnotationMatcher implements AnnotationMatcher {
 
     /**

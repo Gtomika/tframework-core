@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import lombok.Getter;
 
 /**
  * The composed annotation scanner implements 'extended annotation detection', which is more elaborate than
@@ -26,6 +27,7 @@ import java.util.Set;
  * placed on each other), the scanning will stop at the first match.
  * @see AnnotationMatcher
  */
+@Getter
 public class ComposedAnnotationScanner implements AnnotationScanner {
 
     private static final Set<String> UNSUPPORTED_PACKAGES = Set.of("java.lang.annotation");
@@ -34,10 +36,10 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
 
     /**
      * Creates a composed annotation scanner that uses the provided {@link AnnotationMatcher}.
-     * @param annotationMatcher {@link AnnotationMatcher} used to check 'equality' between the found
+     * @param annotationMatcher {@link AnnotationMatcher} used to match the found
      *                          annotation and the one to scan for.
      */
-    public ComposedAnnotationScanner(AnnotationMatcher annotationMatcher) {
+    ComposedAnnotationScanner(AnnotationMatcher annotationMatcher) {
         this.annotationMatcher = annotationMatcher;
     }
 

@@ -18,7 +18,7 @@ class PropertiesContainerTest {
     public void setUp() {
         container = PropertiesContainer.fromProperties(Map.of(
                 "p1", new SinglePropertyValue("v1"),
-                "p2", new CollectionPropertyValue(List.of("v2-1", "v2-2")
+                "p2", new ListPropertyValue(List.of("v2-1", "v2-2")
         )));
     }
 

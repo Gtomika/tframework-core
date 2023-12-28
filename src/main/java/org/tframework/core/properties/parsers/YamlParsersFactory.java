@@ -4,7 +4,8 @@ package org.tframework.core.properties.parsers;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.utils.ClassLoaderUtils;
+import org.tframework.core.utils.OptionalDependency;
+import org.tframework.core.utils.OptionalDependencyUtils;
 
 //this class must not import any Jackson or SnakeYaml classes!!!
 /**
@@ -27,12 +28,12 @@ public final class YamlParsersFactory {
      * @throws NoYamlParserLibraryException If none of the supported YAML parsing libraries were available.
      */
     public static YamlParser createAvailableYamlParser() {
-        if(ClassLoaderUtils.isClassAvailable("com.fasterxml.jackson.dataformat.yaml.YAMLFactory", YamlParsersFactory.class)) {
+        if(OptionalDependencyUtils.isOptionalDependencyAvailable(OptionalDependency.JACKSON_YAML)) {
             log.info("Found Jackson YAML library on the classpath, using '{}'", JacksonYamlParser.class.getName());
             return JacksonYamlParser.createJacksonYamlParser();
         }
 
-        if(ClassLoaderUtils.isClassAvailable("org.yaml.snakeyaml.Yaml", YamlParsersFactory.class)) {
+        if(OptionalDependencyUtils.isOptionalDependencyAvailable(OptionalDependency.SNAKE_YAML)) {
             log.info("Found Snake YAML library on the classpath, using '{}'", SnakeYamlParser.class.getName());
             return SnakeYamlParser.createSnakeYamlParser();
         }

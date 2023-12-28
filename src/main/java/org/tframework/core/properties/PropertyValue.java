@@ -4,5 +4,5 @@ package org.tframework.core.properties;
 /**
  * A property value is either a single value, or a collection of values.
  */
-public sealed interface PropertyValue permits SinglePropertyValue, CollectionPropertyValue {
+public sealed interface PropertyValue permits SinglePropertyValue, ListPropertyValue {
 }

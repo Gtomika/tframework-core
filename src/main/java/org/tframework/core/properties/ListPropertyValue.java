@@ -3,7 +3,7 @@ package org.tframework.core.properties;
 
 import java.util.List;
 
-public record CollectionPropertyValue(
+public record ListPropertyValue(
         List<String> values
 ) implements PropertyValue {
 }

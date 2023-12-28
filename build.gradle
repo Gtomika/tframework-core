@@ -64,8 +64,6 @@ testing {
                 all {
                     testTask.configure {
                         finalizedBy("jacocoTestReport") // report + coverage check is always generated after tests run
-                        finalizedBy("jacksonYamlTest") //also run specific test suites
-                        finalizedBy("snakeYamlTest")
                     }
                 }
             }

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -16,12 +17,22 @@ class ProfileValidatorTest {
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"", "ABC", "üö", "123-456"})
-    public void shouldValidateProfile_andThrowException_ifNull(String profile) {
+    public void shouldValidateProfile_andThrowException_ifInvalid(String profile) {
         var exception = assertThrows(InvalidProfileException.class, () -> profileValidator.validate(profile));
 
         String expectedProfileInException = profile == null ? "null" : profile;
         assertEquals(
                 exception.getMessageTemplate().formatted(expectedProfileInException, ProfileValidator.class.getName()),
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    public void shouldValidateProfile_andThrowException_ifTooLong() {
+        String longProfile = "a".repeat(ProfileValidator.MAX_PROFILE_LENGTH + 10);
+        var exception = assertThrows(InvalidProfileException.class, () -> profileValidator.validate(longProfile));
+        assertEquals(
+                exception.getMessageTemplate().formatted(longProfile, ProfileValidator.class.getName()),
                 exception.getMessage()
         );
     }

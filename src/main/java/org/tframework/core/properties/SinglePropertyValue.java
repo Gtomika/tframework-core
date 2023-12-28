@@ -1,5 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties;
 
-public record SinglePropertyValue() implements PropertyValue {
+public record SinglePropertyValue(
+        String value
+) implements PropertyValue {
 }

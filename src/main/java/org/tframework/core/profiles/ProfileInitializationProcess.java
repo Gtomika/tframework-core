@@ -33,7 +33,7 @@ public class ProfileInitializationProcess {
                 .map(profileCleaner::clean)
                 .peek(profileValidator::validate)
                 .collect(Collectors.toSet());
-        return new ProfilesContainer(profiles);
+        return ProfilesContainer.fromProfiles(profiles);
     }
 
 }

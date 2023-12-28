@@ -22,7 +22,7 @@ class ProfilesCoreInitializerTest {
 
     @Test
     public void shouldInitializeProfiles() {
-        var expectedProfiles = new ProfilesContainer(Set.of("a", "b"));
+        var expectedProfiles = ProfilesContainer.fromProfiles(Set.of("a", "b"));
         when(profileInitializationProcess.initializeProfiles(anyList()))
                 .thenReturn(expectedProfiles);
 

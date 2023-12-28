@@ -2,13 +2,17 @@
 package org.tframework.core.profiles;
 
 import java.util.Set;
+import lombok.AccessLevel;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 /**
- * Contains the profiles and some related utility methods.
- * @param profiles {@link Set} of profiles.
+ * Read only container of the profiles, and some related utility methods.
  */
-public record ProfilesContainer(Set<String> profiles) {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+public final class ProfilesContainer {
+
+    private final Set<String> profiles;
 
     /**
      * Checks if a profile is set.
@@ -16,6 +20,20 @@ public record ProfilesContainer(Set<String> profiles) {
      */
     public boolean isProfileSet(@NonNull String profile) {
         return profiles.contains(profile);
+    }
+
+    /**
+     * Creates a copy of the profiles.
+     */
+    public Set<String> profiles() {
+        return Set.copyOf(profiles);
+    }
+
+    /**
+     * Creates a {@link ProfilesContainer} that will have the given {@link Set} of profiles.
+     */
+    public static ProfilesContainer fromProfiles(@NonNull Set<String> profiles) {
+        return new ProfilesContainer(profiles);
     }
 
 }

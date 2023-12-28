@@ -5,7 +5,7 @@ import java.util.Map;
 
 /**
  * A YAML parser converts a YAML string into a {@link Map} of contents, but does
- * not perform further post-processing on the parsed map.
+ * not perform further post-processing on the parsed map (see {@link #parseYaml(String)} for details).
  * @see YamlParsersFactory
  */
 public interface YamlParser {

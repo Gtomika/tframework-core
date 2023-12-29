@@ -44,4 +44,16 @@ class PropertiesContainerTest {
         );
     }
 
+    @Test
+    public void shouldMergeProperties_andCreateNewContainer() {
+        PropertiesContainer newContainer = container.merge(Map.of(
+                "p2", new SinglePropertyValue("v2-override"),
+                "p3", new SinglePropertyValue("v3")
+        ));
+
+        assertEquals("v1", ((SinglePropertyValue) newContainer.getPropertyValue("p1")).value());
+        assertEquals("v2-override", ((SinglePropertyValue) newContainer.getPropertyValue("p2")).value());
+        assertEquals("v3", ((SinglePropertyValue) newContainer.getPropertyValue("p3")).value());
+    }
+
 }

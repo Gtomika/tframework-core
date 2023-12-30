@@ -27,8 +27,9 @@ class JacksonYamlParserTest {
         var parsedYaml = parser.parseYaml(simpleYaml);
 
         assertEquals("v1", parsedYaml.get("k1"));
-        assertEquals("v2", parsedYaml.get("k2"));
-        assertEquals(3, parsedYaml.get("k3"));
+        assertEquals(3, parsedYaml.get("k2"));
+        assertEquals(4.1, parsedYaml.get("k3"));
+        assertEquals(true, parsedYaml.get("k4"));
     }
 
     @Test

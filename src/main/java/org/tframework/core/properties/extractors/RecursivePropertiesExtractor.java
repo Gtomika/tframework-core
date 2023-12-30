@@ -5,19 +5,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import org.tframework.core.properties.ListPropertyValue;
+import lombok.RequiredArgsConstructor;
 import org.tframework.core.properties.PropertyValue;
-import org.tframework.core.properties.SinglePropertyValue;
+import org.tframework.core.properties.extractors.leaves.LeafExtractor;
 
 /**
  * A {@link PropertiesExtractor} implementation which walks the given parsed YAML
  * recursively to gather the properties.
  */
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class RecursivePropertiesExtractor implements PropertiesExtractor {
 
     private static final String ROOT_PROPERTY_PATH = "";
+
+    private final List<LeafExtractor> leafExtractors;
 
     @Override
     public Map<String, PropertyValue> extractProperties(Map<String, Object> parsedYaml) {
@@ -38,8 +39,8 @@ public class RecursivePropertiesExtractor implements PropertiesExtractor {
             String newPropertyPath = concatPropertyPath(parentPropertyPath, propertyPath);
             if(node instanceof Map<?, ?>) { // node is a Map, but not necessarily Map<String, Object>...
                 saveProperties(properties, newPropertyPath, (Map<String, Object>) node);
-            } else {
-                properties.put(newPropertyPath, extractNodeValue(node));
+            } else { //this node is a leaf
+                properties.put(newPropertyPath, extractLeafValue(node));
             }
         }
     }
@@ -51,17 +52,13 @@ public class RecursivePropertiesExtractor implements PropertiesExtractor {
         return parentPropertyPath + PROPERTY_PATH_SEPARATOR + propertyPath;
     }
 
-    //TODO: should create interface and separate implementations: NodeExtractor?
-    private PropertyValue extractNodeValue(Object node) {
-        if(node == null) {
-            return new SinglePropertyValue(null);
+    private PropertyValue extractLeafValue(Object node) {
+        for(LeafExtractor leafExtractor : leafExtractors) {
+            if(leafExtractor.matchesLeaf(node)) {
+                return leafExtractor.extractLeaf(node);
+            }
         }
-        if(node instanceof List<?> list) {
-            List<String> strings = list.stream()
-                    .map(object -> object == null ? null : String.valueOf(object))
-                    .toList();
-            return new ListPropertyValue(strings);
-        }
-        return new SinglePropertyValue(String.valueOf(node));
+        //should not get here, DefaultLeafExtractor should match anything
+        throw new IllegalStateException("No leaf extractor found for node: " + node);
     }
 }

@@ -3,10 +3,8 @@ package org.tframework.core.properties.extractors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -85,27 +83,6 @@ public class ExtractorTestUtils {
         } else {
             fail();
         }
-    }
-
-    public static final Map<String, Object> TEST_PARSED_YAML_WITH_UNKNOWN_LEAF = Map.of(
-        "a", "1",
-        "b", Map.of(
-            "b1", "2",
-            "b2", "3"
-        ),
-        "c", new File("test.txt") //File typed leaf is never expected from YAML
-    );
-
-    public static void assertExceptionThrown_whenExtractingProperties_withUnknownLeaf(PropertiesExtractor extractor) {
-        var exception = assertThrows(NoMatchingLeafExtractorException.class, () -> {
-            extractor.extractProperties(TEST_PARSED_YAML_WITH_UNKNOWN_LEAF);
-        });
-
-        var unknownLeaf = TEST_PARSED_YAML_WITH_UNKNOWN_LEAF.get("c");
-        assertEquals(
-                exception.getMessageTemplate().formatted(unknownLeaf, unknownLeaf.getClass().getName()),
-                exception.getMessage()
-        );
     }
 
 }

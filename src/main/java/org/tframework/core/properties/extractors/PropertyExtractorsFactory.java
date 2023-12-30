@@ -3,11 +3,14 @@ package org.tframework.core.properties.extractors;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.properties.extractors.leaves.LeafExtractorsFactory;
+import org.tframework.core.utils.LogUtils;
 
 /**
  * Utilities for creating {@link PropertiesExtractor}s.
  */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PropertyExtractorsFactory {
 
@@ -16,7 +19,12 @@ public final class PropertyExtractorsFactory {
      */
     public static PropertiesExtractor createPropertiesExtractor() {
         var leafExtractors = LeafExtractorsFactory.createLeafExtractors();
-        return new RecursivePropertiesExtractor(leafExtractors);
+        var propertiesExtractor = new RecursivePropertiesExtractor(leafExtractors);
+
+        log.debug("Created leaf extractors: '{}'", LogUtils.classNames(leafExtractors));
+        log.debug("Created properties extractor: '{}'", propertiesExtractor.getClass().getName());
+
+        return propertiesExtractor;
     }
 
 }

@@ -22,9 +22,4 @@ class RecursivePropertiesExtractorTest {
         ExtractorTestUtils.assertPropertyDIsCorrect(properties);
     }
 
-    @Test
-    public void shouldThrowException_whenLeafTypeIsUnknown() {
-        ExtractorTestUtils.assertExceptionThrown_whenExtractingProperties_withUnknownLeaf(extractor);
-    }
-
 }

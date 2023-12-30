@@ -4,7 +4,7 @@ package org.tframework.core.properties.scanners;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Set;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class CliArgumentPropertyFileScannerTest {
@@ -32,7 +32,7 @@ class CliArgumentPropertyFileScannerTest {
                 "tframework.propertyFile=props/custom-properties.yaml"
         };
         CliArgumentPropertyFileScanner scanner = new CliArgumentPropertyFileScanner(args);
-        assertEquals(Set.of("custom-properties.yaml", "props/custom-properties.yaml"), scanner.scan());
+        assertEquals(List.of("custom-properties.yaml", "props/custom-properties.yaml"), scanner.scan());
     }
 
 }

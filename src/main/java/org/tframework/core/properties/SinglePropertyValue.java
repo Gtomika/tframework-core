@@ -4,4 +4,9 @@ package org.tframework.core.properties;
 public record SinglePropertyValue(
         String value
 ) implements PropertyValue {
+
+    @Override
+    public String toString() {
+        return value;
+    }
 }

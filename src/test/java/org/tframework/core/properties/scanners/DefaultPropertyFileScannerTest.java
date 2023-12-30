@@ -3,7 +3,7 @@ package org.tframework.core.properties.scanners;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.util.Set;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 
 class DefaultPropertyFileScannerTest {
@@ -11,8 +11,8 @@ class DefaultPropertyFileScannerTest {
     @Test
     public void testScan() {
         DefaultPropertyFileScanner defaultPropertyFileScanner = new DefaultPropertyFileScanner();
-        var files = defaultPropertyFileScanner.scan();
-        assertEquals(Set.of(DefaultPropertyFileScanner.DEFAULT_PROPERTY_FILE_NAME), files);
+        List<String> files = defaultPropertyFileScanner.scan();
+        assertEquals(List.of(DefaultPropertyFileScanner.DEFAULT_PROPERTY_FILE_NAME), files);
     }
 
 }

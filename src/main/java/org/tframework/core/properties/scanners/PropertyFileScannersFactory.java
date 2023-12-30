@@ -4,12 +4,15 @@ package org.tframework.core.properties.scanners;
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesInitializationInput;
+import org.tframework.core.utils.LogUtils;
 
 /**
  * Utilities for creating {@link PropertyFileScanner}s.
  */
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PropertyFileScannersFactory {
 
@@ -19,11 +22,13 @@ public final class PropertyFileScannersFactory {
      */
     public static List<PropertyFileScanner> createTframeworkPropertyFileScanners(PropertiesInitializationInput input) {
         //the order of the scanners is important
-        return List.of(
+        var scanners = List.of(
                 createDefaultScanner(),
                 createProfilesScanner(input.profilesContainer()),
                 createCliArgumentScanner(input.cliArgs())
         );
+        log.debug("Created the following property file scanners: {}", LogUtils.classNames(scanners));
+        return scanners;
     }
 
     private static DefaultPropertyFileScanner createDefaultScanner() {

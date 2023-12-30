@@ -7,10 +7,12 @@ import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A read-only container of the properties, and related utility methods.
  */
+@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PropertiesContainer {
 
@@ -33,7 +35,14 @@ public final class PropertiesContainer {
      */
     PropertiesContainer merge(@NonNull Map<String, PropertyValue> additionalProperties) {
         Map<String, PropertyValue> mergedProperties = new HashMap<>(properties);
-        mergedProperties.putAll(additionalProperties);
+        for(String propertyName : additionalProperties.keySet()) {
+            var newValue = additionalProperties.get(propertyName);
+            if(mergedProperties.containsKey(propertyName)) {
+                var oldValue = mergedProperties.get(propertyName);
+                log.debug("Overriding property '{}'. Old value: '{}'. New value: '{}'", propertyName, oldValue, newValue);
+            }
+            mergedProperties.put(propertyName, newValue);
+        }
         return PropertiesContainer.fromProperties(mergedProperties);
     }
 
@@ -43,6 +52,13 @@ public final class PropertiesContainer {
      */
     public static PropertiesContainer fromProperties(Map<String, PropertyValue> properties) {
         return new PropertiesContainer(properties);
+    }
+
+    /**
+     * Creates an empty {@link PropertiesContainer}.
+     */
+    public static PropertiesContainer empty() {
+        return fromProperties(Map.of());
     }
 
 }

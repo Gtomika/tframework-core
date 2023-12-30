@@ -2,8 +2,7 @@
 package org.tframework.core.properties.scanners;
 
 import java.util.Arrays;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,12 +34,12 @@ public class CliArgumentPropertyFileScanner implements PropertyFileScanner {
     private final String[] args;
 
     @Override
-    public Set<String> scan() {
+    public List<String> scan() {
         return Arrays.stream(args)
                 .filter(arg -> CliUtils.isArgumentWithKey(arg, PROPERTY_FILE_ARGUMENT_KEY))
                 .map(CliUtils::extractArgumentValue)
                 .filter(arg -> !arg.isBlank())
                 .peek(arg -> log.debug("Scanning for property file activated by CLI argument: '{}'", arg))
-                .collect(Collectors.toSet());
+                .toList();
     }
 }

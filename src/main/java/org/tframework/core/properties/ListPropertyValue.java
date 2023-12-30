@@ -13,4 +13,8 @@ public record ListPropertyValue(
         }
     }
 
+    @Override
+    public String toString() {
+        return values.toString();
+    }
 }

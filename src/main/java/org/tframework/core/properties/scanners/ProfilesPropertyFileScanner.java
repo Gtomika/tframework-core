@@ -1,8 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.scanners;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +19,11 @@ public class ProfilesPropertyFileScanner implements PropertyFileScanner {
     private final ProfilesContainer profilesContainer;
 
     @Override
-    public Set<String> scan() {
+    public List<String> scan() {
         return profilesContainer.profiles()
                 .stream()
                 .map(profile -> String.format(PROFILE_PROPERTY_FILE_NAME_TEMPLATE, profile))
                 .peek(file -> log.debug("Scanning for profile property file: {}", file))
-                .collect(Collectors.toSet());
+                .toList();
     }
 }

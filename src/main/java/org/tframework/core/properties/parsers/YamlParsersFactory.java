@@ -38,6 +38,7 @@ public final class YamlParsersFactory {
             return SnakeYamlParser.createSnakeYamlParser();
         }
 
+        log.error("No YAML parsing library was found on the classpath");
         throw new NoYamlParserLibraryException();
     }
 

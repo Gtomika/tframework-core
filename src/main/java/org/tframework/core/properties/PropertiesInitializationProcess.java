@@ -17,8 +17,7 @@ import org.tframework.core.readers.ResourceFileReader;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class PropertiesInitializationProcess {
 
-    private static final String SOURCE_FILE = "sourceFile";
-    private static final String OVERRIDE_FILE = "overrideFile";
+    private static final String OVERRIDING_PROPERTY_FILE = "overridingPropertyFile";
 
     private final List<PropertyFileScanner> propertyFileScanners; //finds the property files
     private final ResourceFileReader resourceFileReader;          //reads the property files
@@ -31,21 +30,19 @@ public class PropertiesInitializationProcess {
         for(PropertyFileScanner propertyFileScanner: propertyFileScanners) {
             List<String> propertyFiles = propertyFileScanner.scan();
             for(String propertyFile : propertyFiles) {
-                MDC.put(OVERRIDE_FILE, propertyFile);
                 log.debug("Found property file '{}', provided by scanner '{}'", propertyFile, propertyFileScanner.getClass().getName());
 
                 var propertyFileContent = resourceFileReader.readResourceFile(propertyFile);
                 var parsedYaml = yamlParser.parseYaml(propertyFileContent);
                 var properties = propertiesExtractor.extractProperties(parsedYaml);
 
-                log.debug("Found {} properties in file '{}', merging...", properties.size(), propertyFile);
+                log.debug("Found {} properties in file '{}', merging them into current properties...", properties.size(), propertyFile);
+                MDC.put(OVERRIDING_PROPERTY_FILE, propertyFile);
                 propertiesContainer = propertiesContainer.merge(properties);
-                MDC.put(SOURCE_FILE, propertyFile);
+                MDC.remove(OVERRIDING_PROPERTY_FILE);
             }
         }
 
-        MDC.remove(SOURCE_FILE);
-        MDC.remove(OVERRIDE_FILE);
         return propertiesContainer;
     }
 

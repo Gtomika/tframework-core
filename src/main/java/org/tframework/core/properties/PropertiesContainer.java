@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
  * A read-only container of the properties, and related utility methods.
  */
 @Slf4j
+@EqualsAndHashCode
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PropertiesContainer {
 
@@ -25,6 +27,13 @@ public final class PropertiesContainer {
     public PropertyValue getPropertyValue(String propertyName) {
         return Optional.ofNullable(properties.get(propertyName))
                 .orElseThrow(() -> new PropertyNotFoundException(propertyName));
+    }
+
+    /**
+     * @return How many properties are in this container.
+     */
+    public int size() {
+        return properties.size();
     }
 
     /**
@@ -44,6 +53,28 @@ public final class PropertiesContainer {
             mergedProperties.put(propertyName, newValue);
         }
         return PropertiesContainer.fromProperties(mergedProperties);
+    }
+
+    /**
+     * Creates a well-formed {@link String} representation of this {@link PropertiesContainer} which lists
+     * the properties in alphabetical order.
+     */
+    @Override
+    public String toString() {
+        var propertyNames = properties.keySet()
+                .stream()
+                .sorted()
+                .toList();
+        StringBuilder stringBuilder = new StringBuilder("Properties container with the following properties:\n");
+        for(String propertyName : propertyNames) {
+            stringBuilder.append(" - ")
+                    .append(propertyName)
+                    .append(": ")
+                    .append(properties.get(propertyName))
+                    .append("\n");
+        }
+        stringBuilder.deleteCharAt(stringBuilder.length() - 1); // Remove the last \n
+        return stringBuilder.toString();
     }
 
     /**

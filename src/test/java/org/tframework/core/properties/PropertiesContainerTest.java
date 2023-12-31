@@ -56,4 +56,17 @@ class PropertiesContainerTest {
         assertEquals("v3", ((SinglePropertyValue) newContainer.getPropertyValue("p3")).value());
     }
 
+    @Test
+    public void shouldGetPropertiesSize() {
+        assertEquals(2, container.size());
+    }
+
+    @Test
+    public void shouldCreateStringRepresentation() {
+        assertEquals("""
+                Properties container with the following properties:
+                 - p1: v1
+                 - p2: [v2-1, v2-2]""", container.toString());
+    }
+
 }

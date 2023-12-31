@@ -59,7 +59,6 @@ class PropertiesInitializationProcessTest {
     @BeforeEach
     public void setUp() {
         propertiesInitializationProcess = PropertiesInitializationProcess.builder()
-                .propertyFileScanners(List.of(propertyFileScanner))
                 .resourceFileReader(resourceFileReader)
                 .yamlParser(yamlParser)
                 .propertiesExtractor(propertiesExtractor)
@@ -102,7 +101,7 @@ class PropertiesInitializationProcessTest {
     @Test
     public void shouldInitializeProperties() {
         setupMocks();
-        var propertiesContainer = propertiesInitializationProcess.initialize();
+        var propertiesContainer = propertiesInitializationProcess.initialize(List.of(propertyFileScanner));
         makeAssertions(propertiesContainer);
     }
 

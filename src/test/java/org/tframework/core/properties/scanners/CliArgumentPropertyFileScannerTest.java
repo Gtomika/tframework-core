@@ -28,11 +28,12 @@ class CliArgumentPropertyFileScannerTest {
         String[] args = new String[] {
                 "--foo=bar",
                 "testArg",
-                "tframework.propertyFile=custom-properties.yaml",
+                "tframework.propertyFile=custom-properties.yaml,special-properties.yaml",
                 "tframework.propertyFile=props/custom-properties.yaml"
         };
         CliArgumentPropertyFileScanner scanner = new CliArgumentPropertyFileScanner(args);
-        assertEquals(List.of("custom-properties.yaml", "props/custom-properties.yaml"), scanner.scan());
+        var expected = List.of("custom-properties.yaml", "special-properties.yaml", "props/custom-properties.yaml");
+        assertEquals(expected, scanner.scan());
     }
 
 }

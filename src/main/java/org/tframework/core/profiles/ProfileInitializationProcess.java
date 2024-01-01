@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.profiles.scanners.ProfileScanner;
 
 /**
  * The profile initialization process scans for profiles to set ({@link ProfileScanner}), then

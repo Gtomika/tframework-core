@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.profiles.scanners.ProfileScanner;
 
 /**
  * The profile merger combines the output of several {@link ProfileScanner}s. Use

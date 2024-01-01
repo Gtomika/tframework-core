@@ -15,7 +15,7 @@ public class DefaultPropertyFileScanner implements PropertyFileScanner {
 
     @Override
     public List<String> scan() {
-        log.debug("Scanning for default property file: {}", DEFAULT_PROPERTY_FILE_NAME);
+        log.debug("Adding default property file: {}", DEFAULT_PROPERTY_FILE_NAME);
         return List.of(DEFAULT_PROPERTY_FILE_NAME);
     }
 }

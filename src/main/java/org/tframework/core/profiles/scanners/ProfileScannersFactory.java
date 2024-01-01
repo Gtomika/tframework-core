@@ -1,9 +1,10 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.profiles;
+package org.tframework.core.profiles.scanners;
 
 import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.readers.ReadersFactory;
 
 /**
@@ -21,6 +22,7 @@ public final class ProfileScannersFactory {
         return List.of(
                 createDefaultProfileScanner(),
                 createEnvironmentProfileScanner(),
+                createSystemPropertyProfileScanner(),
                 createCliProfileScanner(input.args())
         );
     }
@@ -28,6 +30,11 @@ public final class ProfileScannersFactory {
     private static EnvironmentProfileScanner createEnvironmentProfileScanner() {
         var environmentVariableReader = ReadersFactory.createEnvironmentVariableReader();
         return new EnvironmentProfileScanner(environmentVariableReader);
+    }
+
+    private static SystemPropertyProfileScanner createSystemPropertyProfileScanner() {
+        var systemPropertyReader = ReadersFactory.createSystemPropertyReader();
+        return new SystemPropertyProfileScanner(systemPropertyReader);
     }
 
     private static DefaultProfileScanner createDefaultProfileScanner() {

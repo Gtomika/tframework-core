@@ -20,7 +20,9 @@ class PropertyFileScannersFactoryTest {
 
         assertInstanceOf(DefaultPropertyFileScanner.class, scanners.get(0));
         assertInstanceOf(ProfilesPropertyFileScanner.class, scanners.get(1));
-        assertInstanceOf(CliArgumentPropertyFileScanner.class, scanners.get(2));
+        assertInstanceOf(SystemPropertyFileScanner.class, scanners.get(2));
+        assertInstanceOf(EnvironmentPropertyFileScanner.class, scanners.get(3));
+        assertInstanceOf(CliArgumentPropertyFileScanner.class, scanners.get(4));
     }
 
 }

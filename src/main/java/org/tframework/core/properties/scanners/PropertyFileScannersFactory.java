@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesInitializationInput;
+import org.tframework.core.readers.ReadersFactory;
 import org.tframework.core.utils.LogUtils;
 
 /**
@@ -25,6 +26,8 @@ public final class PropertyFileScannersFactory {
         var scanners = List.of(
                 createDefaultScanner(),
                 createProfilesScanner(input.profilesContainer()),
+                createSystemPropertyScanner(),
+                createEnvironmentPropertyScanner(),
                 createCliArgumentScanner(input.cliArgs())
         );
         log.debug("Created the following property file scanners: {}", LogUtils.classNames(scanners));
@@ -41,6 +44,16 @@ public final class PropertyFileScannersFactory {
 
     private static CliArgumentPropertyFileScanner createCliArgumentScanner(String[] args) {
         return new CliArgumentPropertyFileScanner(args);
+    }
+
+    private static SystemPropertyFileScanner createSystemPropertyScanner() {
+        var reader = ReadersFactory.createSystemPropertyReader();
+        return new SystemPropertyFileScanner(reader);
+    }
+
+    private static EnvironmentPropertyFileScanner createEnvironmentPropertyScanner() {
+        var reader = ReadersFactory.createEnvironmentVariableReader();
+        return new EnvironmentPropertyFileScanner(reader);
     }
 
 }

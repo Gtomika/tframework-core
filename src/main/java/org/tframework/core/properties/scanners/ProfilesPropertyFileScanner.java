@@ -23,7 +23,7 @@ public class ProfilesPropertyFileScanner implements PropertyFileScanner {
         return profilesContainer.profiles()
                 .stream()
                 .map(profile -> String.format(PROFILE_PROPERTY_FILE_NAME_TEMPLATE, profile))
-                .peek(file -> log.debug("Scanning for profile property file: {}", file))
+                .peek(file -> log.debug("Adding property file activated by profile: {}", file))
                 .toList();
     }
 }

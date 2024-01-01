@@ -1,9 +1,9 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.profiles;
+package org.tframework.core.profiles.scanners;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.tframework.core.profiles.CLIProfileScanner.PROFILES_CLI_ARGUMENT_KEY;
+import static org.tframework.core.profiles.scanners.CLIProfileScanner.PROFILES_CLI_ARGUMENT_KEY;
 import static org.tframework.core.utils.CliUtils.CLI_KEY_VALUE_SEPARATOR;
 
 import java.util.Set;

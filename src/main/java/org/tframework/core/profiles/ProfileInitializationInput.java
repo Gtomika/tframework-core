@@ -2,6 +2,7 @@
 package org.tframework.core.profiles;
 
 import lombok.Builder;
+import org.tframework.core.profiles.scanners.ProfileScanner;
 
 /**
  * Contains all input need to construct {@link ProfileScanner}s.

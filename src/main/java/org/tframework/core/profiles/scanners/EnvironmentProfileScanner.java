@@ -1,8 +1,6 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.profiles;
+package org.tframework.core.profiles.scanners;
 
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,14 +27,14 @@ public class EnvironmentProfileScanner implements ProfileScanner {
             String profilesRaw = environmentReader.readVariable(TFRAMEWORK_PROFILES_VARIABLE_NAME);
             log.debug("Value of '{}' environmental variable is: {}", TFRAMEWORK_PROFILES_VARIABLE_NAME, profilesRaw);
 
-            Set<String> profiles = new HashSet<>(Arrays.asList(profilesRaw.split(",")));
+            Set<String> profiles = Set.of(profilesRaw.split(","));
             log.debug("The '{}' profile scanner will attempt to activate the following profiles: {}",
                     EnvironmentProfileScanner.class.getName(), profiles);
             return profiles;
         } catch (EnvironmentVariableNotFoundException e) {
             log.debug("Environmental variable with name '{}' was not found." +
                     " The '{}' profile scanner will not active any profiles.",
-                    EnvironmentProfileScanner.class.getName(), TFRAMEWORK_PROFILES_VARIABLE_NAME);
+                    TFRAMEWORK_PROFILES_VARIABLE_NAME, EnvironmentProfileScanner.class.getName());
             return Set.of();
         }
     }

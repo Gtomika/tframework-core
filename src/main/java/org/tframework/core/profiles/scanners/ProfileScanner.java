@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.profiles;
+package org.tframework.core.profiles.scanners;
 
 import java.util.Set;
 

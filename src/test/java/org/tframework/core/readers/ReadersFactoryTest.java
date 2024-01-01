@@ -17,6 +17,12 @@ class ReadersFactoryTest {
     }
 
     @Test
+    public void shouldCreateSystemPropertyReader() {
+        var reader = ReadersFactory.createSystemPropertyReader();
+        assertNotNull(reader);
+    }
+
+    @Test
     public void shouldCreateResourceFileReader() {
         var reader = ReadersFactory.createResourceFileReader();
 

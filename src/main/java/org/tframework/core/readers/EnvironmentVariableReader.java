@@ -12,7 +12,7 @@ import lombok.RequiredArgsConstructor;
  * This class mainly exists so that code relying on environmental variables can be tested (by mocking this class).
  * @see ReadersFactory
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for unit testing
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class EnvironmentVariableReader {
 
     private final Function<String, String> variableAccessor;

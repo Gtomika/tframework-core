@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.tframework.core.profiles.scanners.ProfileScanner;
 
 @ExtendWith(MockitoExtension.class)
 class ProfileMergerTest {

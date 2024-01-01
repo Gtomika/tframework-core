@@ -2,14 +2,17 @@
 package org.tframework.core;
 
 import lombok.Builder;
-import org.tframework.core.profiles.Profiles;
+import org.tframework.core.profiles.ProfilesContainer;
+import org.tframework.core.properties.PropertiesContainer;
 
 /**
  * A bundle of information about a TFramework application.
- * @param profiles {@link Profiles} that are set.
+ * @param profilesContainer {@link ProfilesContainer} that stores profiles information.
+ * @param propertiesContainer {@link PropertiesContainer} that stores the properties.
  */
 @Builder
 public record Application(
-        Profiles profiles
+        ProfilesContainer profilesContainer,
+        PropertiesContainer propertiesContainer
 ) {
 }

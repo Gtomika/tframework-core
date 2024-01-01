@@ -52,12 +52,12 @@ class ProfileInitializationProcessTest {
         doNothing().when(validator).validate("c");
 
         var input = List.of(scannerA, scannerB);
-        Profiles profiles = profileInitializationProcess.initializeProfiles(input);
+        ProfilesContainer profilesContainer = profileInitializationProcess.initializeProfiles(input);
 
-        assertEquals(Set.of("a", "b", "c"), profiles.profiles());
-        assertTrue(profiles.isProfileSet("a"));
-        assertTrue(profiles.isProfileSet("b"));
-        assertTrue(profiles.isProfileSet("c"));
+        assertEquals(Set.of("a", "b", "c"), profilesContainer.profiles());
+        assertTrue(profilesContainer.isProfileSet("a"));
+        assertTrue(profilesContainer.isProfileSet("b"));
+        assertTrue(profilesContainer.isProfileSet("c"));
     }
 
     @Test

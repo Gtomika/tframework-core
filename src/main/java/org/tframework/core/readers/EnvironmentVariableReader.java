@@ -15,7 +15,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE) //for unit testing
 public class EnvironmentVariableReader {
 
-    private final Function<String, String> variableExtractor;
+    private final Function<String, String> variableAccessor;
 
     /**
      * Fetch a variable from the environment.
@@ -24,7 +24,7 @@ public class EnvironmentVariableReader {
      * @throws EnvironmentVariableNotFoundException If a variable by this name does not exist.
      */
     public String readVariable(String name) {
-        return Optional.ofNullable(variableExtractor.apply(name))
+        return Optional.ofNullable(variableAccessor.apply(name))
                 .orElseThrow(() -> new EnvironmentVariableNotFoundException(name));
     }
 

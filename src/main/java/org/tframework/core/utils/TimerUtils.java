@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
  * Various utilities to measure elapsed time.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class TimerUtils {
+public final class TimerUtils {
 
     /**
      * Calculates the amount of milliseconds between two {@link Instant}s.

@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.profiles.ProfileInitializationProcessFactory;
+import org.tframework.core.properties.PropertiesInitializationProcessFactory;
 
 /**
  * Factory methods to instantiate {@link CoreInitializer}s and the {@link CoreInitializationProcess}.
@@ -18,12 +19,21 @@ public final class CoreInitializationFactory {
      */
     public static CoreInitializationProcess createCoreInitializationProcess() {
         var profilesCoreInitializer = createProfilesCoreInitializer();
-        return new CoreInitializationProcess(profilesCoreInitializer);
+        var propertiesCoreInitializer = createPropertiesCoreInitializer();
+        return new CoreInitializationProcess(
+                profilesCoreInitializer,
+                propertiesCoreInitializer
+        );
     }
 
     private static ProfilesCoreInitializer createProfilesCoreInitializer() {
         var profilesProcess = ProfileInitializationProcessFactory.createProfileInitializationProcess();
         return new ProfilesCoreInitializer(profilesProcess);
+    }
+
+    private static PropertiesCoreInitializer createPropertiesCoreInitializer() {
+        var propertiesProcess = PropertiesInitializationProcessFactory.createProfileInitializationProcess();
+        return new PropertiesCoreInitializer(propertiesProcess);
     }
 
 }

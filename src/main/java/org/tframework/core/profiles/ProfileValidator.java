@@ -10,12 +10,15 @@ import lombok.NoArgsConstructor;
  * <ul>
  *     <li>Cannot be empty, or null.</li>
  *     <li>Only lower case english letters and the dash ('-') character is allowed.</li>
+ *     <li>Must be at most {@value MAX_PROFILE_LENGTH} characters long.</li>
  * </ul>
  */
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class ProfileValidator {
 
-    private static final Pattern PROFILE_REGEX = Pattern.compile("[a-z\\-]+");
+    public static final int MAX_PROFILE_LENGTH = 50;
+
+    private static final Pattern PROFILE_REGEX = Pattern.compile("[a-z\\-]{1,%d}".formatted(MAX_PROFILE_LENGTH));
 
     /**
      * Validates a profile according to the rules defined in {@link ProfileValidator} documentation.

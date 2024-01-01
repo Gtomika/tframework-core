@@ -1,6 +1,7 @@
 plugins {
     id 'java-library'
     id 'jacoco'
+    id 'jvm-test-suite'
     id "com.diffplug.spotless" version "6.23.3"
     id "io.freefair.lombok" version "8.4"
 }
@@ -11,6 +12,8 @@ version '0.0.1'
 ext {
     slf4jVersion = "1.7.25"
     classGraphVersion = "4.8.165"
+    jacksonVersion = "2.16.1"
+    snakeYamlVersion = "1.8"
     junitJupiterVersion = "5.8.2"
     mockitoVersion = "5.8.0"
     log4jVersion = "2.17.2"
@@ -24,25 +27,62 @@ dependencies {
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation "io.github.classgraph:classgraph:${classGraphVersion}"
 
-    // testing
-    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
-    testImplementation "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
-    testRuntimeOnly "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
-
-    testImplementation "org.mockito:mockito-core:${mockitoVersion}"
-    testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
-
-    testImplementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
-    testImplementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
-    testImplementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+    //optional dependencies that the user can provide
+    compileOnly "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
+    compileOnly "org.yaml:snakeyaml:${snakeYamlVersion}"
 }
 
-test {
-    useJUnitPlatform()
-    testLogging.showStandardStreams = true
-    testLogging.exceptionFormat = 'full'
-    finalizedBy jacocoTestReport // report is always generated after tests run
+testing {
+    suites {
+        //common test configuration that applies to all test suites
+        configureEach {
+            useJUnitJupiter()
+            dependencies {
+                implementation project()
+
+                // testing frameworks
+                implementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+                runtimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+                implementation "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+                runtimeOnly "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+                implementation "org.mockito:mockito-core:${mockitoVersion}"
+                implementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+
+                //logging during tests
+                implementation "org.apache.logging.log4j:log4j-api:${log4jVersion}"
+                implementation "org.apache.logging.log4j:log4j-core:${log4jVersion}"
+                implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4jVersion}"
+            }
+        }
+
+        //the standard unit test suite, which includes most unit tests
+        test {
+            dependencies {
+                //none of the optional dependencies are included to be able to test error cases in this suite
+            }
+            targets {
+                all {
+                    testTask.configure {
+                        finalizedBy("jacocoTestReport") // report + coverage check is always generated after tests run
+                    }
+                }
+            }
+        }
+
+        //the unit test suite where the classpath includes the Jackson YAML library
+        jacksonYamlTest(JvmTestSuite) {
+            dependencies {
+                implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
+            }
+        }
+
+        //the test suite where the classpath includes the Snake YAML library
+        snakeYamlTest(JvmTestSuite) {
+            dependencies {
+                implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
+            }
+        }
+    }
 }
 
 //spotless check configuration
@@ -81,6 +121,8 @@ jacocoTestCoverageVerification {
             limit {
                 minimum = 0.75
             }
+            //these packages have tests in several test suites, so coverage is not easy to measure
+            excludes = ["org.tframework.core.properties.parsers"]
         }
     }
 }

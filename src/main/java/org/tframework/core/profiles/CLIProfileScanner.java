@@ -20,7 +20,7 @@ import org.tframework.core.utils.CliUtils;
 @Slf4j
 public class CLIProfileScanner implements ProfileScanner {
 
-    public static final String PROFILES_CLI_ARGUMENT_KEY = "tframework_profiles";
+    public static final String PROFILES_CLI_ARGUMENT_KEY = "tframework.profiles";
 
     private final String[] args;
 

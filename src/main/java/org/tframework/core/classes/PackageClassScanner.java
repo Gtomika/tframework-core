@@ -39,6 +39,7 @@ public class PackageClassScanner implements ClassScanner {
                 .acceptPackages(packageNames.toArray(new String[] {}));
         ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
         try(ScanResult scanResult = classGraph.scan(executor, THREAD_COUNT)) {
+            //TODO: should this be changed to use ClassLoaderUtils.loadClass?
             return scanResult.getAllClasses().loadClasses(true);
         }
     }

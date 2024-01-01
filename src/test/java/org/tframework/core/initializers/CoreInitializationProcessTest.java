@@ -14,7 +14,8 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.Application;
 import org.tframework.core.profiles.InvalidProfileException;
-import org.tframework.core.profiles.Profiles;
+import org.tframework.core.profiles.ProfilesContainer;
+import org.tframework.core.properties.PropertiesContainer;
 
 @ExtendWith(MockitoExtension.class)
 class CoreInitializationProcessTest {
@@ -24,30 +25,34 @@ class CoreInitializationProcessTest {
     @Mock
     private ProfilesCoreInitializer profilesCoreInitializer;
 
+    @Mock
+    private PropertiesCoreInitializer propertiesCoreInitializer;
+
     @BeforeEach
     public void setUp() {
         coreInitializationProcess = new CoreInitializationProcess(
-                profilesCoreInitializer
+                profilesCoreInitializer,
+                propertiesCoreInitializer
         );
     }
 
     @Test
     public void shouldPerformCoreInitialization() {
-        var expectedResult = new CoreInitializationResult(
-                Application.builder()
-                        .profiles(new Profiles(Set.of("a, b")))
-                        .build()
-        );
+        var expectedApp = Application.builder()
+                .profilesContainer(ProfilesContainer.fromProfiles(Set.of("a, b")))
+                .propertiesContainer(PropertiesContainer.empty())
+                .build();
 
-        when(profilesCoreInitializer.initialize(any())).thenReturn(expectedResult.application().profiles());
+        when(profilesCoreInitializer.initialize(any())).thenReturn(expectedApp.profilesContainer());
+        when(propertiesCoreInitializer.initialize(any())).thenReturn(expectedApp.propertiesContainer());
 
         CoreInitializationInput input = CoreInitializationInput.builder()
                 .args(new String[]{"testArg"})
                 .build();
 
-        var actualResult = coreInitializationProcess.performCoreInitialization(input);
+        var actualApp = coreInitializationProcess.performCoreInitialization(input);
 
-        assertEquals(expectedResult, actualResult);
+        assertEquals(expectedApp, actualApp);
     }
 
     @Test

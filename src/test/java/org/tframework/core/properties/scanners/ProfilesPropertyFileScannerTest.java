@@ -1,7 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.scanners;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import java.util.Set;
@@ -15,7 +15,8 @@ class ProfilesPropertyFileScannerTest {
         ProfilesContainer profilesContainer = ProfilesContainer.fromProfiles(Set.of("dev", "test"));
         ProfilesPropertyFileScanner scanner = new ProfilesPropertyFileScanner(profilesContainer);
         List<String> propertyFiles = scanner.scan();
-        assertEquals(List.of("properties-dev.yaml", "properties-test.yaml"), propertyFiles);
+        assertTrue(propertyFiles.contains("properties-dev.yaml"));
+        assertTrue(propertyFiles.contains("properties-test.yaml"));
     }
 
 }

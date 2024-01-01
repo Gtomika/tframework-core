@@ -25,8 +25,8 @@ class PropertiesContainerTest {
     @Test
     public void shouldGetProperty_whenExists() {
         PropertyValue propertyValue = container.getPropertyValue("p1");
-        if(propertyValue instanceof SinglePropertyValue singleValue) {
-            assertEquals("v1", singleValue.value());
+        if(propertyValue instanceof SinglePropertyValue(String value)) {
+            assertEquals("v1", value);
         } else {
             fail("SinglePropertyValue expected");
         }

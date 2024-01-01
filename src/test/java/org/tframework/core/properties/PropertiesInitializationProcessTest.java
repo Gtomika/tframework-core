@@ -79,20 +79,20 @@ class PropertiesInitializationProcessTest {
     }
 
     private void makeAssertions(PropertiesContainer container) {
-        if(container.getPropertyValue("property1") instanceof SinglePropertyValue spv) {
-            assertEquals("value1", spv.value());
+        if(container.getPropertyValue("property1") instanceof SinglePropertyValue(String value)) {
+            assertEquals("value1", value);
         } else {
             fail("property1 is not a SinglePropertyValue");
         }
 
-        if(container.getPropertyValue("property2") instanceof SinglePropertyValue spv) {
-            assertEquals("value2-override", spv.value());
+        if(container.getPropertyValue("property2") instanceof SinglePropertyValue(String value)) {
+            assertEquals("value2-override", value);
         } else {
             fail("property2 is not a SinglePropertyValue");
         }
 
-        if(container.getPropertyValue("property3") instanceof SinglePropertyValue spv) {
-            assertEquals("value3", spv.value());
+        if(container.getPropertyValue("property3") instanceof SinglePropertyValue(String value)) {
+            assertEquals("value3", value);
         } else {
             fail("property3 is not a SinglePropertyValue");
         }

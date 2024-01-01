@@ -58,7 +58,7 @@ testing {
         //the standard unit test suite, which includes most unit tests
         test {
             dependencies {
-                //none of the optional dependencies are included to be able to test error cases in this suite
+                implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
             }
             targets {
                 all {
@@ -69,10 +69,10 @@ testing {
             }
         }
 
-        //the unit test suite where the classpath includes the Jackson YAML library
-        jacksonYamlTest(JvmTestSuite) {
+        //none of the optional dependencies are included to be able to test error cases in this suite
+        noOptionalDependencyTest(JvmTestSuite) {
             dependencies {
-                implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
+
             }
         }
 

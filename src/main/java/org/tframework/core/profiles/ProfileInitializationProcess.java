@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.profiles.scanners.ProfileScanner;
+import org.tframework.core.utils.LogUtils;
 
 /**
  * The profile initialization process scans for profiles to set ({@link ProfileScanner}), then
@@ -28,7 +29,8 @@ public class ProfileInitializationProcess {
      * @return {@link ProfilesContainer} record with the set profiles.
      */
     public ProfilesContainer initializeProfiles(@NonNull List<ProfileScanner> profileScanners) {
-        log.debug("The profile initialization process will use these profiles scanners: {}", profileScanners);
+        log.debug("The profile initialization process will use these profiles scanners: {}",
+                LogUtils.classNames(profileScanners));
         Set<String> profiles = ProfileMerger.merging(profileScanners)
                 .mergeAndStream()
                 .map(profileCleaner::clean)

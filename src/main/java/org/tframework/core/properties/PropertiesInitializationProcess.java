@@ -2,6 +2,7 @@
 package org.tframework.core.properties;
 
 import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.tframework.core.properties.extractors.PropertiesExtractor;
 import org.tframework.core.properties.parsers.YamlParser;
 import org.tframework.core.properties.scanners.PropertyFileScanner;
 import org.tframework.core.readers.ResourceFileReader;
+import org.tframework.core.readers.ResourceNotFoundException;
 
 /**
  * This class is responsible for initializing the properties, by the following process:
@@ -46,20 +48,30 @@ public class PropertiesInitializationProcess {
         for(PropertyFileScanner propertyFileScanner: propertyFileScanners) {
             List<String> propertyFiles = propertyFileScanner.scan();
             for(String propertyFile : propertyFiles) {
-                log.debug("Found property file '{}', provided by scanner '{}'", propertyFile, propertyFileScanner.getClass().getName());
+                log.debug("Attempting to read property file '{}', provided by scanner '{}'", propertyFile, propertyFileScanner.getClass().getName());
 
-                var propertyFileContent = resourceFileReader.readResourceFile(propertyFile);
-                var parsedYaml = yamlParser.parseYaml(propertyFileContent);
-                var properties = propertiesExtractor.extractProperties(parsedYaml);
-
-                log.debug("Found {} properties in file '{}', merging them into current properties...", properties.size(), propertyFile);
-                MDC.put(OVERRIDING_PROPERTY_FILE, propertyFile);
-                propertiesContainer = propertiesContainer.merge(properties);
-                MDC.remove(OVERRIDING_PROPERTY_FILE);
+                var properties = processPropertyFile(propertyFile);
+                if(!properties.isEmpty()) {
+                    log.debug("Found {} properties in file '{}', merging them into current properties...", properties.size(), propertyFile);
+                    MDC.put(OVERRIDING_PROPERTY_FILE, propertyFile);
+                    propertiesContainer = propertiesContainer.merge(properties);
+                    MDC.remove(OVERRIDING_PROPERTY_FILE);
+                }
             }
         }
 
         return propertiesContainer;
+    }
+
+    private Map<String, PropertyValue> processPropertyFile(String propertyFile) {
+        try {
+            var propertyFileContent = resourceFileReader.readResourceFile(propertyFile);
+            var parsedYaml = yamlParser.parseYaml(propertyFileContent);
+            return propertiesExtractor.extractProperties(parsedYaml);
+        } catch (ResourceNotFoundException e) {
+            log.debug("Property file '{}' not found, skipping...", propertyFile);
+            return Map.of();
+        }
     }
 
 }

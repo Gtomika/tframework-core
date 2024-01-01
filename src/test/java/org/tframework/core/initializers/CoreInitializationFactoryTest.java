@@ -1,18 +1,16 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.initializers;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
-import org.tframework.core.properties.parsers.NoYamlParserLibraryException;
 
 class CoreInitializationFactoryTest {
 
-    //happy path is tested in snackYamlTest and jackYamlTest sets
     @Test
     public void shouldCreateCoreInitializationProcess() {
-        assertThrows(NoYamlParserLibraryException.class,
-                CoreInitializationFactory::createCoreInitializationProcess);
+        var process = CoreInitializationFactory.createCoreInitializationProcess();
+        assertNotNull(process);
     }
 
 }

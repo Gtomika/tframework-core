@@ -1,0 +1,8 @@
+custom:
+  string-prop: test
+  int-prop: 1
+  boolean-prop: true
+  list-prop:
+    - test1
+    - test2
+    - test3

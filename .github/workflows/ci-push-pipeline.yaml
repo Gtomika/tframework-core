@@ -57,7 +57,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
       - name: Run unit tests with gradle
-        run: ./gradlew clean jacksonYamlTest snakeYamlTest
+        run: ./gradlew clean noOptionalDependencyTest snakeYamlTest
 
   spotless-check:
     runs-on: ubuntu-latest

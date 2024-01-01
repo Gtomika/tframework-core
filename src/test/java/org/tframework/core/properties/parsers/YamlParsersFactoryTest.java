@@ -2,7 +2,6 @@
 package org.tframework.core.properties.parsers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -11,15 +10,9 @@ import org.junit.jupiter.api.Test;
 class YamlParsersFactoryTest {
 
     @Test
-    public void shouldThrowException_whenNoYamlParsingLibraryFoundOnClasspath() {
-        var exception = assertThrows(NoYamlParserLibraryException.class, YamlParsersFactory::createAvailableYamlParser);
-
-        assertEquals(
-                exception.getMessageTemplate().formatted(),
-                exception.getMessage()
-        );
-
-        log.info(exception.getMessage());
+    public void shouldCreateJacksonYamlParser_whenJacksonYamlIsOnClasspath() {
+        var parser = YamlParsersFactory.createAvailableYamlParser();
+        assertEquals(JacksonYamlParser.class, parser.getClass());
     }
 
 }

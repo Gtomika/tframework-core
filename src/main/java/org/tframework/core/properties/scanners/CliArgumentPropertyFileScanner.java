@@ -15,9 +15,8 @@ import org.tframework.core.utils.CliUtils;
  *     <li>Starts with {@value PROPERTY_FILE_ARGUMENT_KEY}.</li>
  *     <li>Continues with {@value CliUtils#CLI_KEY_VALUE_SEPARATOR}.</li>
  *     <li>
- *         Finishes with the property file name. Only one file can be specified. If more is needed,
- *         the argument can be repeated. If this file name is blank, it will be ignored. <b>This is a
- *         relative path inside the {@code resources} folder.</b>
+ *         Finishes with the property file names. Multiple can be provided with comma separation. <b>These are
+ *         relative paths inside the {@code resources} folder.</b>
  *     </li>
  * </ul>
  * For example
@@ -39,7 +38,9 @@ public class CliArgumentPropertyFileScanner implements PropertyFileScanner {
                 .filter(arg -> CliUtils.isArgumentWithKey(arg, PROPERTY_FILE_ARGUMENT_KEY))
                 .map(CliUtils::extractArgumentValue)
                 .filter(arg -> !arg.isBlank())
-                .peek(arg -> log.debug("Scanning for property file activated by CLI argument: '{}'", arg))
+                .flatMap(arg -> Arrays.stream(arg.split(",")))
+                .map(String::trim)
+                .peek(arg -> log.debug("Adding property file activated by CLI argument: '{}'", arg))
                 .toList();
     }
 }

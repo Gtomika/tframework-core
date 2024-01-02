@@ -13,6 +13,7 @@ import org.tframework.core.readers.EnvironmentVariableReader;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class EnvironmentPropertyFileScanner implements PropertyFileScanner {
 
+    //if this value is updated, also update it in the documentation such as README
     public static final String PROPERTY_FILES_ENVIRONMENT_VARIABLE = "TFRAMEWORK_PROPERTY_FILES";
 
     private final EnvironmentVariableReader environmentPropertyReader;

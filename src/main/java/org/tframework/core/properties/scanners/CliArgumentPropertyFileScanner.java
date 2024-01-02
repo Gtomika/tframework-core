@@ -28,6 +28,7 @@ import org.tframework.core.utils.CliUtils;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class CliArgumentPropertyFileScanner implements PropertyFileScanner {
 
+    //if this value is updated, also update it in the documentation such as README
     public static final String PROPERTY_FILE_ARGUMENT_KEY = "tframework.propertyFiles";
 
     private final String[] args;

@@ -17,6 +17,7 @@ import org.tframework.core.readers.EnvironmentVariableReader;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class EnvironmentProfileScanner implements ProfileScanner {
 
+    //if this value is updated, also update it in the documentation such as README
     public static final String TFRAMEWORK_PROFILES_VARIABLE_NAME = "TFRAMEWORK_PROFILES";
 
     private final EnvironmentVariableReader environmentReader;

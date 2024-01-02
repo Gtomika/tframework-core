@@ -16,6 +16,7 @@ import org.tframework.core.readers.SystemPropertyReader;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class SystemPropertyProfileScanner implements ProfileScanner {
 
+    //if this value is updated, also update it in the documentation such as README
     public static final String PROFILES_SYSTEM_PROPERTY = "tframework.profiles";
 
     private final SystemPropertyReader systemPropertyReader;

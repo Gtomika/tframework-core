@@ -20,6 +20,7 @@ import org.tframework.core.readers.SystemPropertyReader;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class SystemPropertyFileScanner implements PropertyFileScanner {
 
+    //if this value is updated, also update it in the documentation such as README
     public static final String PROPERTY_FILES_SYSTEM_PROPERTY = "tframework.propertyFiles";
 
     private final SystemPropertyReader systemPropertyReader;

@@ -21,12 +21,12 @@ class TFrameworkTest {
         assertTrue(application.profilesContainer().isProfileSet("unit-test"));
         assertTrue(application.profilesContainer().isProfileSet("demo"));
 
-        assertEquals("test", application.propertiesContainer().getPropertyValueObject("custom.string-prop").toString());
-        assertEquals("1", application.propertiesContainer().getPropertyValueObject("custom.int-prop").toString());
-        assertEquals("true", application.propertiesContainer().getPropertyValueObject("custom.boolean-prop").toString());
+        assertEquals("test", application.propertiesContainer().getPropertyValue("custom.string-prop"));
+        assertEquals("1", application.propertiesContainer().getPropertyValue("custom.int-prop"));
+        assertEquals("true", application.propertiesContainer().getPropertyValue("custom.boolean-prop"));
         assertEquals(
-                List.of("test1", "test2", "test3").toString(),
-                application.propertiesContainer().getPropertyValueObject("custom.list-prop").toString()
+                List.of("test1", "test2", "test3"),
+                application.propertiesContainer().getPropertyValueList("custom.list-prop")
         );
     }
 

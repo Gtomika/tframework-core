@@ -2,6 +2,7 @@
 package org.tframework.core.properties;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -21,12 +22,38 @@ public final class PropertiesContainer {
     private final Map<String, PropertyValue> properties;
 
     /**
+     * Gets the {@link PropertyValue} of a property. If interested only in the raw underlying value,
+     * it's possible to use {@link #getPropertyValue(String)} or {@link #getPropertyValueList(String)} instead.
      * @return The {@link PropertyValue} for the given property name.
      * @throws PropertyNotFoundException If the property does not exist.
      */
-    public PropertyValue getPropertyValue(String propertyName) {
+    public PropertyValue getPropertyValueObject(String propertyName) {
         return Optional.ofNullable(properties.get(propertyName))
                 .orElseThrow(() -> new PropertyNotFoundException(propertyName));
+    }
+
+    /**
+     * Convenience method that gets a property as a string. If the property is a list,
+     * it will be converted to a string using {@code List#toString()}.
+     * @throws PropertyNotFoundException If the property does not exist.
+     */
+    public String getPropertyValue(String propertyName) {
+        return switch (getPropertyValueObject(propertyName)) {
+            case SinglePropertyValue(var value) -> value;
+            case ListPropertyValue(var values) -> values.toString();
+        };
+    }
+
+    /**
+     * Convenience method that gets a property as a list of strings. If this property is just a
+     * single value, it will be converted to a list with a single element.
+     * @throws PropertyNotFoundException If the property does not exist.
+     */
+    public List<String> getPropertyValueList(String propertyName) {
+        return switch (getPropertyValueObject(propertyName)) {
+            case SinglePropertyValue(var value) -> List.of(value);
+            case ListPropertyValue(var values) -> values;
+        };
     }
 
     /**

@@ -51,9 +51,49 @@ class PropertiesContainerTest {
     }
 
     @Test
+    public void shouldThrowException_getPropertyValue_whenPropertyDoesNotExist() {
+        var exception = assertThrows(PropertyNotFoundException.class, () -> {
+            container.getPropertyValue("p3");
+        });
+
+        assertEquals(
+                exception.getMessageTemplate().formatted("p3"),
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    public void shouldGetPropertyValue_whenExists_withDefaultValue() {
+        assertEquals("v1", container.getPropertyValue("p1", "default"));
+        assertEquals("[v2-1, v2-2]", container.getPropertyValue("p2", "default"));
+    }
+
+    @Test
+    public void shouldGetDefaultValue_getPropertyValue_whenPropertyDoesNotExist() {
+        assertEquals("default", container.getPropertyValue("p3", "default"));
+    }
+
+    @Test
     public void shouldGetPropertyValueList_whenExists() {
         assertEquals(List.of("v1"), container.getPropertyValueList("p1"));
         assertEquals(List.of("v2-1", "v2-2"), container.getPropertyValueList("p2"));
+    }
+
+    @Test
+    public void shouldThrowException_getPropertyValueList_whenPropertyDoesNotExist() {
+        var exception = assertThrows(PropertyNotFoundException.class, () -> {
+            container.getPropertyValueList("p3");
+        });
+
+        assertEquals(
+                exception.getMessageTemplate().formatted("p3"),
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    public void shouldGetPropertyValueList_whenExists_withDefaultValue() {
+        assertEquals(List.of("default"), container.getPropertyValueList("p3", List.of("default")));
     }
 
     @Test

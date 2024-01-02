@@ -45,6 +45,18 @@ public final class PropertiesContainer {
     }
 
     /**
+     * A version of {@link #getPropertyValue(String)} that returns a default value instead of throwing
+     * {@link PropertyNotFoundException} when the given property does not exist.
+     */
+    public String getPropertyValue(String propertyName, String defaultValue) {
+        try {
+            return getPropertyValue(propertyName);
+        } catch (PropertyNotFoundException e) {
+            return defaultValue;
+        }
+    }
+
+    /**
      * Convenience method that gets a property as a list of strings. If this property is just a
      * single value, it will be converted to a list with a single element.
      * @throws PropertyNotFoundException If the property does not exist.
@@ -54,6 +66,18 @@ public final class PropertiesContainer {
             case SinglePropertyValue(var value) -> List.of(value);
             case ListPropertyValue(var values) -> values;
         };
+    }
+
+    /**
+     * A version of {@link #getPropertyValueList(String)} that returns a default value instead of throwing
+     * {@link PropertyNotFoundException} when the given property does not exist.
+     */
+    public List<String> getPropertyValueList(String propertyName, List<String> defaultValue) {
+        try {
+            return getPropertyValueList(propertyName);
+        } catch (PropertyNotFoundException e) {
+            return defaultValue;
+        }
     }
 
     /**

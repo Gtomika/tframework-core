@@ -9,8 +9,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.utils.ClassLoaderUtils;
 
@@ -23,13 +25,15 @@ import org.tframework.core.utils.ClassLoaderUtils;
  * </ul>
  */
 @Slf4j
+@Setter
 @Getter
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@AllArgsConstructor(access = AccessLevel.PACKAGE)
 public class PackageClassScanner implements ClassScanner {
 
     private static final int THREAD_COUNT = 5;
 
-    private final Set<String> packageNames;
+    private Set<String> packageNames;
 
     /**
      * Performs the scan in the packages specified at construction time. If some classes could not

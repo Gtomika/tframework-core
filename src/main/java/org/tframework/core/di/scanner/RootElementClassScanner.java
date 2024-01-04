@@ -24,19 +24,23 @@ public class RootElementClassScanner extends ElementClassScanner {
     public static final String ROOT_SCANNING_ENABLED_PROPERTY = "tframework.dependency-injection.scan-root";
     private static final SinglePropertyValue ROOT_SCANNING_ENABLED_DEFAULT_VALUE = new SinglePropertyValue("true");
 
-    private final PropertiesContainer propertiesContainer;
     private final PackageClassScanner classScanner;
     private final PropertyConverter<Boolean> propertyConverter;
 
     RootElementClassScanner(
             AnnotationScanner annotationScanner,
             ClassFilter classFilter,
+            PropertiesContainer propertiesContainer,
             PackageClassScanner classScanner,
-            PropertiesContainer propertiesContainer
+            Class<?> rootClass
     ) {
-        super(classFilter, annotationScanner);
-        this.propertiesContainer = propertiesContainer;
+        super(classFilter, annotationScanner, propertiesContainer);
         this.classScanner = classScanner;
+
+        String packageName = rootClass.getPackageName();
+        this.classScanner.setPackageNames(Set.of(packageName));
+        log.debug("The root element scanner will scan the package '{}' and all its sub-packages", packageName);
+
         this.propertyConverter = PropertyConvertersFactory.getConverter(Boolean.class);
     }
 
@@ -50,6 +54,7 @@ public class RootElementClassScanner extends ElementClassScanner {
         if(propertyConverter.convert(scanRootProperty)) {
             return classScanner.scanClasses();
         } else {
+            log.debug("The root element scanner is disabled, no classes will be scanned");
             return Set.of();
         }
     }
@@ -59,8 +64,9 @@ public class RootElementClassScanner extends ElementClassScanner {
             @NonNull AnnotationScanner annotationScanner,
             @NonNull ClassFilter classFilter,
             @NonNull PackageClassScanner classScanner,
-            @NonNull PropertiesContainer propertiesContainer
+            @NonNull PropertiesContainer propertiesContainer,
+            @NonNull Class<?> rootClass
     ) {
-        return new RootElementClassScanner(annotationScanner, classFilter, classScanner, propertiesContainer);
+        return new RootElementClassScanner(annotationScanner, classFilter, propertiesContainer, classScanner, rootClass);
     }
 }

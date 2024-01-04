@@ -20,6 +20,14 @@ public final class ClassScannersFactory {
     }
 
     /**
+     * Creates a {@link PackageClassScanner} with no packages assigned. This can be done
+     * later with {@link PackageClassScanner#setPackageNames(Set)}.
+     */
+    public static PackageClassScanner createPackageClassScanner() {
+        return new PackageClassScanner();
+    }
+
+    /**
      * Creates a {@link NestedClassScanner}.
      * @param classToScan Class to assign to the scanner.
      */

@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.tframework.core.annotations.AnnotationScanner;
 import org.tframework.core.classes.ClassFilter;
 import org.tframework.core.di.annotations.Element;
+import org.tframework.core.properties.PropertiesContainer;
 
 /**
  * Abstract base class for all implementations that search for the {@link Element} annotation on classes.
@@ -18,6 +19,7 @@ public abstract class ElementClassScanner {
 
     private final ClassFilter classFilter;
     private final AnnotationScanner annotationScanner;
+    protected final PropertiesContainer propertiesContainer;
 
     /**
      * Scans for classes that could be elements. Does not actually filter them by the

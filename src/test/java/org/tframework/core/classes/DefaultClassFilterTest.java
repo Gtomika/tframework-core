@@ -1,7 +1,8 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.classes;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.lang.annotation.Retention;
@@ -36,24 +37,20 @@ class DefaultClassFilterTest {
     @Test
     public void shouldFilterByInterface() {
         List<Class<?>> classes = List.of(TestFilterClass1.class, TestFilterClass2.class);
-        var filteredClasses = defaultClassFilter.filterByInterface(classes, TestInterface.class);
+        var filteredClasses = defaultClassFilter.filterBySuperClass(classes, TestInterface.class);
 
         assertEquals(1, filteredClasses.size());
         assertTrue(filteredClasses.stream().anyMatch(clazz -> clazz.getName().equals(TestFilterClass1.class.getName())));
     }
 
     @Test
-    public void shouldThrowNotInterfaceException_ifFilterByInterfaceParamIsNotInterface() {
-        List<Class<?>> classes = List.of(TestFilterClass1.class, TestFilterClass2.class);
+    public void shouldFilterBySuperClass() {
+        List<Class<?>> classes = List.of(String.class, Integer.class, Double.class);
+        var filteredClasses = defaultClassFilter.filterBySuperClass(classes, Number.class);
 
-        NotAnInterfaceException exception = assertThrows(NotAnInterfaceException.class, () -> {
-            defaultClassFilter.filterByInterface(classes, DefaultClassFilterTest.class);
-        });
-
-        assertEquals(
-                exception.getMessageTemplate().formatted(DefaultClassFilterTest.class.getName()),
-                exception.getMessage()
-        );
+        assertEquals(2, filteredClasses.size());
+        assertTrue(filteredClasses.stream().anyMatch(clazz -> clazz.equals(Integer.class)));
+        assertTrue(filteredClasses.stream().anyMatch(clazz -> clazz.equals(Double.class)));
     }
 
     interface TestInterface {}

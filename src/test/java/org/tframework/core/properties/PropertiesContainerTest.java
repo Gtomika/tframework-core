@@ -45,6 +45,16 @@ class PropertiesContainerTest {
     }
 
     @Test
+    public void shouldGetPropertyValueObject_whenDoesNotExist_withDefaultValue() {
+        PropertyValue propertyValue = container.getPropertyValueObject("p3", new SinglePropertyValue("default"));
+        if(propertyValue instanceof SinglePropertyValue(String value)) {
+            assertEquals("default", value);
+        } else {
+            fail("SinglePropertyValue expected");
+        }
+    }
+
+    @Test
     public void shouldGetPropertyValue_whenExists() {
         assertEquals("v1", container.getPropertyValue("p1"));
         assertEquals("[v2-1, v2-2]", container.getPropertyValue("p2"));

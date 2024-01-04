@@ -20,7 +20,7 @@ public class ElementsContainer {
      * All elements of the application, wrapped in {@link ElementContext}s.
      * The key is the name of the element.
      */
-    private final Map<String, ElementContext<?>> elementContexts;
+    private final Map<String, ElementContext> elementContexts;
 
     /**
      * Returns the {@link ElementContext} of the element with the given type.
@@ -28,7 +28,7 @@ public class ElementsContainer {
      * @param elementType Type of the requested element, must not be null.
      * @throws ElementNotFoundException If no element with the given type is found.
      */
-    public <T> ElementContext<T> getElementContext(@NonNull Class<T> elementType) {
+    public ElementContext getElementContext(@NonNull Class<?> elementType) {
         String name = ElementUtils.getElementNameByType(elementType);
         return getElementContext(name);
     }
@@ -38,21 +38,15 @@ public class ElementsContainer {
      * @param name Name of the requested element, must not be null.
      * @throws ElementNotFoundException If no element with the given name is found.
      */
-    @SuppressWarnings("unchecked")
-    public <T> ElementContext<T> getElementContext(@NonNull String name) {
-        try {
-            return (ElementContext<T>) Optional.ofNullable(elementContexts.get(name))
-                    .orElseThrow(() -> new ElementNotFoundException(name));
-        } catch (ClassCastException e) {
-            //the element with this name might have different type then "T
-            throw new ElementNotFoundException(name);
-        }
+    public ElementContext getElementContext(@NonNull String name) {
+        return Optional.ofNullable(elementContexts.get(name))
+                .orElseThrow(() -> new ElementNotFoundException(name));
     }
 
     /**
      * Creates a {@link ElementsContainer} from the given {@link ElementContext}s.
      */
-    static ElementsContainer fromElementContexts(@NonNull Collection<ElementContext<?>> elementContexts) {
+    static ElementsContainer fromElementContexts(@NonNull Collection<ElementContext> elementContexts) {
         return new ElementsContainer(elementContexts.stream()
                 .collect(
                         Collectors.toMap(

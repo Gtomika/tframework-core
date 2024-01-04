@@ -13,7 +13,8 @@ class NestedClassScannerTest {
         var scanner = new NestedClassScanner(NestedClassScannerTest.class);
         var scannedClasses = scanner.scanClasses();
 
-        assertEquals(2, scannedClasses.size());
+        assertEquals(3, scannedClasses.size());
+        assertTrue(scannedClasses.stream().anyMatch(c -> c.equals(NestedClassScannerTest.class)));
         assertTrue(scannedClasses.stream().anyMatch(c -> c.equals(NestedClass1.class)));
         assertTrue(scannedClasses.stream().anyMatch(c -> c.equals(NestedClass2.class)));
     }

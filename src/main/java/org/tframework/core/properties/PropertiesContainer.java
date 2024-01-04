@@ -33,6 +33,20 @@ public final class PropertiesContainer {
     }
 
     /**
+     * Gets the {@link PropertyValue} of a property, or the provided default one. If interested only in the raw underlying value,
+     * it's possible to use {@link #getPropertyValue(String)} or {@link #getPropertyValueList(String)} instead.
+     * @param propertyName The property to get.
+     * @param defaultValue A default value to return if the property does not exist.
+     */
+    public PropertyValue getPropertyValueObject(String propertyName, PropertyValue defaultValue) {
+        return Optional.ofNullable(properties.get(propertyName))
+                .orElseGet(() -> {
+                    log.debug("Property '{}' not found. Returning default value '{}'", propertyName, defaultValue);
+                    return defaultValue;
+                });
+    }
+
+    /**
      * Convenience method that gets a property as a string. If the property is a list,
      * it will be converted to a string using {@code List#toString()}.
      * @throws PropertyNotFoundException If the property does not exist.
@@ -52,6 +66,7 @@ public final class PropertiesContainer {
         try {
             return getPropertyValue(propertyName);
         } catch (PropertyNotFoundException e) {
+            log.debug("Property '{}' not found. Returning default value '{}'", propertyName, defaultValue);
             return defaultValue;
         }
     }
@@ -76,6 +91,7 @@ public final class PropertiesContainer {
         try {
             return getPropertyValueList(propertyName);
         } catch (PropertyNotFoundException e) {
+            log.debug("Property '{}' not found. Returning default value '{}'", propertyName, defaultValue);
             return defaultValue;
         }
     }

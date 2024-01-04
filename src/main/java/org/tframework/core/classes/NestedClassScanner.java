@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 /**
  * This {@link ClassScanner} implementation scans all nested classes of a given class.
- * The class itself will <b>not</b> be included.
+ * The class itself will also be included.
  */
 @Getter
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
@@ -23,7 +23,6 @@ public class NestedClassScanner implements ClassScanner {
     @Override
     public List<Class<?>> scanClasses() {
         return Arrays.stream(classToScan.getNestMembers())
-                .filter(clazz -> !clazz.equals(classToScan))
                 .toList();
     }
 }

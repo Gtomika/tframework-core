@@ -27,21 +27,10 @@ public interface ClassFilter {
     );
 
     /**
-     * Filters the classes so that only those which implement an interface are returned.
+     * Filters the classes so that only those which can be assigned to {@code superClass} will be returned.
      * @param classes The classes to filter.
-     * @param interfaceClass The interface to filter for, this {@link Class} should actually be an interface.
-     * @return Filtered list of classes
-     * @throws NotAnInterfaceException If {@code interfaceClass} is not an interface.
+     * @param superClass The super class to filter for. This can also be an interface.
      */
-    List<Class<?>> filterByInterface(List<Class<?>> classes, Class<?> interfaceClass);
+    List<Class<?>> filterBySuperClass(List<Class<?>> classes, Class<?> superClass);
 
-    /**
-     * Can be used by implementations to perform an interface check and throw
-     * an {@link NotAnInterfaceException} if the check is failed.
-     */
-    default void checkIfInterface(Class<?> clazz) {
-        if(!clazz.isInterface()) {
-            throw new NotAnInterfaceException(clazz);
-        }
-    }
 }

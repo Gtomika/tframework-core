@@ -17,10 +17,10 @@ import org.tframework.core.di.annotations.Element;
 @Slf4j
 @Getter
 @EqualsAndHashCode
-public sealed abstract class ElementContext<T> permits SingletonElementContext, PrototypeElementContext {
+public sealed abstract class ElementContext permits SingletonElementContext, PrototypeElementContext {
 
     protected final String name;
-    protected final Class<T> type;
+    protected final Class<?> type;
     protected final ElementScope scope;
 
     /**
@@ -30,7 +30,7 @@ public sealed abstract class ElementContext<T> permits SingletonElementContext, 
      * @param type Type of the element.
      * @param scope {@link ElementScope} of this element.
      */
-    protected ElementContext(@NonNull String name, @NonNull Class<T> type, @NonNull ElementScope scope) {
+    protected ElementContext(@NonNull String name, @NonNull Class<?> type, @NonNull ElementScope scope) {
         this.name = name.equals(Element.NAME_NOT_SPECIFIED) ? ElementUtils.getElementNameByType(type) : name;
         this.type = type;
         this.scope = scope;
@@ -42,6 +42,6 @@ public sealed abstract class ElementContext<T> permits SingletonElementContext, 
      * Depending on the implementation, this might reuse an existing instance, or
      * create a new one.
      */
-    public abstract T requestInstance();
+    public abstract Object requestInstance();
 
 }

@@ -25,10 +25,9 @@ public class DefaultClassFilter implements ClassFilter {
     }
 
     @Override
-    public List<Class<?>> filterByInterface(List<Class<?>> classes, Class<?> interfaceClass) {
-        checkIfInterface(interfaceClass);
+    public List<Class<?>> filterBySuperClass(List<Class<?>> classes, Class<?> superClass) {
         return classes.stream()
-                .filter(interfaceClass::isAssignableFrom)
+                .filter(superClass::isAssignableFrom)
                 .toList();
     }
 }

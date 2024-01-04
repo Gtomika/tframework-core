@@ -1,7 +1,6 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.classes;
 
-import java.util.List;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -18,14 +17,6 @@ public final class ClassScannersFactory {
      */
     public static PackageClassScanner createPackageClassScanner(Set<String> packages) {
         return new PackageClassScanner(packages);
-    }
-
-    /**
-     * Creates a {@link FixedClassScanner}.
-     * @param classesToScan List of classes to assign to the scanner.
-     */
-    public static FixedClassScanner createFixedClassScanner(List<Class<?>> classesToScan) {
-        return new FixedClassScanner(classesToScan);
     }
 
     /**

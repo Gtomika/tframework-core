@@ -8,7 +8,7 @@ import org.tframework.core.TFrameworkException;
  */
 public class ElementNotFoundException extends TFrameworkException {
 
-    private static final String TEMPLATE = "Element not found with name '%s', or it could not be cast to the requested type.";
+    private static final String TEMPLATE = "Element not found with name '%s'";
 
     public ElementNotFoundException(String name) {
         super(String.format(TEMPLATE, name));

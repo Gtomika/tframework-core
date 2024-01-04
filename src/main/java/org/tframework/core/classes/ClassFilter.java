@@ -2,7 +2,7 @@
 package org.tframework.core.classes;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
+import java.util.Collection;
 import org.tframework.core.annotations.AnnotationScanner;
 
 /**
@@ -18,10 +18,10 @@ public interface ClassFilter {
      * @param annotationClass The annotation to filter on.
      * @param annotationScanner An {@link AnnotationScanner} that is going to check if {@code annotationClass}
      *                          is present on the classes.
-     * @return Filtered list of classes.
+     * @return Filtered collection of classes.
      */
-    List<Class<?>> filterByAnnotation(
-            List<Class<?>> classes,
+    Collection<Class<?>> filterByAnnotation(
+            Collection<Class<?>> classes,
             Class<? extends Annotation> annotationClass,
             AnnotationScanner annotationScanner
     );
@@ -31,6 +31,6 @@ public interface ClassFilter {
      * @param classes The classes to filter.
      * @param superClass The super class to filter for. This can also be an interface.
      */
-    List<Class<?>> filterBySuperClass(List<Class<?>> classes, Class<?> superClass);
+    Collection<Class<?>> filterBySuperClass(Collection<Class<?>> classes, Class<?> superClass);
 
 }

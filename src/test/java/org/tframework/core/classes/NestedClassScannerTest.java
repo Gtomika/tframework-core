@@ -4,6 +4,7 @@ package org.tframework.core.classes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class NestedClassScannerTest {
@@ -11,7 +12,7 @@ class NestedClassScannerTest {
     @Test
     public void shouldFindNestedClasses() {
         var scanner = new NestedClassScanner(NestedClassScannerTest.class);
-        var scannedClasses = scanner.scanClasses();
+        Set<Class<?>> scannedClasses = scanner.scanClasses();
 
         assertEquals(3, scannedClasses.size());
         assertTrue(scannedClasses.stream().anyMatch(c -> c.equals(NestedClassScannerTest.class)));

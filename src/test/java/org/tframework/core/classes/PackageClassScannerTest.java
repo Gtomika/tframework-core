@@ -18,7 +18,7 @@ class PackageClassScannerTest {
         String packageName = "org.tframework.core.classes";
         var packageClassScanner = new PackageClassScanner(Set.of(packageName));
 
-        var classes = packageClassScanner.scanClasses();
+        Set<Class<?>> classes = packageClassScanner.scanClasses();
         log.info("Found {} classes in package '{}'", classes.size(), packageName);
 
         //there may be more classes, but these are guaranteed to be there
@@ -32,7 +32,7 @@ class PackageClassScannerTest {
         String packageName = "org.slf4j";
         var packageClassScanner = new PackageClassScanner(Set.of(packageName));
 
-        var classes = packageClassScanner.scanClasses();
+        Set<Class<?>> classes = packageClassScanner.scanClasses();
         log.info("Found {} classes in package inside JAR '{}'", classes.size(), packageName);
 
         //there may be more classes, but these are guaranteed to be there

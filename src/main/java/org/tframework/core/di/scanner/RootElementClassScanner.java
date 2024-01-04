@@ -1,7 +1,7 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.di.scanner;
 
-import java.util.List;
+import java.util.Set;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,7 @@ public class RootElementClassScanner extends ElementClassScanner {
     }
 
     @Override
-    public List<Class<?>> scanPotentialElements() {
+    public Set<Class<?>> scanPotentialElements() {
         var scanRootProperty = propertiesContainer.getPropertyValueObject(
                 ROOT_SCANNING_ENABLED_PROPERTY,
                 ROOT_SCANNING_ENABLED_DEFAULT_VALUE
@@ -50,7 +50,7 @@ public class RootElementClassScanner extends ElementClassScanner {
         if(propertyConverter.convert(scanRootProperty)) {
             return classScanner.scanClasses();
         } else {
-            return List.of();
+            return Set.of();
         }
     }
 

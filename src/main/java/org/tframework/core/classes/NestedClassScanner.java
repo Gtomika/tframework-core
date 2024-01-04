@@ -2,7 +2,8 @@
 package org.tframework.core.classes;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +22,8 @@ public class NestedClassScanner implements ClassScanner {
      * Use reflection to detect and return the nested classes of the one provided at construction time.
      */
     @Override
-    public List<Class<?>> scanClasses() {
+    public Set<Class<?>> scanClasses() {
         return Arrays.stream(classToScan.getNestMembers())
-                .toList();
+                .collect(Collectors.toSet());
     }
 }

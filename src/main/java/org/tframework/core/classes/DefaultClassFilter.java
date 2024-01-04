@@ -2,7 +2,7 @@
 package org.tframework.core.classes;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
+import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.annotations.AnnotationScanner;
@@ -14,8 +14,8 @@ import org.tframework.core.annotations.AnnotationScanner;
 public class DefaultClassFilter implements ClassFilter {
 
     @Override
-    public List<Class<?>> filterByAnnotation(
-            List<Class<?>> classes,
+    public Collection<Class<?>> filterByAnnotation(
+            Collection<Class<?>> classes,
             Class<? extends Annotation> annotationClass,
             AnnotationScanner annotationScanner
     ) {
@@ -25,7 +25,7 @@ public class DefaultClassFilter implements ClassFilter {
     }
 
     @Override
-    public List<Class<?>> filterBySuperClass(List<Class<?>> classes, Class<?> superClass) {
+    public Collection<Class<?>> filterBySuperClass(Collection<Class<?>> classes, Class<?> superClass) {
         return classes.stream()
                 .filter(superClass::isAssignableFrom)
                 .toList();

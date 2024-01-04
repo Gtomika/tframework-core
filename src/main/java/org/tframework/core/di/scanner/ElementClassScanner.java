@@ -1,7 +1,8 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.di.scanner;
 
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.tframework.core.annotations.AnnotationScanner;
@@ -23,19 +24,19 @@ public abstract class ElementClassScanner {
      * {@link Element} annotation. Subclasses should implement their own logic for finding potential elements,
      * For example: scanning a package, or scanning the classpath.
      */
-    protected abstract List<Class<?>> scanPotentialElements();
+    protected abstract Set<Class<?>> scanPotentialElements();
 
     /**
      * Scans for classes that are elements, using the underlying implementation
      * to find potential elements, and then filtering them.
-     * @return A list of classes that are elements (the internal {@link ClassFilter} determined that they
+     * @return A {@link Set} of classes that are elements (the internal {@link ClassFilter} determined that they
      * are annotated with {@link Element}).
      */
-    public List<Class<?>> scanElements() {
+    public Set<Class<?>> scanElements() {
         return filterElements(scanPotentialElements());
     }
 
-    protected List<Class<?>> filterElements(List<Class<?>> classes) {
-        return classFilter.filterByAnnotation(classes, Element.class, annotationScanner);
+    protected Set<Class<?>> filterElements(Set<Class<?>> classes) {
+        return new HashSet<>(classFilter.filterByAnnotation(classes, Element.class, annotationScanner));
     }
 }

@@ -6,8 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static org.tframework.core.di.scanner.RootElementClassScanner.ROOT_SCANNING_ENABLED_PROPERTY;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -30,7 +30,7 @@ class RootElementClassScannerTest {
     @Test
     public void shouldScanElements_whenEnableProperty_isProvidedAsTrue() {
         setUpScannerWithScanEnabledProperty(true);
-        when(packageClassScanner.scanClasses()).thenReturn(List.of(SomeElement.class, SomeNonElement.class));
+        when(packageClassScanner.scanClasses()).thenReturn(Set.of(SomeElement.class, SomeNonElement.class));
 
         var elements = scanner.scanElements();
 
@@ -50,7 +50,7 @@ class RootElementClassScannerTest {
     @Test
     public void shouldScanElements_whenEnableProperty_isNotProvided_defaultToTrue() {
         setUpScannerWithScanEnabledProperty(null);
-        when(packageClassScanner.scanClasses()).thenReturn(List.of(SomeElement.class, SomeNonElement.class));
+        when(packageClassScanner.scanClasses()).thenReturn(Set.of(SomeElement.class, SomeNonElement.class));
 
         var elements = scanner.scanElements();
 

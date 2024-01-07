@@ -12,7 +12,6 @@ import org.tframework.core.di.annotations.Element;
 /**
  * A wrapper for an element, that keeps track of all the data of this element, and
  * all currently known instances as well.
- * @param <T> The type of the element.
  */
 @Slf4j
 @Getter

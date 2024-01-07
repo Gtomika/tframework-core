@@ -21,7 +21,7 @@ public final class PropertyExtractorsFactory {
         var leafExtractors = LeafExtractorsFactory.createLeafExtractors();
         var propertiesExtractor = new RecursivePropertiesExtractor(leafExtractors);
 
-        log.debug("Created leaf extractors: '{}'", LogUtils.classNames(leafExtractors));
+        log.debug("Created leaf extractors: '{}'", LogUtils.objectClassNames(leafExtractors));
         log.debug("Created properties extractor: '{}'", propertiesExtractor.getClass().getName());
 
         return propertiesExtractor;

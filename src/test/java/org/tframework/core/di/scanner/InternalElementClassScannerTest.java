@@ -53,8 +53,9 @@ class InternalElementClassScannerTest {
 
         var elements = internalElementClassScanner.scanElements();
 
-        //defaults to false, so empty set is expected
-        assertTrue(elements.isEmpty());
+        //defaults to true
+        assertEquals(1, elements.size());
+        assertTrue(elements.contains(SomeElement.class));
     }
 
     private void setUpScannerWithScanEnabledProperty(Boolean enabled) {

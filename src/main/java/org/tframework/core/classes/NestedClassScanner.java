@@ -2,8 +2,8 @@
 package org.tframework.core.classes;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,9 @@ public class NestedClassScanner implements ClassScanner {
      */
     @Override
     public Set<Class<?>> scanClasses() {
-        return Arrays.stream(classToScan.getNestMembers())
-                .collect(Collectors.toSet());
+        HashSet<Class<?>> classes = new HashSet<>();
+        classes.add(classToScan);
+        classes.addAll(Arrays.asList(classToScan.getDeclaredClasses()));
+        return classes;
     }
 }

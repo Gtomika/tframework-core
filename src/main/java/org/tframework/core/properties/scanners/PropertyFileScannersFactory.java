@@ -30,7 +30,7 @@ public final class PropertyFileScannersFactory {
                 createEnvironmentPropertyScanner(),
                 createCliArgumentScanner(input.cliArgs())
         );
-        log.debug("Created the following property file scanners: {}", LogUtils.classNames(scanners));
+        log.debug("Created the following property file scanners: {}", LogUtils.objectClassNames(scanners));
         return scanners;
     }
 

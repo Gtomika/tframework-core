@@ -21,4 +21,16 @@ class ElementClassScannersFactoryTest {
         var scanner = ElementClassScannersFactory.createInternalElementClassScanner(PropertiesContainer.empty());
         assertNotNull(scanner);
     }
+
+    @Test
+    void shouldCreatePackagesElementClassScanner() {
+        var scanner = ElementClassScannersFactory.createPackagesElementClassScanner(PropertiesContainer.empty());
+        assertNotNull(scanner);
+    }
+
+    @Test
+    void shouldCreateClassesElementClassScanner() {
+        var scanner = ElementClassScannersFactory.createClassesElementClassScanner(PropertiesContainer.empty());
+        assertNotNull(scanner);
+    }
 }

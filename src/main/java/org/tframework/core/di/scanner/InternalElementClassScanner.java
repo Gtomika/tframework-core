@@ -14,8 +14,8 @@ import org.tframework.core.properties.converters.PropertyConvertersFactory;
 
 /**
  * An {@link ElementClassScanner} implementation which scans the internal TFramework packages
- * ({@value TFRAMEWORK_INTERNAL_PACKAGE}). By default, this scanner is disabled, but can be enabled by setting the
- * {@value TFRAMEWORK_INTERNAL_PACKAGE_PROPERTY} to {@code true}.
+ * ({@value TFRAMEWORK_INTERNAL_PACKAGE}). By default, this scanner is enabled, but can be enabled by setting the
+ * {@value TFRAMEWORK_INTERNAL_PACKAGE_PROPERTY} to {@code false}.
  */
 @Slf4j
 public class InternalElementClassScanner extends ElementClassScanner {
@@ -31,7 +31,7 @@ public class InternalElementClassScanner extends ElementClassScanner {
      */
     public static final String TFRAMEWORK_INTERNAL_PACKAGE_PROPERTY = "tframework.dependency-injection.scan-internal";
 
-    private static final SinglePropertyValue TFRAMEWORK_INTERNAL_PACKAGE_DEFAULT_VALUE = new SinglePropertyValue("false");
+    private static final SinglePropertyValue TFRAMEWORK_INTERNAL_PACKAGE_DEFAULT_VALUE = new SinglePropertyValue("true");
 
     private final PackageClassScanner classScanner;
     private final PropertyConverter<Boolean> propertyConverter;

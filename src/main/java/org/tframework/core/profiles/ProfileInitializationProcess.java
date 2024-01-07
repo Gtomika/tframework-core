@@ -30,7 +30,7 @@ public class ProfileInitializationProcess {
      */
     public ProfilesContainer initializeProfiles(@NonNull List<ProfileScanner> profileScanners) {
         log.debug("The profile initialization process will use these profiles scanners: {}",
-                LogUtils.classNames(profileScanners));
+                LogUtils.objectClassNames(profileScanners));
         Set<String> profiles = ProfileMerger.merging(profileScanners)
                 .mergeAndStream()
                 .map(profileCleaner::clean)

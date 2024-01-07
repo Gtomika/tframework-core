@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,13 @@ public final class PropertiesContainer {
      */
     public List<String> getPropertyValueList(String propertyName) {
         return switch (getPropertyValueObject(propertyName)) {
-            case SinglePropertyValue(var value) -> List.of(value);
+            case SinglePropertyValue(var value) -> {
+                log.debug("Property '{}' is a single value. Converting it to a list with a single element", propertyName);
+                //List.of does not accept null, so we need to use ArrayList
+                List<String> singleValueList = new ArrayList<>();
+                singleValueList.add(value);
+                yield singleValueList;
+            }
             case ListPropertyValue(var values) -> values;
         };
     }

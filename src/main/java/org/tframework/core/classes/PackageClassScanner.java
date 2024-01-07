@@ -22,7 +22,9 @@ import org.tframework.core.utils.ClassLoaderUtils;
  * <ul>
  *     <li>Classes both outside and inside JAR files are correctly picked up.</li>
  *     <li>Both outer and inner classes are found.</li>
+ *     <li>Wildcards are supported inside the package names. For example {@code some.*.stuff}</li>
  * </ul>
+ * There is no need to specify subpackages, because all subpackages are automatically scanned.
  */
 @Slf4j
 @Setter

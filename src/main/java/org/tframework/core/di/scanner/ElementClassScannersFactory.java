@@ -42,4 +42,30 @@ public final class ElementClassScannersFactory {
                 .build();
     }
 
+    /**
+     * Creates a new {@link PackagesElementClassScanner} to scan the packages specified in the
+     * {@value PackagesElementClassScanner#SCAN_PACKAGES_PROPERTY} property.
+     * @param properties Properties container to check which packages are to be scanned.
+     */
+    public static PackagesElementClassScanner createPackagesElementClassScanner(PropertiesContainer properties) {
+        return PackagesElementClassScanner.builder()
+                .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())
+                .classFilter(ClassFiltersFactory.createDefaultClassFilter())
+                .classScanner(ClassScannersFactory.createPackageClassScanner())
+                .propertiesContainer(properties)
+                .build();
+    }
+
+    /**
+     * Creates a new {@link ClassesElementClassScanner} to scan the classes specified in the
+     * {@value ClassesElementClassScanner#SCAN_CLASSES_PROPERTY} property.
+     */
+    public static ClassesElementClassScanner createClassesElementClassScanner(PropertiesContainer properties) {
+        return ClassesElementClassScanner.builder()
+                .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())
+                .classFilter(ClassFiltersFactory.createDefaultClassFilter())
+                .propertiesContainer(properties)
+                .build();
+    }
+
 }

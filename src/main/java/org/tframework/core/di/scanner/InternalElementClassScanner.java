@@ -5,12 +5,12 @@ import java.util.Set;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.annotations.AnnotationScanner;
-import org.tframework.core.classes.ClassFilter;
-import org.tframework.core.classes.PackageClassScanner;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.properties.converters.PropertyConverter;
 import org.tframework.core.properties.converters.PropertyConvertersFactory;
+import org.tframework.core.reflection.classes.ClassFilter;
+import org.tframework.core.reflection.classes.PackageClassScanner;
 
 /**
  * An {@link ElementClassScanner} implementation which scans the internal TFramework packages

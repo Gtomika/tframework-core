@@ -6,9 +6,9 @@ import java.util.Set;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.tframework.core.annotations.AnnotationScanner;
-import org.tframework.core.classes.ClassFilter;
 import org.tframework.core.di.annotations.Element;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.reflection.classes.ClassFilter;
 
 /**
  * Abstract base class for all implementations that search for the {@link Element} annotation on classes.

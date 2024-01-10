@@ -7,9 +7,9 @@ import java.util.stream.Collectors;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.annotations.AnnotationScanner;
-import org.tframework.core.classes.ClassFilter;
-import org.tframework.core.classes.PackageClassScanner;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.reflection.classes.ClassFilter;
+import org.tframework.core.reflection.classes.PackageClassScanner;
 
 /**
  * This {@link ElementClassScanner} scans all elements in the given packages. A list of packages

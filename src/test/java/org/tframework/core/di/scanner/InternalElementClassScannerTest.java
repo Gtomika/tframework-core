@@ -13,11 +13,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.annotations.AnnotationScannersFactory;
-import org.tframework.core.classes.ClassFiltersFactory;
-import org.tframework.core.classes.PackageClassScanner;
 import org.tframework.core.di.annotations.Element;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;
+import org.tframework.core.reflection.classes.ClassFiltersFactory;
+import org.tframework.core.reflection.classes.PackageClassScanner;
 
 @ExtendWith(MockitoExtension.class)
 class InternalElementClassScannerTest {

@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.annotations.AnnotationScannersFactory;
-import org.tframework.core.classes.ClassFiltersFactory;
 import org.tframework.core.di.annotations.Element;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;
+import org.tframework.core.reflection.classes.ClassFiltersFactory;
 
 class ClassesElementClassScannerTest {
 

@@ -4,9 +4,9 @@ package org.tframework.core.di.scanner;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.annotations.AnnotationScannersFactory;
-import org.tframework.core.classes.ClassFiltersFactory;
-import org.tframework.core.classes.ClassScannersFactory;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.reflection.classes.ClassFiltersFactory;
+import org.tframework.core.reflection.classes.ClassScannersFactory;
 
 /**
  * Factory for creating various {@link ElementClassScanner}s.

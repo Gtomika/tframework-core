@@ -2,6 +2,7 @@
 package org.tframework.core.annotations;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +14,13 @@ import lombok.Getter;
  * the simple one provided by {@link Class#isAnnotationPresent(Class)}. {@code isAnnotationPresent} can only find
  * <b>directly present</b> annotations. On the other hand, this scanner finds <b>composed annotations.</b>
  * <br>
- * We say that class {@code A} has composed annotation {@code @B} if either is fulfilled:
+ * We say that a component {@code A} has composed annotation {@code @B} if either is fulfilled:
  * <ul>
  *     <li>{@code A} is directly annotated with {@code @B} (thus, this is an extension of {@link Class#isAnnotationPresent(Class)}).</li>
- *     <li>Any <b>supported</b> annotations on class {@code A} have composed annotation {@code @B} (recursion).</li>
+ *     <li>Any <b>supported</b> annotations on component {@code A} have composed annotation {@code @B} (recursion).</li>
  * </ul>
  * Note the word 'supported'. Some types of annotations are unsupported due to technical limitations. Composed annotation
- * scanning cannot be used to find unsupported annotations, neither will it them. See {@link #isUnsupportedAnnotation(Class)}
+ * scanning cannot be used to find unsupported annotations, neither will it scan them. See {@link #isUnsupportedAnnotation(Class)}
  * method for the types of unsupported annotations.
  * <br>
  * While annotations that are placed on themselves are supported, only the first occurrence of the annotation will be
@@ -45,30 +46,34 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
 
     /**
      * Scans the class (provided at construction time) for composed annotations.
+     * @param annotatedElement Element to scan for the annotation.
      * @param annotationToFind The annotation to composed scan for.
      * @return List of annotations that were found in the scan. This is a list, because a composed annotation can be present
      * multiple times on the scanned class.
      * @param <A> Type of {@code annotationToFind}.
      * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
      */
-    public <A extends Annotation> List<A> scan(Class<?> scannedClass, Class<A> annotationToFind) {
+    @Override
+    public <A extends Annotation> List<A> scan(AnnotatedElement annotatedElement, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        return scan(scannedClass, annotationToFind, false);
+        return scan(annotatedElement, annotationToFind, false);
     }
 
     /**
      * Scans the class (provided at construction time) for one composed annotation. Always the first matched
      * annotation is returned. If only one scanned annotation is needed, this method is a more performant
-     * choice than {@link #scan(Class, Class)}. If you need to make sure that at most one annotation was found,
-     * use {@link #scanOneStrict(Class, Class)} instead.
+     * choice than {@link #scan(AnnotatedElement, Class)}. If you need to make sure that at most one annotation was found,
+     * use {@link #scanOneStrict(AnnotatedElement, Class)} instead.
+     * @param annotatedElement Element to scan for the annotation.
      * @param annotationToFind The annotation to composed scan for.
      * @return {@link Optional} with the annotation if found, or empty if not found.
      * @param <A> Type of {@code annotationToFind}.
      * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
      */
-    public <A extends Annotation> Optional<A> scanOne(Class<?> scannedClass, Class<A> annotationToFind) {
+    @Override
+    public <A extends Annotation> Optional<A> scanOne(AnnotatedElement annotatedElement, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        var scannedAnnotations = scan(scannedClass, annotationToFind, true);
+        var scannedAnnotations = scan(annotatedElement, annotationToFind, true);
         if(!scannedAnnotations.isEmpty()) {
             return Optional.of(scannedAnnotations.getFirst());
         } else {
@@ -77,17 +82,19 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
     }
 
     /**
-     * Scans the class (provided at construction time) for one composed annotation. Unlike {@link #scan(Class, Class)},
+     * Scans the class (provided at construction time) for one composed annotation. Unlike {@link #scan(AnnotatedElement, Class)},
      * this method will raise an exception if multiple annotations are found.
+     * @param annotatedElement Element to scan for the annotation.
      * @param annotationToFind The annotation to composed scan for.
      * @return {@link Optional} with the annotation if found, or empty if not found.
      * @param <A> Type of {@code annotationToFind}.
      * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
      * @throws MultipleAnnotationsScannedException If more than one annotation was found during the scan.
      */
-    public <A extends Annotation> Optional<A> scanOneStrict(Class<?> scannedClass, Class<A> annotationToFind) {
+    @Override
+    public <A extends Annotation> Optional<A> scanOneStrict(AnnotatedElement annotatedElement, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        var scannedAnnotations = scan(scannedClass, annotationToFind, false);
+        var scannedAnnotations = scan(annotatedElement, annotationToFind, false);
         if(scannedAnnotations.size() == 1) {
             return Optional.of(scannedAnnotations.getFirst());
         } else if(scannedAnnotations.size() > 1) {
@@ -111,23 +118,24 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
 
     /**
      * Checks if the class has at least one composed annotation.
+     * @param annotatedElement Element to scan for the annotation.
      * @param annotationToFind The annotation to check for.
      * @return True only if at least one composed annotation was found.
      * @param <A> Type of {@code annotationToFind}.
      */
     @Override
-    public <A extends Annotation> boolean hasAnnotation(Class<?> scannedClass, Class<A> annotationToFind) {
-        return scanOne(scannedClass, annotationToFind).isPresent();
+    public <A extends Annotation> boolean hasAnnotation(AnnotatedElement annotatedElement, Class<A> annotationToFind) {
+        return scanOne(annotatedElement, annotationToFind).isPresent();
     }
 
     private <A extends Annotation> List<A> scan(
-            Class<?> scannedClass,
+            AnnotatedElement annotatedElement,
             Class<A> annotationToFind,
             boolean stopOnFirstFind
     ) {
         List<A> composedAnnotations = new LinkedList<>();
 
-        for(Annotation annotationOnScannedClass: scannedClass.getAnnotations()) {
+        for(Annotation annotationOnScannedClass: annotatedElement.getAnnotations()) {
 
             //all unsupported annotations will be skipped
             if(isUnsupportedAnnotation(annotationOnScannedClass.annotationType())) {

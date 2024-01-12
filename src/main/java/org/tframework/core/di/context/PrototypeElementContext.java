@@ -3,12 +3,13 @@ package org.tframework.core.di.context;
 
 import lombok.EqualsAndHashCode;
 import org.tframework.core.di.ElementScope;
+import org.tframework.core.di.context.source.ElementSource;
 
 @EqualsAndHashCode(callSuper = true)
 public final class PrototypeElementContext extends ElementContext {
 
-    public PrototypeElementContext(String name, Class<?> type) {
-        super(name, type, ElementScope.PROTOTYPE);
+    public PrototypeElementContext(String name, Class<?> type, ElementSource source) {
+        super(name, type, ElementScope.PROTOTYPE, source);
     }
 
     @Override

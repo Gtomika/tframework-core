@@ -15,9 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.annotations.AnnotationScanner;
 
 @ExtendWith(MockitoExtension.class)
-class DefaultClassFilterTest {
+class SimpleClassFilterTest {
 
-    private final DefaultClassFilter defaultClassFilter = new DefaultClassFilter();
+    private final SimpleClassFilter simpleClassFilter = new SimpleClassFilter();
 
     @Mock
     private AnnotationScanner annotationScanner;
@@ -28,7 +28,7 @@ class DefaultClassFilterTest {
 
         when(annotationScanner.hasAnnotation(TestFilterClass1.class, TestAnnotation.class)).thenReturn(false);
         when(annotationScanner.hasAnnotation(TestFilterClass2.class, TestAnnotation.class)).thenReturn(true);
-        var filteredClasses = defaultClassFilter.filterByAnnotation(classes, TestAnnotation.class, annotationScanner);
+        var filteredClasses = simpleClassFilter.filterByAnnotation(classes, TestAnnotation.class, annotationScanner);
 
         assertEquals(1, filteredClasses.size());
         assertTrue(filteredClasses.stream().anyMatch(clazz -> clazz.getName().equals(TestFilterClass2.class.getName())));
@@ -37,7 +37,7 @@ class DefaultClassFilterTest {
     @Test
     public void shouldFilterByInterface() {
         List<Class<?>> classes = List.of(TestFilterClass1.class, TestFilterClass2.class);
-        var filteredClasses = defaultClassFilter.filterBySuperClass(classes, TestInterface.class);
+        var filteredClasses = simpleClassFilter.filterBySuperClass(classes, TestInterface.class);
 
         assertEquals(1, filteredClasses.size());
         assertTrue(filteredClasses.stream().anyMatch(clazz -> clazz.getName().equals(TestFilterClass1.class.getName())));
@@ -46,7 +46,7 @@ class DefaultClassFilterTest {
     @Test
     public void shouldFilterBySuperClass() {
         List<Class<?>> classes = List.of(String.class, Integer.class, Double.class);
-        var filteredClasses = defaultClassFilter.filterBySuperClass(classes, Number.class);
+        var filteredClasses = simpleClassFilter.filterBySuperClass(classes, Number.class);
 
         assertEquals(2, filteredClasses.size());
         assertTrue(filteredClasses.stream().anyMatch(clazz -> clazz.equals(Integer.class)));

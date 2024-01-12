@@ -7,13 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
-class DefaultMethodScannerTest {
+class DeclaredMethodScannerTest {
+
+    private final  DeclaredMethodScanner scanner = new DeclaredMethodScanner();
 
     @Test
     public void shouldScanMethods() {
-        DefaultMethodScanner scanner = new DefaultMethodScanner(Child.class);
-
-        var scannedMethods = scanner.scanMethods()
+        var scannedMethods = scanner.scanMethods(Child.class)
                 .stream()
                 .filter(m -> !m.getName().startsWith("$")) //filter out synthetic methods added by tools like JaCoCo
                 .collect(Collectors.toSet());

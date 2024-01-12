@@ -11,8 +11,8 @@ import java.util.Set;
 public interface MethodScanner {
 
     /**
-     * Finds all methods of the class or classes.
+     * Finds the methods of the class.
      */
-    Set<Method> scanMethods();
+    Set<Method> scanMethods(Class<?> classToScan);
 
 }

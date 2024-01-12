@@ -14,12 +14,10 @@ import lombok.RequiredArgsConstructor;
  * class itself will be returned (for example, methods on the superclass will not be found).
  */
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class DefaultMethodScanner implements MethodScanner {
-
-    private final Class<?> classToScan;
+public class DeclaredMethodScanner implements MethodScanner {
 
     @Override
-    public Set<Method> scanMethods() {
+    public Set<Method> scanMethods(Class<?> classToScan) {
         return Arrays.stream(classToScan.getDeclaredMethods())
                 .collect(Collectors.toSet());
     }

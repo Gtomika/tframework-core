@@ -3,7 +3,6 @@ package org.tframework.core.reflection.methods;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import lombok.NonNull;
 
 /**
  * Utilities to construct {@link MethodScanner}s.
@@ -12,10 +11,10 @@ import lombok.NonNull;
 public final class MethodScannersFactory {
 
     /**
-     * Creates a {@link MethodScanner} that scans the given class.
+     * Creates a {@link MethodScanner} that other framework components can use.
      */
-    public static MethodScanner createDefaultMethodScanner(@NonNull Class<?> classToScan) {
-        return new DefaultMethodScanner(classToScan);
+    public static MethodScanner createDefaultMethodScanner() {
+        return new DeclaredMethodScanner();
     }
 
 }

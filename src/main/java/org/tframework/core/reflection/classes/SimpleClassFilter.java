@@ -11,7 +11,7 @@ import org.tframework.core.annotations.AnnotationScanner;
  * A reasonable default implementation for {@link ClassFilter}.
  */
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class DefaultClassFilter implements ClassFilter {
+public class SimpleClassFilter implements ClassFilter {
 
     @Override
     public Collection<Class<?>> filterByAnnotation(

@@ -10,14 +10,17 @@ import org.junit.jupiter.api.Test;
 import org.tframework.core.di.annotations.Element;
 import org.tframework.core.di.context.PrototypeElementContext;
 import org.tframework.core.di.context.SingletonElementContext;
+import org.tframework.core.di.context.source.ClassElementSource;
+import org.tframework.core.di.context.source.ElementSource;
 
 class ElementsContainerTest {
 
     private static final String ELEMENT_NAME = "test";
+    private static final ElementSource TEST_SOURCE = new ClassElementSource(ElementsContainerTest.class.getConstructors()[0]);
 
     @Test
     public void shouldGetElementByName() {
-        var elementContext = new SingletonElementContext(ELEMENT_NAME, String.class);
+        var elementContext = new SingletonElementContext(ELEMENT_NAME, String.class, TEST_SOURCE);
         var elementsContainer = ElementsContainer.fromElementContexts(List.of(elementContext));
         assertEquals(elementContext, elementsContainer.getElementContext(ELEMENT_NAME));
     }
@@ -37,7 +40,7 @@ class ElementsContainerTest {
     @Test
     public void shouldGetElementByType() {
         //not specified name will default to the class name
-        var elementContext = new PrototypeElementContext(Element.NAME_NOT_SPECIFIED, Integer.class);
+        var elementContext = new PrototypeElementContext(Element.NAME_NOT_SPECIFIED, Integer.class, TEST_SOURCE);
         var elementsContainer = ElementsContainer.fromElementContexts(List.of(elementContext));
         assertEquals(elementContext, elementsContainer.getElementContext(Integer.class));
     }

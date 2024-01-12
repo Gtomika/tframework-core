@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 public final class ClassFiltersFactory {
 
     /**
-     * Creates a {@link DefaultClassFilter}.
+     * Creates a {@link ClassFilter} for other framework components.
      */
-    public static DefaultClassFilter createDefaultClassFilter() {
-        return new DefaultClassFilter();
+    public static ClassFilter createDefaultClassFilter() {
+        return new SimpleClassFilter();
     }
 
 }

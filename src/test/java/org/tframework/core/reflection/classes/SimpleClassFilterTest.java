@@ -2,17 +2,22 @@
 package org.tframework.core.reflection.classes;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.annotations.AnnotationScanner;
+import org.tframework.core.annotations.MultipleAnnotationsScannedException;
 
 @ExtendWith(MockitoExtension.class)
 class SimpleClassFilterTest {
@@ -23,15 +28,34 @@ class SimpleClassFilterTest {
     private AnnotationScanner annotationScanner;
 
     @Test
-    public void shouldFilterByAnnotation() {
-        List<Class<?>> classes = List.of(TestFilterClass1.class, TestFilterClass2.class);
+    public void shouldFilterByAnnotation_whenNotStrict() {
+        when(annotationScanner.scanOne(TestFilterClass1.class, TestAnnotation.class)).thenReturn(Optional.empty());
 
-        when(annotationScanner.hasAnnotation(TestFilterClass1.class, TestAnnotation.class)).thenReturn(false);
-        when(annotationScanner.hasAnnotation(TestFilterClass2.class, TestAnnotation.class)).thenReturn(true);
-        var filteredClasses = simpleClassFilter.filterByAnnotation(classes, TestAnnotation.class, annotationScanner);
+        TestAnnotation annotation = TestFilterClass2.class.getAnnotation(TestAnnotation.class);
+        when(annotationScanner.scanOne(TestFilterClass2.class, TestAnnotation.class)).thenReturn(Optional.of(annotation));
 
-        assertEquals(1, filteredClasses.size());
-        assertTrue(filteredClasses.stream().anyMatch(clazz -> clazz.getName().equals(TestFilterClass2.class.getName())));
+        var classes = List.of(TestFilterClass1.class, TestFilterClass2.class);
+        var filteringResults = simpleClassFilter.filterByAnnotation(classes, TestAnnotation.class, annotationScanner, false);
+
+        assertEquals(1, filteringResults.size());
+        var result = filteringResults.iterator().next();
+        assertEquals(annotation, result.annotation());
+        assertEquals(TestFilterClass2.class, result.annotationSource());
+    }
+
+    @Test
+    public void shouldFilterByAnnotation_whenStrict() {
+        when(annotationScanner.scanOneStrict(TestFilterClass1.class, TestAnnotation.class)).thenReturn(Optional.empty());
+
+        var testAnnotations = Arrays.asList(TestFilterClass3.class.getAnnotationsByType(TestAnnotation.class));
+        when(annotationScanner.scanOneStrict(TestFilterClass3.class, TestAnnotation.class))
+                .thenThrow(new MultipleAnnotationsScannedException(testAnnotations));
+
+        var classes = List.of(TestFilterClass1.class, TestFilterClass3.class);
+
+        assertThrows(MultipleAnnotationsScannedException.class, () -> {
+            simpleClassFilter.filterByAnnotation(classes, TestAnnotation.class, annotationScanner, true);
+        });
     }
 
     @Test
@@ -55,12 +79,22 @@ class SimpleClassFilterTest {
 
     interface TestInterface {}
 
+    @Repeatable(TestAnnotationContainer.class)
     @Retention(RetentionPolicy.RUNTIME)
     @interface TestAnnotation {}
+
+    @Retention(RetentionPolicy.RUNTIME)
+    @interface TestAnnotationContainer {
+        TestAnnotation[] value();
+    }
 
     static class TestFilterClass1 implements TestInterface {}
 
     @TestAnnotation
     static class TestFilterClass2 {}
+
+    @TestAnnotation
+    @TestAnnotation
+    static class TestFilterClass3 {}
 
 }

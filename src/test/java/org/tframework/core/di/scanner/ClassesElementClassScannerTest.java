@@ -24,40 +24,40 @@ class ClassesElementClassScannerTest {
                 OuterElementClass.class.getName(), OuterNonElementClass.class.getName()
         ));
 
-        var elements = scanner.scanElements();
+        var results = scanner.scanElements();
 
-        assertEquals(2, elements.size());
-        assertTrue(elements.contains(OuterElementClass.class));
-        assertTrue(elements.contains(OuterElementClass.InnerElementClass.class));
+        assertEquals(2, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(OuterElementClass.class)));
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(OuterElementClass.InnerElementClass.class)));
     }
 
     @Test
     public void shouldScanElements_ifScanClassesProperty_isProvidedAsSingleValue() {
         setUpScannerWithOneClassProperty(OuterElementClass.class.getName());
 
-        var elements = scanner.scanElements();
+        var results = scanner.scanElements();
 
-        assertEquals(2, elements.size());
-        assertTrue(elements.contains(OuterElementClass.class));
-        assertTrue(elements.contains(OuterElementClass.InnerElementClass.class));
+        assertEquals(2, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(OuterElementClass.class)));
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(OuterElementClass.InnerElementClass.class)));
     }
 
     @Test
     public void shouldScanElementsEmpty_ifScanClassesProperty_isNotProvided() {
         setUpScannerWithScannerWithNoClassToScan();
 
-        var elements = scanner.scanElements();
+        var results = scanner.scanElements();
 
-        assertTrue(elements.isEmpty());
+        assertTrue(results.isEmpty());
     }
 
     @Test
     public void shouldScanElementsEmpty_ifScanClassesProperty_isInvalid() {
         setUpScannerWithOneClassProperty(null);
 
-        var elements = scanner.scanElements();
+        var results = scanner.scanElements();
 
-        assertTrue(elements.isEmpty());
+        assertTrue(results.isEmpty());
     }
 
     private void setUpScannerWithMultipleClassesProperty(List<String> classesToScan) {

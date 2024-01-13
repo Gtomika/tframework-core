@@ -3,11 +3,11 @@ package org.tframework.core.reflection.methods;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.annotations.AnnotationScanner;
+import org.tframework.core.reflection.AnnotationFilteringResult;
 
 /**
  * A default {@link MethodFilter} implementation.
@@ -16,13 +16,25 @@ import org.tframework.core.annotations.AnnotationScanner;
 public class SimpleMethodFilter implements MethodFilter {
 
     @Override
-    public Set<Method> filterByAnnotation(
-            Set<Method> methods,
-            Class<? extends Annotation> annotationClass,
-            AnnotationScanner annotationScanner
+    public <A extends Annotation> Collection<AnnotationFilteringResult<A, Method>> filterByAnnotation(
+            Collection<Method> methods,
+            Class<A> annotationClass,
+            AnnotationScanner annotationScanner,
+            boolean strict
     ) {
         return methods.stream()
-                .filter(method -> annotationScanner.hasAnnotation(method, annotationClass))
-                .collect(Collectors.toSet());
+                .flatMap(method -> {
+                    if(strict) {
+                        return annotationScanner.scanOneStrict(method, annotationClass)
+                                .map(annotation -> new AnnotationFilteringResult<>(annotation, method))
+                                .stream();
+                    } else {
+                        return annotationScanner.scanOne(method, annotationClass)
+                                .map(annotation -> new AnnotationFilteringResult<>(annotation, method))
+                                .stream();
+                    }
+                })
+                .toList();
     }
+
 }

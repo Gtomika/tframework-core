@@ -32,19 +32,19 @@ class RootElementClassScannerTest {
         setUpScannerWithScanEnabledProperty(true);
         when(packageClassScanner.scanClasses()).thenReturn(Set.of(SomeElement.class, SomeNonElement.class));
 
-        var elements = scanner.scanElements();
+        var results = scanner.scanElements();
 
-        assertEquals(1, elements.size());
-        assertTrue(elements.contains(SomeElement.class));
+        assertEquals(1, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(SomeElement.class)));
     }
 
     @Test
     public void shouldScanElementsAsEmpty_whenEnableProperty_isProvidedAsFalse() {
         setUpScannerWithScanEnabledProperty(false);
 
-        var elements = scanner.scanElements();
+        var results = scanner.scanElements();
 
-        assertTrue(elements.isEmpty());
+        assertTrue(results.isEmpty());
     }
 
     @Test
@@ -52,11 +52,11 @@ class RootElementClassScannerTest {
         setUpScannerWithScanEnabledProperty(null);
         when(packageClassScanner.scanClasses()).thenReturn(Set.of(SomeElement.class, SomeNonElement.class));
 
-        var elements = scanner.scanElements();
+        var results = scanner.scanElements();
 
         //defaults to true, so scanned elements should be returned
-        assertEquals(1, elements.size());
-        assertTrue(elements.contains(SomeElement.class));
+        assertEquals(1, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(SomeElement.class)));
     }
 
     private void setUpScannerWithScanEnabledProperty(Boolean enabled) {

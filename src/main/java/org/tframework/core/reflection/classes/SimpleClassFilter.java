@@ -6,6 +6,7 @@ import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.annotations.AnnotationScanner;
+import org.tframework.core.reflection.AnnotationFilteringResult;
 
 /**
  * A reasonable default implementation for {@link ClassFilter}.
@@ -14,13 +15,24 @@ import org.tframework.core.annotations.AnnotationScanner;
 public class SimpleClassFilter implements ClassFilter {
 
     @Override
-    public Collection<Class<?>> filterByAnnotation(
+    public <A extends Annotation> Collection<AnnotationFilteringResult<A, Class<?>>> filterByAnnotation(
             Collection<Class<?>> classes,
-            Class<? extends Annotation> annotationClass,
-            AnnotationScanner annotationScanner
+            Class<A> annotationClass,
+            AnnotationScanner annotationScanner,
+            boolean strict
     ) {
         return classes.stream()
-                .filter(clazz -> annotationScanner.hasAnnotation(clazz, annotationClass))
+                .flatMap(clazz -> {
+                    if(strict) {
+                        return annotationScanner.scanOneStrict(clazz, annotationClass)
+                                .map(annotation -> new AnnotationFilteringResult<A, Class<?>>(annotation, clazz))
+                                .stream();
+                    } else {
+                        return annotationScanner.scanOne(clazz, annotationClass)
+                                .map(annotation -> new AnnotationFilteringResult<A, Class<?>>(annotation, clazz))
+                                .stream();
+                    }
+                })
                 .toList();
     }
 

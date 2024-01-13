@@ -13,12 +13,12 @@ import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.reflection.methods.MethodScanner;
 
 /**
- * A {@link ElementMethodScanner} that is able to find {@link Element}s
+ * A {@link ElementScanner} that is able to find {@link Element}s
  * from the methods a fixed collection classes, provided at construction time.
  */
 @Builder
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class FixedClassesElementMethodScanner implements ElementMethodScanner {
+public class FixedClassesElementMethodScanner implements ElementScanner<Method> {
 
     private final Set<Class<?>> classesToScan;
     private final MethodScanner methodScanner;
@@ -26,11 +26,15 @@ public class FixedClassesElementMethodScanner implements ElementMethodScanner {
     private final AnnotationScanner annotationScanner;
 
     @Override
-    public Set<Method> scanElements() {
+    public Set<ElementScanningResult<Method>> scanElements() {
         var methods = classesToScan.stream()
                 .flatMap(clazz -> methodScanner.scanMethods(clazz).stream())
                 .collect(Collectors.toSet());
 
-        return methodFilter.filterByAnnotation(methods, Element.class, annotationScanner);
+        //strict filtering: if a method has more than one @Element annotation, throw an exception
+        return methodFilter.filterByAnnotation(methods, Element.class, annotationScanner, true)
+                .stream()
+                .map(result -> new ElementScanningResult<>(result.annotation(), result.annotationSource()))
+                .collect(Collectors.toSet());
     }
 }

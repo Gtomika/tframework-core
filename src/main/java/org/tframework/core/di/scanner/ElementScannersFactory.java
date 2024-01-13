@@ -1,18 +1,22 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.di.scanner;
 
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import org.tframework.core.annotations.AnnotationScannersFactory;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.classes.ClassFiltersFactory;
 import org.tframework.core.reflection.classes.ClassScannersFactory;
+import org.tframework.core.reflection.methods.MethodFiltersFactory;
+import org.tframework.core.reflection.methods.MethodScannersFactory;
 
 /**
- * Factory for creating various {@link ElementClassScanner}s.
+ * Factory for creating various {@link ElementScanner}s.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class ElementClassScannersFactory {
+public final class ElementScannersFactory {
 
     /**
      * Creates a new {@link RootElementClassScanner} to scan a root class' package and subpackages.
@@ -65,6 +69,20 @@ public final class ElementClassScannersFactory {
                 .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())
                 .classFilter(ClassFiltersFactory.createDefaultClassFilter())
                 .propertiesContainer(properties)
+                .build();
+    }
+
+    /**
+     * Creates a {@link FixedClassesElementMethodScanner} with default configuration that scans elements
+     * from the methods of a class set.
+     * @param classesToScan Classes to scan, not null.
+     */
+    public static FixedClassesElementMethodScanner createFixedClassesElementMethodScanner(@NonNull Set<Class<?>> classesToScan) {
+        return FixedClassesElementMethodScanner.builder()
+                .classesToScan(classesToScan)
+                .methodScanner(MethodScannersFactory.createDefaultMethodScanner())
+                .methodFilter(MethodFiltersFactory.createDefaultMethodFilter())
+                .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())
                 .build();
     }
 

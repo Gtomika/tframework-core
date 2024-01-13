@@ -15,7 +15,7 @@ class PackageClassScannerTest {
     @Test
     public void shouldFindClasses_whenPackageNotInJar() {
         //this package is not in a JAR file when the test runs.
-        String packageName = "org.tframework.core.classes";
+        String packageName = ClassScanner.class.getPackageName();
         var packageClassScanner = new PackageClassScanner(Set.of(packageName));
 
         Set<Class<?>> classes = packageClassScanner.scanClasses();
@@ -29,7 +29,7 @@ class PackageClassScannerTest {
     @Test
     public void shouldFindClasses_whenPackageInJar() {
         //this package is in a JAR file when the test runs.
-        String packageName = "org.slf4j";
+        String packageName = Logger.class.getPackageName();
         var packageClassScanner = new PackageClassScanner(Set.of(packageName));
 
         Set<Class<?>> classes = packageClassScanner.scanClasses();

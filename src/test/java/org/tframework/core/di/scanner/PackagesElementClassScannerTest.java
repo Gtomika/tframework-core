@@ -34,11 +34,11 @@ class PackagesElementClassScannerTest {
         when(packageClassScanner.scanClasses())
                 .thenReturn(Set.of(SomeElementFromPackage1.class, SomeElementFromPackage2.class, SomeNonElement.class));
 
-        var elements = packagesElementClassScanner.scanElements();
+        var results = packagesElementClassScanner.scanElements();
 
-        assertEquals(2, elements.size());
-        assertTrue(elements.contains(SomeElementFromPackage1.class));
-        assertTrue(elements.contains(SomeElementFromPackage2.class));
+        assertEquals(2, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(SomeElementFromPackage1.class)));
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(SomeElementFromPackage2.class)));
     }
 
     @Test
@@ -47,19 +47,19 @@ class PackagesElementClassScannerTest {
         when(packageClassScanner.scanClasses())
                 .thenReturn(Set.of(SomeElementFromPackage1.class, SomeNonElement.class));
 
-        var elements = packagesElementClassScanner.scanElements();
+        var results = packagesElementClassScanner.scanElements();
 
-        assertEquals(1, elements.size());
-        assertTrue(elements.contains(SomeElementFromPackage1.class));
+        assertEquals(1, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(SomeElementFromPackage1.class)));
     }
 
     @Test
     public void shouldScanPackages_whenPackagesProperty_isNotProvided() {
         setUpScannerWithScannerWithNoPackagesToScan();
 
-        var elements = packagesElementClassScanner.scanElements();
+        var results = packagesElementClassScanner.scanElements();
 
-        assertTrue(elements.isEmpty());
+        assertTrue(results.isEmpty());
     }
 
     @Test

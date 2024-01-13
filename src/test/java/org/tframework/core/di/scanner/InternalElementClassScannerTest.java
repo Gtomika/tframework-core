@@ -32,30 +32,31 @@ class InternalElementClassScannerTest {
         setUpScannerWithScanEnabledProperty(true);
         when(packageClassScanner.scanClasses()).thenReturn(Set.of(SomeElement.class, SomeNonElement.class));
 
-        var elements = internalElementClassScanner.scanElements();
+        var results = internalElementClassScanner.scanElements();
 
-        assertEquals(1, elements.size());
-        assertTrue(elements.contains(SomeElement.class));
+        assertEquals(1, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(SomeElement.class)));
     }
 
     @Test
     public void shouldScanInternalElementsAsEmpty_whenEnableProperty_isProvidedAsFalse() {
         setUpScannerWithScanEnabledProperty(false);
 
-        var elements = internalElementClassScanner.scanElements();
+        var results = internalElementClassScanner.scanElements();
 
-        assertTrue(elements.isEmpty());
+        assertTrue(results.isEmpty());
     }
 
     @Test
     public void shouldScanInternalElements_whenEnableProperty_isNotProvided_defaultValue() {
         setUpScannerWithScanEnabledProperty(null);
+        when(packageClassScanner.scanClasses()).thenReturn(Set.of(SomeElement.class, SomeNonElement.class));
 
-        var elements = internalElementClassScanner.scanElements();
+        var results = internalElementClassScanner.scanElements();
 
         //defaults to true
-        assertEquals(1, elements.size());
-        assertTrue(elements.contains(SomeElement.class));
+        assertEquals(1, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(SomeElement.class)));
     }
 
     private void setUpScannerWithScanEnabledProperty(Boolean enabled) {

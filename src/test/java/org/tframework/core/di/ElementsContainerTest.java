@@ -15,6 +15,9 @@ import org.tframework.core.di.context.source.ElementSource;
 
 class ElementsContainerTest {
 
+    public ElementsContainerTest() {
+    }
+
     private static final String ELEMENT_NAME = "test";
     private static final ElementSource TEST_SOURCE = new ClassElementSource(ElementsContainerTest.class.getConstructors()[0]);
 

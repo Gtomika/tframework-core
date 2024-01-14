@@ -2,6 +2,7 @@
 package org.tframework.core.di.context.assembler;
 
 import org.tframework.core.di.context.ElementContext;
+import org.tframework.core.di.context.source.ElementSource;
 import org.tframework.core.di.scanner.ElementScanningResult;
 
 /**
@@ -11,7 +12,10 @@ import org.tframework.core.di.scanner.ElementScanningResult;
 public class ClassElementContextAssembler implements ElementContextAssembler<Class<?>> {
 
     @Override
-    public ElementContext assemble(ElementScanningResult<Class<?>> scanningResult) {
+    public ElementContext assemble(
+            ElementScanningResult<Class<?>> scanningResult,
+            ElementSource<Class<?>> elementSource
+    ) {
         return null;
     }
 }

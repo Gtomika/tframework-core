@@ -1,43 +1,35 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.di.scanner;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import java.util.Set;
 import org.junit.jupiter.api.Test;
+import org.tframework.core.di.DependencyInjectionInput;
+import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
 
-class ElementScannersFactoryTest {
-
-    static class RootClass {}
+public class ElementScannersFactoryTest {
 
     @Test
-    void shouldCreateRootElementClassScanner() {
-        var scanner = ElementScannersFactory.createRootElementClassScanner(RootClass.class, PropertiesContainer.empty());
-        assertNotNull(scanner);
+    public void shouldCreateDefaultElementClassScanners() {
+        var input = new DependencyInjectionInput(this.getClass(), ProfilesContainer.empty(), PropertiesContainer.empty());
+        var scanners = ElementScannersFactory.getDefaultElementClassScanners(input);
+
+        assertEquals(4, scanners.size());
+        assertInstanceOf(RootElementClassScanner.class, scanners.get(0));
+        assertInstanceOf(InternalElementClassScanner.class, scanners.get(1));
+        assertInstanceOf(PackagesElementClassScanner.class, scanners.get(2));
+        assertInstanceOf(ClassesElementClassScanner.class, scanners.get(3));
     }
 
     @Test
-    void shouldCreateInternalElementClassScanner() {
-        var scanner = ElementScannersFactory.createInternalElementClassScanner(PropertiesContainer.empty());
-        assertNotNull(scanner);
+    public void shouldCreateDefaultElementMethodScanners() {
+        var scanners = ElementScannersFactory.getDefaultElementMethodScanners(Set.of());
+
+        assertEquals(1, scanners.size());
+        assertInstanceOf(FixedClassesElementMethodScanner.class, scanners.getFirst());
     }
 
-    @Test
-    void shouldCreatePackagesElementClassScanner() {
-        var scanner = ElementScannersFactory.createPackagesElementClassScanner(PropertiesContainer.empty());
-        assertNotNull(scanner);
-    }
-
-    @Test
-    void shouldCreateClassesElementClassScanner() {
-        var scanner = ElementScannersFactory.createClassesElementClassScanner(PropertiesContainer.empty());
-        assertNotNull(scanner);
-    }
-
-    @Test
-    void shouldCreateFixedClassesElementMethodScanner() {
-        var scanner = ElementScannersFactory.createFixedClassesElementMethodScanner(Set.of());
-        assertNotNull(scanner);
-    }
 }

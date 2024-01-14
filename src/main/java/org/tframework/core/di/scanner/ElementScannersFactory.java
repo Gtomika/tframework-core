@@ -1,11 +1,14 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.di.scanner;
 
+import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Set;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.tframework.core.annotations.AnnotationScannersFactory;
+import org.tframework.core.di.DependencyInjectionInput;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.classes.ClassFiltersFactory;
 import org.tframework.core.reflection.classes.ClassScannersFactory;
@@ -19,11 +22,39 @@ import org.tframework.core.reflection.methods.MethodScannersFactory;
 public final class ElementScannersFactory {
 
     /**
+     * Creates a list of {@link ElementScanner}s that scan for elements that are defined as classes, annotated
+     * with {@link org.tframework.core.di.annotations.Element}. Some scanners are enabled/disabled based on the
+     * properties in the {@code input}.
+     * @param input {@link DependencyInjectionInput}, not null.
+     */
+    public static List<ElementScanner<Class<?>>> getDefaultElementClassScanners(@NonNull DependencyInjectionInput input) {
+        return List.of(
+                createRootElementClassScanner(input.rootClass(), input.propertiesContainer()),
+                createInternalElementClassScanner(input.propertiesContainer()),
+                createPackagesElementClassScanner(input.propertiesContainer()),
+                createClassesElementClassScanner(input.propertiesContainer())
+        );
+    }
+
+    /**
+     * Creates a list of {@link ElementScanner}s that scan for elements that are defined as methods, annotated
+     * with {@link org.tframework.core.di.annotations.Element}. These classes are typically discovered by the
+     * element scanners of {@link #getDefaultElementClassScanners(DependencyInjectionInput)}.
+     * @param classesToScan Classes to scan, not null.
+     */
+    public static List<ElementScanner<Method>> getDefaultElementMethodScanners(@NonNull Set<Class<?>> classesToScan) {
+        return List.of(
+                createFixedClassesElementMethodScanner(classesToScan)
+        );
+    }
+
+
+    /**
      * Creates a new {@link RootElementClassScanner} to scan a root class' package and subpackages.
      * @param rootClass Root class that the scanner should use.
      * @param properties Properties container to check if scanning should be enabled/disabled.
      */
-    public static RootElementClassScanner createRootElementClassScanner(Class<?> rootClass, PropertiesContainer properties) {
+     static RootElementClassScanner createRootElementClassScanner(Class<?> rootClass, PropertiesContainer properties) {
         return RootElementClassScanner.builder()
                 .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())
                 .classFilter(ClassFiltersFactory.createDefaultClassFilter())
@@ -37,7 +68,7 @@ public final class ElementScannersFactory {
      * Creates a new {@link InternalElementClassScanner} to scan the internal framework packages.
      * @param properties Properties container to check if scanning should be enabled/disabled.
      */
-    public static InternalElementClassScanner createInternalElementClassScanner(PropertiesContainer properties) {
+     static InternalElementClassScanner createInternalElementClassScanner(PropertiesContainer properties) {
         return InternalElementClassScanner.builder()
                 .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())
                 .classFilter(ClassFiltersFactory.createDefaultClassFilter())
@@ -51,7 +82,7 @@ public final class ElementScannersFactory {
      * {@value PackagesElementClassScanner#SCAN_PACKAGES_PROPERTY} property.
      * @param properties Properties container to check which packages are to be scanned.
      */
-    public static PackagesElementClassScanner createPackagesElementClassScanner(PropertiesContainer properties) {
+     static PackagesElementClassScanner createPackagesElementClassScanner(PropertiesContainer properties) {
         return PackagesElementClassScanner.builder()
                 .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())
                 .classFilter(ClassFiltersFactory.createDefaultClassFilter())
@@ -64,7 +95,7 @@ public final class ElementScannersFactory {
      * Creates a new {@link ClassesElementClassScanner} to scan the classes specified in the
      * {@value ClassesElementClassScanner#SCAN_CLASSES_PROPERTY} property.
      */
-    public static ClassesElementClassScanner createClassesElementClassScanner(PropertiesContainer properties) {
+     static ClassesElementClassScanner createClassesElementClassScanner(PropertiesContainer properties) {
         return ClassesElementClassScanner.builder()
                 .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())
                 .classFilter(ClassFiltersFactory.createDefaultClassFilter())
@@ -77,7 +108,7 @@ public final class ElementScannersFactory {
      * from the methods of a class set.
      * @param classesToScan Classes to scan, not null.
      */
-    public static FixedClassesElementMethodScanner createFixedClassesElementMethodScanner(@NonNull Set<Class<?>> classesToScan) {
+     static FixedClassesElementMethodScanner createFixedClassesElementMethodScanner(@NonNull Set<Class<?>> classesToScan) {
         return FixedClassesElementMethodScanner.builder()
                 .classesToScan(classesToScan)
                 .methodScanner(MethodScannersFactory.createDefaultMethodScanner())

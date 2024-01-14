@@ -15,7 +15,7 @@ import lombok.NonNull;
  */
 public record ClassElementSource(
         @NonNull Constructor<?> constructor
-) implements ElementSource {
+) implements ElementSource<Class<?>> {
 
     @Override
     public List<Parameter> elementConstructionParameters() {

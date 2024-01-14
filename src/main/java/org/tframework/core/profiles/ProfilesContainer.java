@@ -36,4 +36,11 @@ public final class ProfilesContainer {
         return new ProfilesContainer(profiles);
     }
 
+    /**
+     * Creates an empty {@link ProfilesContainer}.
+     */
+    public static ProfilesContainer empty() {
+        return new ProfilesContainer(Set.of());
+    }
+
 }

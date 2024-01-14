@@ -3,7 +3,6 @@ package org.tframework.core.di.context.assembler;
 
 import java.lang.reflect.Method;
 import org.tframework.core.di.context.ElementContext;
-import org.tframework.core.di.context.source.ElementSource;
 import org.tframework.core.di.scanner.ElementScanningResult;
 
 /**
@@ -13,10 +12,7 @@ import org.tframework.core.di.scanner.ElementScanningResult;
 public class MethodElementContextAssembler implements ElementContextAssembler<Method> {
 
     @Override
-    public ElementContext assemble(
-            ElementScanningResult<Method> scanningResult,
-            ElementSource<Method> elementSource
-    ) {
+    public ElementContext assemble(ElementScanningResult<Method> scanningResult) {
         return null;
     }
 }

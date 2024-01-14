@@ -3,6 +3,8 @@ package org.tframework.core.di;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.tframework.core.di.annotations.Element;
 
 /**
  * Utility class for operations on elements.
@@ -15,6 +17,17 @@ public final class ElementUtils {
      */
     public static String getElementNameByType(Class<?> clazz) {
         return clazz.getName();
+    }
+
+    /**
+     * Creates a string representation of an {@link Element} annotation.
+     */
+    public static String stringifyElementAnnotation(@NonNull Element elementAnnotation) {
+        return String.format(
+                "@Element(name = %s, scope = %s)",
+                elementAnnotation.name(),
+                elementAnnotation.scope()
+        );
     }
 
 }

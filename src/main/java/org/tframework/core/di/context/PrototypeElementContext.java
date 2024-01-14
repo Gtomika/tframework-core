@@ -5,6 +5,10 @@ import lombok.EqualsAndHashCode;
 import org.tframework.core.di.ElementScope;
 import org.tframework.core.di.context.source.ElementSource;
 
+/**
+ * An {@link ElementContext} that represents a prototype element.
+ * @see ElementScope#PROTOTYPE
+ */
 @EqualsAndHashCode(callSuper = true)
 public final class PrototypeElementContext extends ElementContext {
 

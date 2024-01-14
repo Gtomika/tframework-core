@@ -44,9 +44,25 @@ public class ElementsContainer {
     }
 
     /**
-     * Creates a {@link ElementsContainer} from the given {@link ElementContext}s.
+     * @return How many elements are stored in this container.
      */
-    static ElementsContainer fromElementContexts(@NonNull Collection<ElementContext> elementContexts) {
+    public int elementCount() {
+        return elementContexts.size();
+    }
+
+    /**
+     * Creates an {@link ElementsContainer} that has no elements.
+     */
+    static ElementsContainer empty() {
+        return new ElementsContainer(Map.of());
+    }
+
+    /**
+     * Creates a new {@link ElementsContainer} from the current one, additionally storing the
+     * given {@code elementContexts} as well.
+     */
+    static ElementsContainer withElementContexts(@NonNull Collection<ElementContext> elementContexts) {
+        //TODO implement and test
         return new ElementsContainer(elementContexts.stream()
                 .collect(
                         Collectors.toMap(

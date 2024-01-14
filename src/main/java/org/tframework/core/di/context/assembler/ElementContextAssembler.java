@@ -4,7 +4,6 @@ package org.tframework.core.di.context.assembler;
 import java.lang.reflect.AnnotatedElement;
 import org.tframework.core.di.annotations.Element;
 import org.tframework.core.di.context.ElementContext;
-import org.tframework.core.di.context.source.ElementSource;
 import org.tframework.core.di.scanner.ElementScanner;
 import org.tframework.core.di.scanner.ElementScanningResult;
 
@@ -19,9 +18,6 @@ public interface ElementContextAssembler<T extends AnnotatedElement> {
      * Assembles an {@link ElementContext}.
      * @param scanningResult The result of scanning for the {@link Element} annotation.
      */
-    ElementContext assemble(
-            ElementScanningResult<T> scanningResult,
-            ElementSource<T> elementSource
-    );
+    ElementContext assemble(ElementScanningResult<T> scanningResult);
 
 }

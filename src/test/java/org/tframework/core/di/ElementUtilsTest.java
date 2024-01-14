@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.tframework.core.di.annotations.Element;
 
 @Slf4j
 class ElementUtilsTest {
@@ -27,5 +28,14 @@ class ElementUtilsTest {
         log.info("Name for int list: '{}' Name for string list: {}", name1, name2);
         //assertNotEquals(name1, name2); -> it would be nice, but I cannot implement it :(
         assertEquals(name1, name2);
+    }
+
+    @Element(name = "dummy", scope = ElementScope.SINGLETON)
+    static class DummyElement {}
+
+    @Test
+    void shouldCreateStringRepresentationOfElementAnnotation() {
+        String stringified = ElementUtils.stringifyElementAnnotation(DummyElement.class.getAnnotation(Element.class));
+        assertEquals("@Element(name = dummy, scope = SINGLETON)", stringified);
     }
 }

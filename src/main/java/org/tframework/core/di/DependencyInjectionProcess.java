@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.di.context.ElementContext;
-import org.tframework.core.di.context.assembler.ClassElementContextAssembler;
+import org.tframework.core.di.context.assembler.ElementContextAssembler;
 import org.tframework.core.di.scanner.ElementScanner;
 
 @Slf4j
@@ -16,7 +16,7 @@ import org.tframework.core.di.scanner.ElementScanner;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class DependencyInjectionProcess {
 
-    private final ClassElementContextAssembler classElementContextAssembler;
+    private final ElementContextAssembler<Class<?>> classElementContextAssembler;
 
     public ElementsContainer initialize(List<ElementScanner<Class<?>>> elementClassScanners) {
         List<ElementContext> elementContexts = new ArrayList<>();
@@ -27,8 +27,8 @@ public class DependencyInjectionProcess {
                     .map(classElementContextAssembler::assemble)
                     .toList();
 
-            //TODO: check for duplicate element names
-            //TODO: create ElementContext-s from methods
+            //TODO: check for duplicate element names: this must be implemented inside ElementContainer
+            //TODO: create ElementContext-s from methods and add them to the container
 
             elementContexts.addAll(assembledElementContexts);
         });

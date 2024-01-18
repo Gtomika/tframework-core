@@ -17,7 +17,8 @@ public interface ElementContextAssembler<T extends AnnotatedElement> {
     /**
      * Assembles an {@link ElementContext}.
      * @param scanningResult The result of scanning for the {@link Element} annotation.
+     * @throws ElementContextAssemblingException If the {@link ElementContext} could not be assembled.
      */
-    ElementContext assemble(ElementScanningResult<T> scanningResult);
+    ElementContext assemble(ElementScanningResult<T> scanningResult) throws ElementContextAssemblingException;
 
 }

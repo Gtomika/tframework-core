@@ -20,14 +20,13 @@ public interface ConstructorFilter {
      * @param annotationClass The annotation to filter on.
      * @param annotationScanner An {@link AnnotationScanner} that is going to check if {@code annotationClass} is present on the constructors.
      * @param strict Enables string filtering. If true, then only at most one annotation of the given type is allowed on a constructor.
-     * @param <T> The type of the class whose constructors are being filtered.
      * @param <A> Type of the annotation to find.
      * @return {@link AnnotationFilteringResult}s, each containing the annotation and the constructor that was annotated with it.
      * @throws org.tframework.core.annotations.MultipleAnnotationsScannedException If {@code strict} is
      * true and more than one annotation of the given type is found on a constructor.
      */
-    <T, A extends Annotation> Set<AnnotationFilteringResult<A, Constructor<T>>> filterByAnnotation(
-            Set<Constructor<T>> constructors,
+    <A extends Annotation> Set<AnnotationFilteringResult<A, Constructor<?>>> filterByAnnotation(
+            Set<Constructor<?>> constructors,
             Class<A> annotationClass,
             AnnotationScanner annotationScanner,
             boolean strict
@@ -36,8 +35,7 @@ public interface ConstructorFilter {
     /**
      * Filters the constructors so that only those which are public will be returned.
      * @param constructors The constructors to filter.
-     * @param <T> The type of the class whose constructors are being filtered.
      */
-    <T> Set<Constructor<T>> filterPublicConstructors(Set<Constructor<T>> constructors);
+    Set<Constructor<?>> filterPublicConstructors(Set<Constructor<?>> constructors);
 
 }

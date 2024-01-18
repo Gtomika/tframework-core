@@ -15,10 +15,8 @@ import lombok.NoArgsConstructor;
 public class SimpleConstructorScanner implements ConstructorScanner {
 
     @Override
-    @SuppressWarnings("unchecked")
-    public <T> Set<Constructor<T>> getAllConstructors(Class<T> clazz) {
+    public Set<Constructor<?>> getAllConstructors(Class<?> clazz) {
         return Arrays.stream(clazz.getDeclaredConstructors())
-                .map(constructor -> (Constructor<T>) constructor)
                 .collect(Collectors.toSet());
     }
 }

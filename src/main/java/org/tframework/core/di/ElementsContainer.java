@@ -58,10 +58,9 @@ public class ElementsContainer {
     }
 
     /**
-     * Creates a new {@link ElementsContainer} from the current one, additionally storing the
-     * given {@code elementContexts} as well.
+     * Creates a new {@link ElementsContainer}, storing the given {@code elementContexts} as well.
      */
-    static ElementsContainer withElementContexts(@NonNull Collection<ElementContext> elementContexts) {
+    static ElementsContainer fromElementContexts(@NonNull Collection<ElementContext> elementContexts) {
         //TODO implement and test
         return new ElementsContainer(elementContexts.stream()
                 .collect(

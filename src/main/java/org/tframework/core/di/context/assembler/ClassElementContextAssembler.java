@@ -3,6 +3,7 @@ package org.tframework.core.di.context.assembler;
 
 import java.lang.reflect.Constructor;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.annotations.AnnotationScanner;
@@ -10,10 +11,9 @@ import org.tframework.core.di.ElementUtils;
 import org.tframework.core.di.annotations.Element;
 import org.tframework.core.di.annotations.ElementConstructor;
 import org.tframework.core.di.context.ElementContext;
-import org.tframework.core.di.context.PrototypeElementContext;
-import org.tframework.core.di.context.SingletonElementContext;
 import org.tframework.core.di.context.source.ClassElementSource;
 import org.tframework.core.di.scanner.ElementScanningResult;
+import org.tframework.core.reflection.AnnotationFilteringResult;
 import org.tframework.core.reflection.constructor.ConstructorFilter;
 import org.tframework.core.reflection.constructor.ConstructorScanner;
 
@@ -26,44 +26,32 @@ import org.tframework.core.reflection.constructor.ConstructorScanner;
  *     <li>Assembles the {@link ElementContext}.</li>
  * </ul>
  */
-//TODO cover with unit tests
 @Slf4j
+@Builder
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ClassElementContextAssembler implements ElementContextAssembler<Class<?>> {
 
-    private static final String DECLARED_AS = "class";
-    private static final String NO_PUBLIC_CONSTRUCTORS_ERROR = "No public constructors found.";
-    private static final String MULTIPLE_PUBLIC_CONSTRUCTORS_ERROR = "Multiple public constructors found. Please annotate" +
+    static final String DECLARED_AS = "class";
+    static final String NO_PUBLIC_CONSTRUCTORS_ERROR = "No public constructors found.";
+    static final String MULTIPLE_PUBLIC_CONSTRUCTORS_ERROR = "Multiple public constructors found. Please annotate" +
             " the appropriate one with " + ElementConstructor.class.getName();
-    private static final String MULTIPLE_ANNOTATED_CONSTRUCTORS_ERROR = "Found several constructors annotated with " +
+    static final String MULTIPLE_ANNOTATED_CONSTRUCTORS_ERROR = "Found several constructors annotated with " +
             ElementConstructor.class.getName() + ". Only one is allowed.";
-
 
     private final ConstructorScanner constructorScanner;
     private final ConstructorFilter constructorFilter;
     private final AnnotationScanner annotationScanner;
 
     @Override
-    public ElementContext assemble(ElementScanningResult<Class<?>> scanningResult) {
+    public ElementContext assemble(ElementScanningResult<Class<?>> scanningResult) throws ElementContextAssemblingException {
         var elementClass = scanningResult.annotationSource();
         var elementSource = new ClassElementSource(findAppropriateConstructor(elementClass));
         log.trace("Created element source for element class '{}': {}", elementClass.getName(), elementSource);
 
         Element elementAnnotation = scanningResult.elementAnnotation();
-        ElementContext elementContext = switch (elementAnnotation.scope()) {
-            case SINGLETON -> new SingletonElementContext(
-                    elementAnnotation.name(),
-                    elementClass,
-                    elementSource
-            );
-            case PROTOTYPE -> new PrototypeElementContext(
-                    elementAnnotation.name(),
-                    elementClass,
-                    elementSource
-            );
-        };
-        log.debug("Created element context for element class '{}' annotated with '{}': {}",
-                elementClass.getName(), ElementUtils.stringifyElementAnnotation(elementAnnotation), elementContext);
+        ElementContext elementContext = ElementContext.from(elementAnnotation, elementClass, elementSource);
+        log.debug("Created element context for element class '{}' annotated with '{}'",
+                elementClass.getName(), ElementUtils.stringifyElementAnnotation(elementAnnotation));
         return elementContext;
     }
 
@@ -102,7 +90,10 @@ public class ClassElementContextAssembler implements ElementContextAssembler<Cla
                 ElementConstructor.class,
                 annotationScanner,
                 false //a constructor may be marked multiple times with the same annotation, but it does not matter
-        );
+        )
+                .stream()
+                .map(AnnotationFilteringResult::annotationSource)
+                .toList();
         log.trace("Found {} constructors annotated, for element class '{}'", annotatedConstructors.size(), elementClass.getName());
 
         //there are multiple public constructors, but none of them are annotated with @ElementConstructor
@@ -119,8 +110,7 @@ public class ClassElementContextAssembler implements ElementContextAssembler<Cla
         log.trace("Found exactly 1 public constructor annotated with @ElementConstructor, for element class '{}', using that one.", elementClass.getName());
         return annotatedConstructors.stream()
                 .findAny()
-                .get()
-                .annotationSource();
+                .get();
     }
 
 }

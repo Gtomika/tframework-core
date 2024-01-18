@@ -18,7 +18,7 @@ import org.tframework.core.di.context.ElementContext;
 public record MethodElementSource(
         @NonNull Method method,
         @NonNull ElementContext parentElementContext
-) implements ElementSource<Method> {
+) implements ElementSource {
 
     @Override
     public List<Parameter> elementConstructionParameters() {

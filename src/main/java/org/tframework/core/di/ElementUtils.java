@@ -25,7 +25,7 @@ public final class ElementUtils {
     public static String stringifyElementAnnotation(@NonNull Element elementAnnotation) {
         return String.format(
                 "@Element(name = %s, scope = %s)",
-                elementAnnotation.name(),
+                elementAnnotation.name().equals(Element.NAME_NOT_SPECIFIED) ? "<default>" : elementAnnotation.name(),
                 elementAnnotation.scope()
         );
     }

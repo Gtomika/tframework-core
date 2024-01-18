@@ -11,7 +11,11 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.tframework.core.annotations.AnnotationScanner;
 import org.tframework.core.annotations.AnnotationScannersFactory;
 import org.tframework.core.annotations.MultipleAnnotationsScannedException;
@@ -39,6 +43,27 @@ class SimpleMethodFilterTest {
         });
     }
 
+    @ParameterizedTest
+    @MethodSource("getVisibilityTestMethods")
+    public void shouldFilterByPublic(Method method, boolean isPublic) {
+        assertEquals(isPublic, simpleMethodFilter.isPublic(method));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getStaticnessTestMethods")
+    public void shouldFilterByStatic(Method method, boolean isStatic) {
+        assertEquals(isStatic, simpleMethodFilter.isStatic(method));
+    }
+
+    @ParameterizedTest
+    @MethodSource("getVoidnessTestMethods")
+    public void shouldFilterByVoid(Method method, boolean isVoid) {
+        assertEquals(isVoid, simpleMethodFilter.hasVoidReturnType(method));
+    }
+
+
+    // ---------------------------------- filter by annotation ----------------------------------
+
     private Set<Method> getMethods() {
         return Arrays.stream(this.getClass().getDeclaredMethods())
                 .filter(m -> m.getName().startsWith("testMethod"))
@@ -52,7 +77,6 @@ class SimpleMethodFilterTest {
     @Retention(RetentionPolicy.RUNTIME)
     @interface AnotherTestAnnotation {}
 
-
     @TestAnnotation
     private void testMethod1() {}
 
@@ -62,4 +86,51 @@ class SimpleMethodFilterTest {
     @AnotherTestAnnotation //this is also a test annotation
     public String testMethod3() { return ""; }
 
+    // ---------------------------------- is public ----------------------------------
+
+    public String publicMethod() { return ""; }
+
+    private int privateMethod() { return 0; }
+
+    protected int protectedMethod() { return 0; }
+
+    int packagePrivateMethod() { return 0; }
+
+    public static Stream<Arguments> getVisibilityTestMethods() throws Exception {
+        return Stream.of(
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("publicMethod"), true),
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("privateMethod"), false),
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("protectedMethod"), false),
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("packagePrivateMethod"), false)
+        );
+    }
+
+    // ---------------------------------- is static ----------------------------------
+
+    private static int staticMethod() { return 0; }
+
+    private int nonStaticMethod() { return 0; }
+
+    public static Stream<Arguments> getStaticnessTestMethods() throws Exception {
+        return Stream.of(
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("staticMethod"), true),
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("nonStaticMethod"), false)
+        );
+    }
+
+    // ---------------------------------- has void return type ----------------------------------
+
+    public void primitiveVoidMethod() {}
+
+    public Void wrapperVoidMethod() { return null; }
+
+    public String nonVoidMethod() { return ""; }
+
+    public static Stream<Arguments> getVoidnessTestMethods() throws Exception {
+        return Stream.of(
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("primitiveVoidMethod"), true),
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("wrapperVoidMethod"), true),
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("nonVoidMethod"), false)
+        );
+    }
 }

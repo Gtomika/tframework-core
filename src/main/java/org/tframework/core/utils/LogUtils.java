@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.utils;
 
+import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
 import lombok.NoArgsConstructor;
@@ -37,6 +38,17 @@ public final class LogUtils {
                     }
                 })
                 .toList();
+    }
+
+    /**
+     * Returns a nice string representation of the given method, which includes both the name,
+     * and the parameter types.
+     * @param method The method. This argument must not be null.
+     */
+    public static String niceMethodName(@NonNull Method method) {
+        var parameterTypes = List.of(method.getParameterTypes());
+        String parameterTypesString = parameterTypes.isEmpty() ? "" : String.join(", ", classNames(parameterTypes, true));
+        return method.getName() + "(" + parameterTypesString + ")";
     }
 
 }

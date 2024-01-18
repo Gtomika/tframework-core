@@ -10,12 +10,12 @@ public class ElementContextAssemblingException extends TFrameworkException {
 
     private static final String TEMPLATE = """
             An error occurred while assembling the element context.
-            - Element class: %s
+            - Element type: %s
             - Declared as '%s' in '%s'
             - Message: %s""";
 
-    public ElementContextAssemblingException(Class<?> elementClass, String declaredAs, String declaredIn, String message) {
-        super(String.format(TEMPLATE, elementClass.getName(), declaredAs, declaredIn, message));
+    public ElementContextAssemblingException(Class<?> elementType, String declaredAs, String declaredIn, String message) {
+        super(String.format(TEMPLATE, elementType.getName(), declaredAs, declaredIn, message));
     }
 
     @Override

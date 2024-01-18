@@ -28,4 +28,20 @@ public interface MethodFilter {
             boolean strict
     );
 
+    /**
+     * Checks if the given method is public.
+     */
+    boolean isPublic(Method method);
+
+    /**
+     * Checks if the given method is static.
+     */
+    boolean isStatic(Method method);
+
+    /**
+     * Checks if the given method has void return type. It will find both the
+     * primitive {@code void} and the wrapper {@link Void} return types.
+     */
+    boolean hasVoidReturnType(Method method);
+
 }

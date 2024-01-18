@@ -13,8 +13,7 @@ public interface ConstructorScanner {
     /**
      * Returns all constructors of the given class.
      * @param clazz The class whose constructors are being scanned.
-     * @param <T> The type of the class whose constructors are being scanned.
      */
-    <T> Set<Constructor<T>> getAllConstructors(Class<T> clazz);
+    Set<Constructor<?>> getAllConstructors(Class<?> clazz);
 
 }

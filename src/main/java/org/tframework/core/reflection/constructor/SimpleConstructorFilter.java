@@ -18,8 +18,8 @@ import org.tframework.core.reflection.AnnotationFilteringResult;
 public class SimpleConstructorFilter implements ConstructorFilter {
 
     @Override
-    public <T, A extends Annotation> Set<AnnotationFilteringResult<A, Constructor<T>>> filterByAnnotation(
-            Set<Constructor<T>> constructors,
+    public <A extends Annotation> Set<AnnotationFilteringResult<A, Constructor<?>>> filterByAnnotation(
+            Set<Constructor<?>> constructors,
             Class<A> annotationClass,
             AnnotationScanner annotationScanner,
             boolean strict
@@ -28,11 +28,11 @@ public class SimpleConstructorFilter implements ConstructorFilter {
                 .flatMap(constructor -> {
                     if(strict) {
                         return annotationScanner.scanOneStrict(constructor, annotationClass)
-                                .map(annotation -> new AnnotationFilteringResult<>(annotation, constructor))
+                                .map(annotation -> new AnnotationFilteringResult<A, Constructor<?>>(annotation, constructor))
                                 .stream();
                     } else {
                         return annotationScanner.scanOne(constructor, annotationClass)
-                                .map(annotation -> new AnnotationFilteringResult<>(annotation, constructor))
+                                .map(annotation -> new AnnotationFilteringResult<A, Constructor<?>>(annotation, constructor))
                                 .stream();
                     }
                 })
@@ -40,7 +40,7 @@ public class SimpleConstructorFilter implements ConstructorFilter {
     }
 
     @Override
-    public <T> Set<Constructor<T>> filterPublicConstructors(Set<Constructor<T>> constructors) {
+    public Set<Constructor<?>> filterPublicConstructors(Set<Constructor<?>> constructors) {
         return constructors.stream()
                 .filter(constructor -> constructor.getModifiers() == Modifier.PUBLIC)
                 .collect(Collectors.toSet());

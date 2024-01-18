@@ -43,7 +43,6 @@ public sealed abstract class ElementContext permits SingletonElementContext, Pro
         this.type = type;
         this.scope = scope;
         this.source = source;
-        log.trace("Element context created: {}", this);
     }
 
     /**
@@ -52,5 +51,26 @@ public sealed abstract class ElementContext permits SingletonElementContext, Pro
      * create a new one.
      */
     public abstract Object requestInstance();
+
+    /**
+     * Creates an {@link ElementContext} from the given {@link Element} annotation and additional required input.
+     * @param elementAnnotation The {@link Element} annotation: determines the scope and name of the element.
+     * @param type The type of the element.
+     * @param source The {@link ElementSource} of the element.
+     */
+    public static ElementContext from(Element elementAnnotation, Class<?> type, ElementSource source) {
+        return switch (elementAnnotation.scope()) {
+            case SINGLETON -> new SingletonElementContext(
+                    elementAnnotation.name(),
+                    type,
+                    source
+            );
+            case PROTOTYPE -> new PrototypeElementContext(
+                    elementAnnotation.name(),
+                    type,
+                    source
+            );
+        };
+    }
 
 }

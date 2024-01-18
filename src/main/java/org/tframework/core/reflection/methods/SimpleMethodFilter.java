@@ -3,6 +3,7 @@ package org.tframework.core.reflection.methods;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -37,4 +38,18 @@ public class SimpleMethodFilter implements MethodFilter {
                 .toList();
     }
 
+    @Override
+    public boolean isPublic(Method method) {
+        return Modifier.isPublic(method.getModifiers());
+    }
+
+    @Override
+    public boolean isStatic(Method method) {
+        return Modifier.isStatic(method.getModifiers());
+    }
+
+    @Override
+    public boolean hasVoidReturnType(Method method) {
+        return Void.TYPE.equals(method.getReturnType()) || Void.class.equals(method.getReturnType());
+    }
 }

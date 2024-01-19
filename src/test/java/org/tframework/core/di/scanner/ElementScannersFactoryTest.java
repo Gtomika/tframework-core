@@ -4,7 +4,6 @@ package org.tframework.core.di.scanner;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.di.DependencyInjectionInput;
 import org.tframework.core.profiles.ProfilesContainer;
@@ -12,10 +11,19 @@ import org.tframework.core.properties.PropertiesContainer;
 
 public class ElementScannersFactoryTest {
 
+    private final DependencyInjectionInput input = new DependencyInjectionInput(this.getClass(), ProfilesContainer.empty(), PropertiesContainer.empty());
+
+    @Test
+    public void shouldCreateDefaultElementScannersBundle() {
+        var scannersBundle = ElementScannersFactory.createDefaultElementScannersBundle(input);
+
+        assertEquals(4, scannersBundle.elementClassScanners().size());
+        assertEquals(1, scannersBundle.elementMethodScanners().size());
+    }
+
     @Test
     public void shouldCreateDefaultElementClassScanners() {
-        var input = new DependencyInjectionInput(this.getClass(), ProfilesContainer.empty(), PropertiesContainer.empty());
-        var scanners = ElementScannersFactory.getDefaultElementClassScanners(input);
+        var scanners = ElementScannersFactory.createDefaultElementClassScanners(input);
 
         assertEquals(4, scanners.size());
         assertInstanceOf(RootElementClassScanner.class, scanners.get(0));
@@ -26,7 +34,7 @@ public class ElementScannersFactoryTest {
 
     @Test
     public void shouldCreateDefaultElementMethodScanners() {
-        var scanners = ElementScannersFactory.getDefaultElementMethodScanners(Set.of());
+        var scanners = ElementScannersFactory.createDefaultElementMethodScanners(input);
 
         assertEquals(1, scanners.size());
         assertInstanceOf(FixedClassesElementMethodScanner.class, scanners.getFirst());

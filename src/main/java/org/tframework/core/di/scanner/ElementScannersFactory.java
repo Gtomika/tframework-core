@@ -1,9 +1,7 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.di.scanner;
 
-import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Set;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -22,12 +20,23 @@ import org.tframework.core.reflection.methods.MethodScannersFactory;
 public final class ElementScannersFactory {
 
     /**
+     * Creates an {@link ElementScannersBundle} with default {@link ElementScanner}s.
+     * @param input {@link DependencyInjectionInput}, not null.
+     */
+    public static ElementScannersBundle createDefaultElementScannersBundle(@NonNull DependencyInjectionInput input) {
+        return ElementScannersBundle.builder()
+                .elementClassScanners(createDefaultElementClassScanners(input))
+                .elementMethodScanners(createDefaultElementMethodScanners(input))
+                .build();
+    }
+
+    /**
      * Creates a list of {@link ElementScanner}s that scan for elements that are defined as classes, annotated
      * with {@link org.tframework.core.di.annotations.Element}. Some scanners are enabled/disabled based on the
      * properties in the {@code input}.
      * @param input {@link DependencyInjectionInput}, not null.
      */
-    public static List<ElementScanner<Class<?>>> getDefaultElementClassScanners(@NonNull DependencyInjectionInput input) {
+    public static List<ElementClassScanner> createDefaultElementClassScanners(@NonNull DependencyInjectionInput input) {
         return List.of(
                 createRootElementClassScanner(input.rootClass(), input.propertiesContainer()),
                 createInternalElementClassScanner(input.propertiesContainer()),
@@ -39,15 +48,13 @@ public final class ElementScannersFactory {
     /**
      * Creates a list of {@link ElementScanner}s that scan for elements that are defined as methods, annotated
      * with {@link org.tframework.core.di.annotations.Element}. These classes are typically discovered by the
-     * element scanners of {@link #getDefaultElementClassScanners(DependencyInjectionInput)}.
-     * @param classesToScan Classes to scan, not null.
+     * element scanners of {@link #createDefaultElementClassScanners(DependencyInjectionInput)}.
+     * @param input {@link DependencyInjectionInput}, not null.
      */
-    public static List<ElementScanner<Method>> getDefaultElementMethodScanners(@NonNull Set<Class<?>> classesToScan) {
-        return List.of(
-                createFixedClassesElementMethodScanner(classesToScan)
-        );
+    public static List<ElementMethodScanner> createDefaultElementMethodScanners(@NonNull DependencyInjectionInput input) {
+        //input is not needed yet, but it might be in the future
+        return List.of(createFixedClassesElementMethodScanner());
     }
-
 
     /**
      * Creates a new {@link RootElementClassScanner} to scan a root class' package and subpackages.
@@ -106,11 +113,9 @@ public final class ElementScannersFactory {
     /**
      * Creates a {@link FixedClassesElementMethodScanner} with default configuration that scans elements
      * from the methods of a class set.
-     * @param classesToScan Classes to scan, not null.
      */
-     static FixedClassesElementMethodScanner createFixedClassesElementMethodScanner(@NonNull Set<Class<?>> classesToScan) {
+     static FixedClassesElementMethodScanner createFixedClassesElementMethodScanner() {
         return FixedClassesElementMethodScanner.builder()
-                .classesToScan(classesToScan)
                 .methodScanner(MethodScannersFactory.createDefaultMethodScanner())
                 .methodFilter(MethodFiltersFactory.createDefaultMethodFilter())
                 .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())

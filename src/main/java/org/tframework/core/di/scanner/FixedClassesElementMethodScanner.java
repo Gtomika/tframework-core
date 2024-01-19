@@ -18,18 +18,15 @@ import org.tframework.core.reflection.methods.MethodScanner;
  */
 @Builder
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class FixedClassesElementMethodScanner implements ElementScanner<Method> {
+public class FixedClassesElementMethodScanner extends ElementMethodScanner {
 
-    private final Set<Class<?>> classesToScan;
     private final MethodScanner methodScanner;
     private final MethodFilter methodFilter;
     private final AnnotationScanner annotationScanner;
 
     @Override
     public Set<ElementScanningResult<Method>> scanElements() {
-        var methods = classesToScan.stream()
-                .flatMap(clazz -> methodScanner.scanMethods(clazz).stream())
-                .collect(Collectors.toSet());
+        var methods = methodScanner.scanMethods(classToScan);
 
         //strict filtering: if a method has more than one @Element annotation, throw an exception
         return methodFilter.filterByAnnotation(methods, Element.class, annotationScanner, true)

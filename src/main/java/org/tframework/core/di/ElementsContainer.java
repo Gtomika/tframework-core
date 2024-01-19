@@ -2,18 +2,18 @@
 package org.tframework.core.di;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import org.tframework.core.di.context.ElementContext;
 
 /**
  * Stores all elements of the application.
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@EqualsAndHashCode
 public class ElementsContainer {
 
     /**
@@ -21,6 +21,10 @@ public class ElementsContainer {
      * The key is the name of the element.
      */
     private final Map<String, ElementContext> elementContexts;
+
+    private ElementsContainer(Map<String, ElementContext> elementContexts) {
+        this.elementContexts = new HashMap<>(elementContexts);
+    }
 
     /**
      * Returns the {@link ElementContext} of the element with the given type.
@@ -44,6 +48,19 @@ public class ElementsContainer {
     }
 
     /**
+     * Adds the given {@code elementContext} to this container.
+     * @param elementContext The element context to add, must not be null.
+     * @throws ElementNameNotUniqueException If an element with the same name is already stored in this container.
+     */
+    public void addElementContext(@NonNull ElementContext elementContext) throws ElementNameNotUniqueException {
+        if(elementContexts.containsKey(elementContext.getName())) {
+            throw new ElementNameNotUniqueException(elementContext.getName());
+        } else {
+            elementContexts.put(elementContext.getName(), elementContext);
+        }
+    }
+
+    /**
      * @return How many elements are stored in this container.
      */
     public int elementCount() {
@@ -61,7 +78,6 @@ public class ElementsContainer {
      * Creates a new {@link ElementsContainer}, storing the given {@code elementContexts} as well.
      */
     static ElementsContainer fromElementContexts(@NonNull Collection<ElementContext> elementContexts) {
-        //TODO implement and test
         return new ElementsContainer(elementContexts.stream()
                 .collect(
                         Collectors.toMap(

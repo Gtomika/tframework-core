@@ -30,7 +30,7 @@ class ElementsContainerTest {
 
     @Test
     public void shouldThrowException_whenElementByNameDoesNotExist() {
-        var elementsContainer = ElementsContainer.fromElementContexts(List.of());
+        var elementsContainer = ElementsContainer.empty();
         var exception = assertThrows(ElementNotFoundException.class, () -> {
             elementsContainer.getElementContext(ELEMENT_NAME);
         });
@@ -50,12 +50,34 @@ class ElementsContainerTest {
 
     @Test
     public void shouldThrowException_whenElementByTypeDoesNotExists() {
-        var elementsContainer = ElementsContainer.fromElementContexts(List.of());
+        var elementsContainer = ElementsContainer.empty();
         var exception = assertThrows(ElementNotFoundException.class, () -> {
             elementsContainer.getElementContext(File.class);
         });
         assertEquals(
                 exception.getMessageTemplate().formatted(ElementUtils.getElementNameByType(File.class)),
+                exception.getMessage()
+        );
+    }
+
+    @Test
+    public void shouldAddElement_whenElementNameIsUnique() {
+        var elementsContainer = ElementsContainer.empty();
+        var elementContext = new SingletonElementContext(ELEMENT_NAME, String.class, TEST_SOURCE);
+        elementsContainer.addElementContext(elementContext);
+        assertEquals(elementContext, elementsContainer.getElementContext(ELEMENT_NAME));
+    }
+
+    @Test
+    public void shouldThrowException_whenElementNameIsNotUnique() {
+        var elementContext = new SingletonElementContext(ELEMENT_NAME, String.class, TEST_SOURCE);
+        var elementsContainer = ElementsContainer.fromElementContexts(List.of(elementContext));
+
+        var exception = assertThrows(ElementNameNotUniqueException.class, () -> {
+            elementsContainer.addElementContext(elementContext);
+        });
+        assertEquals(
+                exception.getMessageTemplate().formatted(ELEMENT_NAME),
                 exception.getMessage()
         );
     }

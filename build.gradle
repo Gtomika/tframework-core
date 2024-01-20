@@ -12,6 +12,7 @@ version '0.0.1'
 ext {
     slf4jVersion = "1.7.25"
     classGraphVersion = "4.8.165"
+    jgraphtVersion = "1.5.2"
     jacksonVersion = "2.16.1"
     snakeYamlVersion = "1.8"
     junitJupiterVersion = "5.8.2"
@@ -26,6 +27,7 @@ repositories {
 dependencies {
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation "io.github.classgraph:classgraph:${classGraphVersion}"
+    implementation "org.jgrapht:jgrapht-core:${jgraphtVersion}"
 
     //optional dependencies that the user can provide
     compileOnly "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"

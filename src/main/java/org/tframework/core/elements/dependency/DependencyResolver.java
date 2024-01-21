@@ -14,9 +14,9 @@ public interface DependencyResolver {
     /**
      * Resolves the dependency definition into a dependency value.
      * @param dependencySource The {@link DependencySource} from which to request the dependency.
-     * @param dependencyDefinition The dependency definition that should be resolved.
+     * @param dependencyDefinition The {@link DependencyDefinition} that should be resolved.
      * @return The resolved dependency value, or empty if this resolver could not resolve this dependency.
      */
-    Optional<Object> resolveDependency(DependencySource dependencySource, AnnotatedElement dependencyDefinition);
+    Optional<Object> resolveDependency(DependencySource dependencySource, DependencyDefinition dependencyDefinition);
 
 }

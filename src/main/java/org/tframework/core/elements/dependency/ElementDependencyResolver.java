@@ -8,28 +8,36 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.annotations.AnnotationMatchingResult;
+import org.tframework.core.elements.ElementUtils;
+import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectElement;
 
 /**
  * This {@link DependencyResolver} is responsible for resolving dependencies that are annotated with
- * {@link InjectElement}.
+ * {@link InjectElement}. If the dependency is not annotated with {@link InjectElement}, this
+ * resolver will ignore it.
  */
-@Slf4j //TODO unit test
+@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ElementDependencyResolver implements DependencyResolver {
 
     private final InjectAnnotationScanner injectAnnotationScanner;
 
     @Override
-    public Optional<Object> resolveDependency(DependencySource dependencySource, AnnotatedElement dependencyDefinition) {
-        var matchingResult = matchInjectAnnotation(dependencyDefinition);
+    public Optional<Object> resolveDependency(DependencySource dependencySource, DependencyDefinition dependencyDefinition) {
+        var matchingResult = matchInjectAnnotation(dependencyDefinition.annotationSource());
         if(matchingResult.matches()) {
-            InjectElement injectAnnotation = matchingResult.matchedAnnotations().get(0);
-            String dependencyName = injectAnnotation.value();
+            InjectElement injectAnnotation = matchingResult.matchedAnnotations().getFirst();
+            String dependencyName = getElementDependencyName(injectAnnotation, dependencyDefinition.dependencyType());
             log.debug("Attempting to resolve dependency with name '{}' from the elements...", dependencyName);
-            Object resolvedDependency = dependencySource.requestDependency(dependencyName);
-            log.debug("Resolved dependency with name '{}' from the elements: {}", dependencyName, resolvedDependency);
-            return Optional.of(resolvedDependency);
+            try {
+                Object resolvedDependency = dependencySource.requestDependency(dependencyName);
+                log.debug("Resolved dependency with name '{}' from the elements: {}", dependencyName, resolvedDependency);
+                return Optional.of(resolvedDependency);
+            } catch (Exception e) {
+                log.debug("Failed to resolve dependency with name '{}' from the elements", dependencyName, e);
+                return Optional.empty();
+            }
         } else {
             log.debug("Dependency definition '{}' is not annotated with '@InjectElement', cannot resolve it", dependencyDefinition);
             return Optional.empty();
@@ -43,4 +51,13 @@ public class ElementDependencyResolver implements DependencyResolver {
                 .map(injectElement -> new AnnotationMatchingResult<>(true, List.of(injectElement)))
                 .orElseGet(() -> new AnnotationMatchingResult<>(false, List.of()));
     }
+
+    private String getElementDependencyName(InjectElement injectAnnotation, Class<?> dependencyType) {
+        if(Element.NAME_NOT_SPECIFIED.equals(injectAnnotation.value())) {
+            return ElementUtils.getElementNameByType(dependencyType);
+        } else {
+            return injectAnnotation.value();
+        }
+    }
+
 }

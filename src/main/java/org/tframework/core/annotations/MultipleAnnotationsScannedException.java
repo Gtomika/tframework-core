@@ -6,7 +6,7 @@ import java.util.List;
 import org.tframework.core.TFrameworkException;
 
 /**
- * This exception is thrown when {@link ComposedAnnotationScanner} finds more than one
+ * This exception is thrown when {@link AnnotationScanner} finds more than one
  * annotation in strict mode.
  */
 public class MultipleAnnotationsScannedException extends TFrameworkException {

@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementUtils;
+import org.tframework.core.elements.ElementsContainer;
 
 /**
  * This {@link DependencyResolver} is responsible for resolving dependencies that <b>are not</b> annotated with
@@ -17,11 +18,14 @@ import org.tframework.core.elements.ElementUtils;
  * is ordered, and this resolver is the last one in the chain.
  */
 @Slf4j
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class FallbackDependencyResolver implements DependencyResolver {
+public class FallbackDependencyResolver extends DependencyResolver {
+
+    FallbackDependencyResolver(ElementsContainer dependencySource) {
+        super(dependencySource);
+    }
 
     @Override
-    public Optional<Object> resolveDependency(DependencySource dependencySource, DependencyDefinition dependencyDefinition) {
+    public Optional<Object> resolveDependency(DependencyDefinition dependencyDefinition) {
         //we have no '@InjectX' annotations, so the type will be used as dependency name
         String dependencyName = ElementUtils.getElementNameByType(dependencyDefinition.dependencyType());
         try {

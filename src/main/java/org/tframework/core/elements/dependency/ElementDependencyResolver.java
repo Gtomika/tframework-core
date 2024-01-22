@@ -1,16 +1,16 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency;
 
-import java.lang.reflect.AnnotatedElement;
-import java.util.List;
-import java.util.Optional;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.annotations.AnnotationMatchingResult;
 import org.tframework.core.elements.ElementUtils;
+import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectElement;
+
+import java.lang.reflect.AnnotatedElement;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * This {@link DependencyResolver} is responsible for resolving dependencies that are annotated with
@@ -18,13 +18,17 @@ import org.tframework.core.elements.annotations.InjectElement;
  * resolver will ignore it.
  */
 @Slf4j
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class ElementDependencyResolver implements DependencyResolver {
+public class ElementDependencyResolver extends DependencyResolver {
 
     private final InjectAnnotationScanner injectAnnotationScanner;
 
+    ElementDependencyResolver(ElementsContainer dependencySource, InjectAnnotationScanner injectAnnotationScanner) {
+        super(dependencySource);
+        this.injectAnnotationScanner = injectAnnotationScanner;
+    }
+
     @Override
-    public Optional<Object> resolveDependency(DependencySource dependencySource, DependencyDefinition dependencyDefinition) {
+    public Optional<Object> resolveDependency(DependencyDefinition dependencyDefinition) {
         var matchingResult = matchInjectAnnotation(dependencyDefinition.annotationSource());
         if(matchingResult.matches()) {
             InjectElement injectAnnotation = matchingResult.matchedAnnotations().getFirst();

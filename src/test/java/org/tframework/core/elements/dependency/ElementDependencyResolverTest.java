@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.ElementUtils;
+import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.annotations.InjectElement;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,7 +25,7 @@ class ElementDependencyResolverTest {
     private InjectAnnotationScanner injectAnnotationScanner;
 
     @Mock
-    private DependencySource dependencySource;
+    private ElementsContainer dependencySource;
 
     private ElementDependencyResolver elementDependencyResolver;
 
@@ -38,7 +39,7 @@ class ElementDependencyResolverTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        elementDependencyResolver = new ElementDependencyResolver(injectAnnotationScanner);
+        elementDependencyResolver = new ElementDependencyResolver(dependencySource, injectAnnotationScanner);
 
         someField = this.getClass().getDeclaredField("someString");
         injectElementWithNameProvided = someField.getAnnotation(InjectElement.class);
@@ -57,7 +58,7 @@ class ElementDependencyResolverTest {
         when(dependencySource.requestDependency(injectElementWithNameProvided.value()))
                 .thenReturn(dependencyValue);
 
-        var resolvedDependency = elementDependencyResolver.resolveDependency(dependencySource, dependencyDefinitionWithNameProvided);
+        var resolvedDependency = elementDependencyResolver.resolveDependency(dependencyDefinitionWithNameProvided);
         if(resolvedDependency.isPresent() && resolvedDependency.get() instanceof String resolvedString) {
             assertEquals(dependencyValue, resolvedString);
         } else {
@@ -73,7 +74,7 @@ class ElementDependencyResolverTest {
         when(dependencySource.requestDependency(ElementUtils.getElementNameByType(otherField.getType())))
                 .thenReturn(dependencyValue);
 
-        var resolvedDependency = elementDependencyResolver.resolveDependency(dependencySource, dependencyDefinitionWithNameNotProvided);
+        var resolvedDependency = elementDependencyResolver.resolveDependency(dependencyDefinitionWithNameNotProvided);
         if(resolvedDependency.isPresent() && resolvedDependency.get() instanceof String resolvedString) {
             assertEquals(dependencyValue, resolvedString);
         } else {
@@ -88,7 +89,7 @@ class ElementDependencyResolverTest {
         when(dependencySource.requestDependency(injectElementWithNameProvided.value()))
                 .thenThrow(new RuntimeException("Dependency not found"));
 
-        var resolvedDependency = elementDependencyResolver.resolveDependency(dependencySource, dependencyDefinitionWithNameProvided);
+        var resolvedDependency = elementDependencyResolver.resolveDependency(dependencyDefinitionWithNameProvided);
         assertTrue(resolvedDependency.isEmpty());
     }
 
@@ -98,7 +99,7 @@ class ElementDependencyResolverTest {
                 .thenThrow(new RuntimeException("Illegal, multiple inject annotations found"));
 
         assertThrows(RuntimeException.class, () -> {
-            elementDependencyResolver.resolveDependency(dependencySource, dependencyDefinitionWithNameProvided);
+            elementDependencyResolver.resolveDependency(dependencyDefinitionWithNameProvided);
         });
     }
 

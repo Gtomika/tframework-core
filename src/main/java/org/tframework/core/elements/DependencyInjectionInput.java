@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements;
 
+import lombok.Builder;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
 
@@ -12,6 +13,7 @@ import org.tframework.core.properties.PropertiesContainer;
  * @param propertiesContainer The container that stores all properties.
  * @see DependencyInjectionProcess
  */
+@Builder
 public record DependencyInjectionInput(
         Class<?> rootClass,
         ProfilesContainer profilesContainer,

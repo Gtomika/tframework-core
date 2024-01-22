@@ -8,9 +8,11 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.properties.extractors.PropertiesExtractor;
 import org.tframework.core.properties.parsers.YamlParser;
 import org.tframework.core.properties.scanners.PropertyFileScanner;
+import org.tframework.core.properties.scanners.PropertyFileScannersFactory;
 import org.tframework.core.readers.ResourceFileReader;
 import org.tframework.core.readers.ResourceNotFoundException;
 
@@ -38,11 +40,22 @@ public class PropertiesInitializationProcess {
     private final PropertiesExtractor propertiesExtractor;        //extracts the properties from the YAML
 
     /**
-     * Initializes the properties according to the process documented on the class.
+     * Initializes the properties.
+     * @param input {@link PropertiesInitializationInput} with the input parameters.
+     * @return {@link PropertiesContainer} containing the properties found.
+     */
+    public PropertiesContainer initialize(PropertiesInitializationInput input) {
+        var propertyFileScanners = PropertyFileScannersFactory.createTframeworkPropertyFileScanners(input);
+        return initialize(propertyFileScanners);
+    }
+
+    /**
+     * Initializes the properties according to the process documented on the class. This method
+     * may be used by tests to perform the initialization with mocked scanners.
      * @param propertyFileScanners {@link PropertyFileScanner}s to find the property files to read.
      * @return {@link PropertiesContainer} containing the properties found.
      */
-    public PropertiesContainer initialize(List<PropertyFileScanner> propertyFileScanners) {
+    PropertiesContainer initialize(List<PropertyFileScanner> propertyFileScanners) {
         PropertiesContainer propertiesContainer = PropertiesContainer.empty();
 
         for(PropertyFileScanner propertyFileScanner: propertyFileScanners) {

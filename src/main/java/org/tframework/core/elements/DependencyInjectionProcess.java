@@ -10,17 +10,19 @@ import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.assembler.ClassElementContextAssembler;
 import org.tframework.core.elements.context.assembler.ElementContextAssembler;
 import org.tframework.core.elements.context.assembler.MethodElementContextAssembler;
+import org.tframework.core.elements.dependency.DependencyResolutionInput;
 import org.tframework.core.elements.scanner.ElementClassScanner;
 import org.tframework.core.elements.scanner.ElementMethodScanner;
 import org.tframework.core.elements.scanner.ElementScanner;
 import org.tframework.core.elements.scanner.ElementScannersBundle;
+import org.tframework.core.elements.scanner.ElementScannersFactory;
 
 /**
  * This class is responsible for the dependency injection process. This process consists of the following steps:
  * <ul>
  *     <li>Scanning for elements (see {@link ElementScanner}s).</li>
  *     <li>Assembling {@link ElementContext}s (see {@link ElementContextAssembler}s).</li>
- *     <li>TODO</li>
+ *     <li>Initializes each element context (see {@link ElementContext#initialize(DependencyResolutionInput)}).</li>
  * </ul>
  * The result of the process will be an {@link ElementsContainer} with unique {@link ElementContext}s.
  */
@@ -34,13 +36,33 @@ public class DependencyInjectionProcess {
 
     /**
      * Initializes the dependency injection process.
-     * @param scannersBundle An {@link ElementScannersBundle} containing the {@link ElementScanner}s to be used.
+     * @param input The {@link DependencyInjectionInput} containing the input data for the process.
      * @return the {@link ElementsContainer} containing the assembled {@link ElementContext}s
      */
-    public ElementsContainer initialize(ElementScannersBundle scannersBundle) {
+    public ElementsContainer initialize(DependencyInjectionInput input) {
+        var classElementScanners = ElementScannersFactory.createDefaultElementClassScanners(input);
+        var methodElementScanners = ElementScannersFactory.createDefaultElementMethodScanners(input);
+        var bundle = ElementScannersBundle.builder()
+                .elementClassScanners(classElementScanners)
+                .elementMethodScanners(methodElementScanners)
+                .build();
+        return initialize(input, bundle);
+    }
+
+    //this should be used by the other 'initialize' method and during tests
+    //here we can provide the components instead of creating a default one
+    ElementsContainer initialize(DependencyInjectionInput input, ElementScannersBundle scannersBundle) {
         ElementsContainer elementsContainer = ElementsContainer.empty();
 
         assembleElementContexts(elementsContainer, scannersBundle);
+        log.debug("Successfully assembled a total of {} element contexts", elementsContainer.elementCount());
+
+        DependencyResolutionInput dependencyResolutionInput = DependencyResolutionInput.builder()
+                .elementsContainer(elementsContainer)
+                .propertiesContainer(input.propertiesContainer())
+                .build();
+        elementsContainer.initializeElementContexts(dependencyResolutionInput);
+        log.debug("Successfully initialized {} element contexts", elementsContainer.elementCount());
 
         return elementsContainer;
     }
@@ -71,8 +93,6 @@ public class DependencyInjectionProcess {
             log.debug("Assembled {} element contexts from class scanner '{}'", elementContexts.size(), elementClassScanner.getClass().getName());
             assembleMethodElementContexts(elementsContainer, elementContexts, scannersBundle.elementMethodScanners());
         }
-
-        log.debug("Assembled a total of {} element contexts", elementsContainer.elementCount());
     }
 
     /**

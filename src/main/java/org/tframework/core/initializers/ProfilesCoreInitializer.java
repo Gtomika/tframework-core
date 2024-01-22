@@ -32,8 +32,7 @@ public class ProfilesCoreInitializer implements CoreInitializer<ProfileInitializ
         log.debug("Starting profiles initialization...");
         Instant start = Instant.now();
 
-        var profileScanners = ProfileScannersFactory.tframeworkProfileScanners(profileInitializationInput);
-        ProfilesContainer profilesContainer = profileInitializationProcess.initializeProfiles(profileScanners);
+        ProfilesContainer profilesContainer = profileInitializationProcess.initialize(profileInitializationInput);
 
         log.info("The profile initialization completed in {} ms, and found the following profiles: {}",
                 TimerUtils.msBetween(start, Instant.now()), profilesContainer.profiles());

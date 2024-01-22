@@ -9,6 +9,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.profiles.scanners.ProfileScanner;
+import org.tframework.core.profiles.scanners.ProfileScannersFactory;
 import org.tframework.core.utils.LogUtils;
 
 /**
@@ -25,10 +26,21 @@ public class ProfileInitializationProcess {
 
     /**
      * Perform the initialization process that scans for, cleans and validates profiles.
+     * @param input The {@link ProfileInitializationInput} with the input parameters.
+     * @return {@link ProfilesContainer} record with the set profiles.
+     */
+    public ProfilesContainer initialize(@NonNull ProfileInitializationInput input) {
+        var profileScanners = ProfileScannersFactory.defaultProfileScanners(input);
+        return initializeProfiles(profileScanners);
+    }
+
+    /**
+     * Perform the initialization process that scans for, cleans and validates profiles. This
+     * may be used by tests to provide mocked scanners.
      * @param profileScanners The {@link ProfileScanner}s used to detect profiles.
      * @return {@link ProfilesContainer} record with the set profiles.
      */
-    public ProfilesContainer initializeProfiles(@NonNull List<ProfileScanner> profileScanners) {
+    ProfilesContainer initializeProfiles(@NonNull List<ProfileScanner> profileScanners) {
         log.debug("The profile initialization process will use these profiles scanners: {}",
                 LogUtils.objectClassNames(profileScanners));
         Set<String> profiles = ProfileMerger.merging(profileScanners)

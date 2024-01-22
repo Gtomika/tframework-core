@@ -8,7 +8,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.elements.dependency.DependencyResolutionInput;
 import org.tframework.core.elements.dependency.DependencySource;
 
 /**
@@ -22,9 +24,11 @@ public class ElementsContainer implements DependencySource {
      * The key is the name of the element.
      */
     private final Map<String, ElementContext> elementContexts;
+    private final boolean initialized;
 
     private ElementsContainer(Map<String, ElementContext> elementContexts) {
         this.elementContexts = new HashMap<>(elementContexts);
+        this.initialized = false;
     }
 
     /**
@@ -66,6 +70,19 @@ public class ElementsContainer implements DependencySource {
      */
     public int elementCount() {
         return elementContexts.size();
+    }
+
+    /**
+     * Performs {@link ElementContext#initialize(DependencyResolutionInput)} on all contexts in this container.
+     * This method can only be called once, which is done by the framework. It should be called after all element contexts have been added.
+     * @param input {@link DependencyResolutionInput} to use during initialization.
+     */
+    @TFrameworkInternal
+    public void initializeElementContexts(DependencyResolutionInput input) {
+        if(initialized) {
+            throw new IllegalStateException("This container has already been initialized");
+        }
+        elementContexts.values().forEach(elementContext -> elementContext.initialize(input));
     }
 
     /**

@@ -22,14 +22,14 @@ class ProfilesCoreInitializerTest {
 
     @Test
     public void shouldInitializeProfiles() {
+        var input = ProfileInitializationInput.builder()
+                .args(new String[]{"-someArg"})
+                .build();
         var expectedProfiles = ProfilesContainer.fromProfiles(Set.of("a", "b"));
-        when(profileInitializationProcess.initializeProfiles(anyList()))
+        when(profileInitializationProcess.initialize(input))
                 .thenReturn(expectedProfiles);
 
         ProfilesCoreInitializer initializer = new ProfilesCoreInitializer(profileInitializationProcess);
-        ProfileInitializationInput input = ProfileInitializationInput.builder()
-                .args(new String[]{"-someArg"})
-                .build();
 
         var actualProfiles = initializer.initialize(input);
 

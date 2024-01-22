@@ -18,7 +18,7 @@ public final class ProfileScannersFactory {
      * during initialization.
      * @param input {@link ProfileInitializationInput} required to create these scanners.
      */
-    public static List<ProfileScanner> tframeworkProfileScanners(ProfileInitializationInput input) {
+    public static List<ProfileScanner> defaultProfileScanners(ProfileInitializationInput input) {
         return List.of(
                 createDefaultProfileScanner(),
                 createEnvironmentProfileScanner(),

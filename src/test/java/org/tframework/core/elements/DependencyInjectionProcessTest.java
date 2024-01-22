@@ -24,6 +24,8 @@ import org.tframework.core.elements.scanner.ElementClassScanner;
 import org.tframework.core.elements.scanner.ElementMethodScanner;
 import org.tframework.core.elements.scanner.ElementScannersBundle;
 import org.tframework.core.elements.scanner.ElementScanningResult;
+import org.tframework.core.profiles.ProfilesContainer;
+import org.tframework.core.properties.PropertiesContainer;
 
 @ExtendWith(MockitoExtension.class)
 class DependencyInjectionProcessTest {
@@ -67,11 +69,20 @@ class DependencyInjectionProcessTest {
         when(elementMethodScanner.scanElements()).thenReturn(Set.of(methodScanningResult));
         when(methodElementContextAssembler.assemble(methodScanningResult)).thenReturn(dummyStringMethodElementContext);
 
-        var elementsContainer = dependencyInjectionProcess.initialize(elementScannersBundle);
+        var input = createDummyDependencyInjectionInput();
+        var elementsContainer = dependencyInjectionProcess.initialize(input, elementScannersBundle);
 
         assertEquals(ElementsContainer.fromElementContexts(
                 List.of(dummyClassElementContext, dummyStringMethodElementContext)
         ), elementsContainer);
+    }
+
+    private DependencyInjectionInput createDummyDependencyInjectionInput() {
+        return DependencyInjectionInput.builder()
+                .rootClass(DependencyInjectionProcessTest.class)
+                .profilesContainer(ProfilesContainer.empty())
+                .propertiesContainer(PropertiesContainer.empty())
+                .build();
     }
 
     /*

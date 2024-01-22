@@ -28,8 +28,7 @@ public class PropertiesCoreInitializer implements CoreInitializer<PropertiesInit
         log.info("Starting properties initialization...");
         Instant start = Instant.now();
 
-        var propertyFileScanners = PropertyFileScannersFactory.createTframeworkPropertyFileScanners(input);
-        var propertiesContainer = propertiesInitializationProcess.initialize(propertyFileScanners);
+        var propertiesContainer = propertiesInitializationProcess.initialize(input);
 
         log.info("The properties initialization completed in {} ms, and found {} properties.",
                 TimerUtils.msBetween(start, Instant.now()), propertiesContainer.size());

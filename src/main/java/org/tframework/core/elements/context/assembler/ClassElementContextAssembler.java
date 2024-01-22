@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.ElementConstructor;

@@ -5,7 +5,7 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.tframework.core.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.AnnotationFilteringResult;
 
 /**

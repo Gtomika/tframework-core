@@ -4,7 +4,7 @@ package org.tframework.core.reflection.methods;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import org.tframework.core.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.AnnotationFilteringResult;
 
 /**

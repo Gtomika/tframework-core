@@ -1,12 +1,11 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.annotations;
+package org.tframework.core.reflection.annotations;
 
-import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+@TestAnnotationA("A on B")
 @Retention(RetentionPolicy.RUNTIME)
-@Repeatable(RepeatedTestAnnotationA.class)
-@interface TestAnnotationA {
+@interface TestAnnotationB {
     String value();
 }

@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import org.junit.jupiter.api.Test;
-import org.tframework.core.annotations.AnnotationScannersFactory;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.ElementConstructor;
 import org.tframework.core.elements.context.source.ClassElementSource;

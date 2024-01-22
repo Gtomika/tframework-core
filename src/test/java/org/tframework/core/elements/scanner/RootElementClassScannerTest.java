@@ -12,7 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.annotations.AnnotationScannersFactory;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;

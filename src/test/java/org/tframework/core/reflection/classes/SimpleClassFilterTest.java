@@ -16,8 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.annotations.AnnotationScanner;
-import org.tframework.core.annotations.MultipleAnnotationsScannedException;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
 
 @ExtendWith(MockitoExtension.class)
 class SimpleClassFilterTest {

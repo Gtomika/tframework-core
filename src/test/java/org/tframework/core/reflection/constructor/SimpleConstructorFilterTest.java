@@ -7,9 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import org.junit.jupiter.api.Test;
-import org.tframework.core.annotations.AnnotationScanner;
-import org.tframework.core.annotations.AnnotationScannersFactory;
-import org.tframework.core.annotations.MultipleAnnotationsScannedException;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
+import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
 
 class SimpleConstructorFilterTest {
 

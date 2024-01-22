@@ -16,9 +16,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.tframework.core.annotations.AnnotationScanner;
-import org.tframework.core.annotations.AnnotationScannersFactory;
-import org.tframework.core.annotations.MultipleAnnotationsScannedException;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
+import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
 
 class SimpleMethodFilterTest {
 

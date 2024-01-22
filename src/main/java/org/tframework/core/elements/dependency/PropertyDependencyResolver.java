@@ -4,11 +4,9 @@ package org.tframework.core.elements.dependency;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Optional;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.annotations.AnnotationMatchingResult;
-import org.tframework.core.elements.annotations.InjectElement;
+import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
 import org.tframework.core.elements.annotations.InjectProperty;
 import org.tframework.core.properties.PropertiesContainer;
 

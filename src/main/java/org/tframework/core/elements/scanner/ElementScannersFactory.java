@@ -5,7 +5,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.tframework.core.annotations.AnnotationScannersFactory;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.elements.DependencyInjectionInput;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.classes.ClassFiltersFactory;

@@ -4,7 +4,7 @@ package org.tframework.core.elements.scanner;
 import java.util.Set;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.properties.converters.PropertyConverter;

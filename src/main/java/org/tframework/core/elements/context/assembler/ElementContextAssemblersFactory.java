@@ -4,7 +4,7 @@ package org.tframework.core.elements.context.assembler;
 import java.lang.reflect.Method;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.tframework.core.annotations.AnnotationScannersFactory;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.reflection.constructor.ConstructorFiltersFactory;
 import org.tframework.core.reflection.constructor.ConstructorScannersFactory;
 import org.tframework.core.reflection.methods.MethodFiltersFactory;

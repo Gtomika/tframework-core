@@ -10,8 +10,8 @@ import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.tframework.core.annotations.AnnotationScanner;
-import org.tframework.core.annotations.MultipleAnnotationsScannedException;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.annotations.InjectProperty;
 

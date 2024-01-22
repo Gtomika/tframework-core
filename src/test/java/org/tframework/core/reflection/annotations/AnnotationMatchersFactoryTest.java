@@ -1,9 +1,10 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.annotations;
+package org.tframework.core.reflection.annotations;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
+import org.tframework.core.reflection.annotations.AnnotationMatchersFactory;
 
 class AnnotationMatchersFactoryTest {
 

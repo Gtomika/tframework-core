@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.tframework.core.annotations.AnnotationScannersFactory;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.PropertiesContainer;

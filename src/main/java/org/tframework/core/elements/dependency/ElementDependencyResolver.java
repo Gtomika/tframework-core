@@ -2,7 +2,7 @@
 package org.tframework.core.elements.dependency;
 
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.annotations.AnnotationMatchingResult;
+import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
 import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.annotations.Element;

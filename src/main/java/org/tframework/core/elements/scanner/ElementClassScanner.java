@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
-import org.tframework.core.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.AnnotationFilteringResult;

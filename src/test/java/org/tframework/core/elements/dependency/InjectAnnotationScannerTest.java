@@ -17,8 +17,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.annotations.AnnotationScanner;
-import org.tframework.core.annotations.MultipleAnnotationsScannedException;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.annotations.InjectProperty;
 

@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.annotations;
+package org.tframework.core.reflection.annotations;
 
 import static org.junit.jupiter.api.Assertions.*;
 

@@ -47,14 +47,14 @@ public class MethodElementContextAssembler implements ElementContextAssembler<Me
         validateMethod(elementMethod, elementType);
 
         ElementSource elementSource = new MethodElementSource(elementMethod, parentElementContext);
-        log.trace("Created element source for element method '{}': {}", LogUtils.niceMethodName(elementMethod), elementSource);
+        log.trace("Created element source for element method '{}': {}", LogUtils.niceExecutableName(elementMethod), elementSource);
 
         Element elementAnnotation = scanningResult.elementAnnotation();
 
         ElementContext elementContext = ElementContext.from(elementAnnotation, elementType, elementSource);
 
         log.debug("Created element context for element method '{}' annotated with '{}'",
-                LogUtils.niceMethodName(elementMethod), ElementUtils.stringifyElementAnnotation(elementAnnotation));
+                LogUtils.niceExecutableName(elementMethod), ElementUtils.stringifyElementAnnotation(elementAnnotation));
         return elementContext;
     }
 
@@ -77,7 +77,7 @@ public class MethodElementContextAssembler implements ElementContextAssembler<Me
         if(methodFilter.hasVoidReturnType(method)) {
             throw new ElementContextAssemblingException(elementType, DECLARED_AS, declaredIn, NO_RETURN_TYPE_ERROR);
         }
-        log.trace("The element method '{}' declared in '{}' is VALID", LogUtils.niceMethodName(method), declaredIn);
+        log.trace("The element method '{}' declared in '{}' is VALID", LogUtils.niceExecutableName(method), declaredIn);
     }
 
     @Builder

@@ -24,6 +24,21 @@ class ClassElementContextAssemblerTest {
             .build();
 
     @Test
+    public void shouldThrowException_whenClassIsNotInstantiable() {
+        var scanningResult = asScanningResult(NotInstantiable.class);
+
+        var exception = assertThrows(ElementContextAssemblingException.class, () -> assembler.assemble(scanningResult));
+
+        String expectedMessage = exception.getMessageTemplate().formatted(
+                NotInstantiable.class.getName(),
+                ClassElementContextAssembler.DECLARED_AS,
+                NotInstantiable.class.getName(),
+                ClassElementContextAssembler.NOT_INSTANTIABLE_ERROR
+        );
+        assertEquals(expectedMessage, exception.getMessage());
+    }
+
+    @Test
     public void shouldThrowException_whenClassHasNoPublicConstructors() {
         var scanningResult = asScanningResult(NoPublicConstructors.class);
 
@@ -85,6 +100,9 @@ class ClassElementContextAssemblerTest {
     private ElementScanningResult<Class<?>> asScanningResult(Class<?> clazz) {
         return new ElementScanningResult<>(clazz.getAnnotation(Element.class), clazz);
     }
+
+    @Element
+    interface NotInstantiable {}
 
     @Element
     static class NoPublicConstructors {

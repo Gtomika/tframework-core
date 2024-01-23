@@ -23,7 +23,7 @@ import org.tframework.core.elements.dependency.DependencyResolver;
 @Getter
 @ToString
 @EqualsAndHashCode
-public sealed abstract class ElementContext permits SingletonElementContext, PrototypeElementContext {
+public abstract class ElementContext {
 
     protected final String name;
     protected final Class<?> type;
@@ -52,14 +52,10 @@ public sealed abstract class ElementContext permits SingletonElementContext, Pro
     }
 
     /**
-     * Initializes this element context so that it is ready to create instances of the element. Subclasses may override
-     * this method to perform additional initialization steps, but they must call the superclass implementation first.
+     * Initializes this element context so that it is ready to create instances of the element.
      * @param input The {@link DependencyResolutionInput} to use to create appropriate {@link DependencyResolver}s.
      */
-    public void initialize(DependencyResolutionInput input) {
-        elementAssembler = ElementAssemblersFactory.createElementAssembler(name, type, source, input);
-        log.trace("Initialized element context: {}. It will use assembler: {}", name, elementAssembler.getClass().getName());
-    }
+    public abstract void initialize(DependencyResolutionInput input);
 
     /**
      * Requests this element context to return with an instance of the element.

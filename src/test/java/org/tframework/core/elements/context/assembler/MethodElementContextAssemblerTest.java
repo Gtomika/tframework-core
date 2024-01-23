@@ -4,6 +4,7 @@ package org.tframework.core.elements.context.assembler;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.annotations.Element;
+import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.ElementContextTestUtils;
 import org.tframework.core.elements.context.source.MethodElementSource;
 import org.tframework.core.elements.scanner.ElementScanningResult;
@@ -24,6 +26,9 @@ import org.tframework.core.reflection.methods.MethodFilter;
 class MethodElementContextAssemblerTest {
 
     @Mock
+    private ElementContext parentElementContext;
+
+    @Mock
     private MethodFilter methodFilter;
 
     private MethodElementContextAssembler assembler;
@@ -31,7 +36,8 @@ class MethodElementContextAssemblerTest {
     @BeforeEach
     void setUp() {
         assembler = MethodElementContextAssembler.create(methodFilter);
-        assembler.setParentElementContext(ElementContextTestUtils.PARENT_ELEMENT_CONTEXT);
+        assembler.setParentElementContext(parentElementContext);
+        doReturn(MethodElementContextAssemblerTest.class).when(parentElementContext).getType();
     }
 
     @Test
@@ -45,7 +51,7 @@ class MethodElementContextAssemblerTest {
         String expectedMessage = exception.getMessageTemplate().formatted(
                 int.class,
                 MethodElementContextAssembler.DECLARED_AS,
-                ElementContextTestUtils.ParentElement.class.getName(),
+                MethodElementContextAssemblerTest.class.getName(),
                 MethodElementContextAssembler.NOT_PUBLIC_ERROR
         );
         assertEquals(expectedMessage, exception.getMessage());
@@ -63,7 +69,7 @@ class MethodElementContextAssemblerTest {
         String expectedMessage = exception.getMessageTemplate().formatted(
                 int.class,
                 MethodElementContextAssembler.DECLARED_AS,
-                ElementContextTestUtils.ParentElement.class.getName(),
+                MethodElementContextAssemblerTest.class.getName(),
                 MethodElementContextAssembler.STATIC_ERROR
         );
         assertEquals(expectedMessage, exception.getMessage());
@@ -82,7 +88,7 @@ class MethodElementContextAssemblerTest {
         String expectedMessage = exception.getMessageTemplate().formatted(
                 int.class,
                 MethodElementContextAssembler.DECLARED_AS,
-                ElementContextTestUtils.ParentElement.class.getName(),
+                MethodElementContextAssemblerTest.class.getName(),
                 MethodElementContextAssembler.NO_RETURN_TYPE_ERROR
         );
         assertEquals(expectedMessage, exception.getMessage());
@@ -100,7 +106,7 @@ class MethodElementContextAssemblerTest {
 
         assertEquals(elementMethod.getReturnType(), elementContext.getType());
         if (elementContext.getSource() instanceof MethodElementSource source) {
-            assertEquals(ElementContextTestUtils.PARENT_ELEMENT_CONTEXT, source.parentElementContext());
+            assertEquals(parentElementContext, source.parentElementContext());
             assertEquals(elementMethod, source.method());
         } else {
             fail("Element context source is not a method element source.");

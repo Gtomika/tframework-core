@@ -2,6 +2,8 @@
 package org.tframework.core.elements.context.assembler;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -37,6 +39,8 @@ public class ClassElementContextAssembler implements ElementContextAssembler<Cla
             " the appropriate one with " + ElementConstructor.class.getName();
     static final String MULTIPLE_ANNOTATED_CONSTRUCTORS_ERROR = "Found several constructors annotated with " +
             ElementConstructor.class.getName() + ". Only one is allowed.";
+    static final String NOT_INSTANTIABLE_ERROR = "Element class is not instantiable. Please make sure it is not an " +
+            "interface, abstract class, annotation or enum.";
 
     private final ConstructorScanner constructorScanner;
     private final ConstructorFilter constructorFilter;
@@ -45,6 +49,7 @@ public class ClassElementContextAssembler implements ElementContextAssembler<Cla
     @Override
     public ElementContext assemble(ElementScanningResult<Class<?>> scanningResult) throws ElementContextAssemblingException {
         var elementClass = scanningResult.annotationSource();
+        validateElementType(elementClass);
         var elementSource = new ClassElementSource(findAppropriateConstructor(elementClass));
         log.trace("Created element source for element class '{}': {}", elementClass.getName(), elementSource);
 
@@ -53,6 +58,19 @@ public class ClassElementContextAssembler implements ElementContextAssembler<Cla
         log.debug("Created element context for element class '{}' annotated with '{}'",
                 elementClass.getName(), ElementUtils.stringifyElementAnnotation(elementAnnotation));
         return elementContext;
+    }
+
+    /**
+     * Validates that the element type can be used to assemble an element context. The rules of validation are:
+     * <ul>
+     *     <li>Must not be anything that cannot be instantiated: interface, abstract class, annotation, enum.</li>
+     * </ul>
+     */
+    private void validateElementType(Class<?> elementType) {
+        if(elementType.isInterface() || Modifier.isAbstract(elementType.getModifiers()) ||
+                elementType.isAnnotation() || elementType.isEnum()) {
+            throw new ElementContextAssemblingException(elementType, DECLARED_AS, elementType.getName(), NOT_INSTANTIABLE_ERROR);
+        }
     }
 
     /**

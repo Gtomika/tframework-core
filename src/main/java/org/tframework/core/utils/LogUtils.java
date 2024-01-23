@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.utils;
 
+import java.lang.reflect.Executable;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.List;
@@ -41,14 +42,15 @@ public final class LogUtils {
     }
 
     /**
-     * Returns a nice string representation of the given method, which includes both the name,
+     * Returns a nice string representation of the given method or constructor, which includes both the name,
      * and the parameter types.
-     * @param method The method. This argument must not be null.
+     * @param executable The {@link Executable}. This argument must not be null.
      */
-    public static String niceMethodName(@NonNull Method method) {
-        var parameterTypes = List.of(method.getParameterTypes());
+    public static String niceExecutableName(@NonNull Executable executable) {
+        var parameterTypes = List.of(executable.getParameterTypes());
         String parameterTypesString = parameterTypes.isEmpty() ? "" : String.join(", ", classNames(parameterTypes, true));
-        return method.getName() + "(" + parameterTypesString + ")";
+        return executable.getName() + "(" + parameterTypesString + ")";
     }
+
 
 }

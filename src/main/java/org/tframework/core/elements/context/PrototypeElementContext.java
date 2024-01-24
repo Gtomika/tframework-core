@@ -8,6 +8,9 @@ import org.tframework.core.elements.assembler.ElementAssemblersFactory;
 import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.dependency.DependencyResolutionInput;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * An {@link ElementContext} that represents a prototype element.
  * @see ElementScope#PROTOTYPE
@@ -15,6 +18,8 @@ import org.tframework.core.elements.dependency.DependencyResolutionInput;
 @Slf4j
 @EqualsAndHashCode(callSuper = true)
 public final class PrototypeElementContext extends ElementContext {
+
+    private List<Object> instances;
 
     public PrototypeElementContext(
             String name,
@@ -27,11 +32,18 @@ public final class PrototypeElementContext extends ElementContext {
     @Override
     public void initialize(DependencyResolutionInput input) {
         elementAssembler = ElementAssemblersFactory.createElementAssembler(name, type, source, input);
-        log.trace("Initialized prototype element context: {}. It will use assembler: {}", name, elementAssembler.getClass().getName());
+        log.trace("Initialized prototype element context: {}", name);
+        this.instances = new ArrayList<>();
     }
 
     @Override
     public Object requestInstance() {
-        return null;
+        if(instances == null) {
+            throw new IllegalStateException("The prototype element context has not been initialized yet");
+        }
+        Object instance = elementAssembler.assemble();
+        instances.add(instance);
+        log.trace("Created new instance of prototype element: {}", name);
+        return instance;
     }
 }

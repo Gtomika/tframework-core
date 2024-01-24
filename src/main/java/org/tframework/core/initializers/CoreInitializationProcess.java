@@ -34,13 +34,16 @@ public class CoreInitializationProcess {
         Instant start = Instant.now();
 
         try {
-            ProfilesContainer profilesContainer = initProfiles(coreInput);
-            PropertiesContainer propertiesContainer = initProperties(coreInput, profilesContainer);
+            Application application = Application.empty();
 
-            return Application.builder()
-                    .profilesContainer(profilesContainer)
-                    .propertiesContainer(propertiesContainer)
-                    .build();
+            ProfilesContainer profilesContainer = initProfiles(coreInput);
+            application.setProfilesContainer(profilesContainer);
+
+            PropertiesContainer propertiesContainer = initProperties(coreInput, profilesContainer);
+            application.setPropertiesContainer(propertiesContainer);
+
+            application.finalizeApplication();
+            return application;
         } catch (Exception e) {
             log.error("The core initialization has failed", e);
             throw new InitializationException(e);

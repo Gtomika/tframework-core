@@ -5,10 +5,12 @@ import java.util.Set;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.tframework.core.elements.annotations.PreConstructedElement;
 
 /**
  * Read only container of the profiles, and some related utility methods.
  */
+@PreConstructedElement
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ProfilesContainer {
 

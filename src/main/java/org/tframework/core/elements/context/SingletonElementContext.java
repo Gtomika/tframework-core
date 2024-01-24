@@ -16,23 +16,24 @@ import org.tframework.core.elements.dependency.DependencyResolutionInput;
 @EqualsAndHashCode(callSuper = true)
 public final class SingletonElementContext extends ElementContext {
 
-    public SingletonElementContext(
-            String name,
-            Class<?> type,
-            ElementSource source
-    ) {
+    private Object instance;
+
+    public SingletonElementContext(String name, Class<?> type, ElementSource source) {
         super(name, type, ElementScope.SINGLETON, source);
     }
 
     @Override
     public void initialize(DependencyResolutionInput input) {
         elementAssembler = ElementAssemblersFactory.createElementAssembler(name, type, source, input);
-        log.trace("Initialized singleton element context: {}. It will use assembler: {}", name, elementAssembler.getClass().getName());
-        //TODO: initialize the only instance
+        instance = elementAssembler.assemble();
+        log.trace("Initialized singleton element context: {}. The instance was created: {}", name, instance);
     }
 
     @Override
     public Object requestInstance() {
-        return null; //TODO: use assembler to create instance, only ONCE!
+        if(instance == null) {
+            throw new IllegalStateException("The singleton element context has not been initialized yet");
+        }
+        return instance;
     }
 }

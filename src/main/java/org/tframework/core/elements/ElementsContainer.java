@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.tframework.core.TFrameworkInternal;
+import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyResolutionInput;
 import org.tframework.core.elements.dependency.DependencySource;
@@ -17,6 +18,7 @@ import org.tframework.core.elements.dependency.DependencySource;
  * Stores all elements of the application.
  */
 @EqualsAndHashCode
+@PreConstructedElement
 public class ElementsContainer implements DependencySource {
 
     /**

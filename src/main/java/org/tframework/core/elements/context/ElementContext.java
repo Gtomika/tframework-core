@@ -43,7 +43,7 @@ public abstract class ElementContext {
             @NonNull String name,
             @NonNull Class<?> type,
             @NonNull ElementScope scope,
-            @NonNull ElementSource source
+            ElementSource source
     ) {
         this.name = name.equals(Element.NAME_NOT_SPECIFIED) ? ElementUtils.getElementNameByType(type) : name;
         this.type = type;

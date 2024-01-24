@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.dependency.DependencySource;
 
 /**
@@ -18,6 +19,7 @@ import org.tframework.core.elements.dependency.DependencySource;
  */
 @Slf4j
 @EqualsAndHashCode
+@PreConstructedElement
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PropertiesContainer implements DependencySource {
 

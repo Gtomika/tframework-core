@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
 
@@ -15,6 +16,7 @@ import java.lang.annotation.Target;
  *     <li>If placed on a package, all contents of that package are internal.</li>
  * </ul>
  */
+@Documented
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.PACKAGE})
 public @interface TFrameworkInternal {
 }

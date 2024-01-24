@@ -6,7 +6,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.Application;
 import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.elements.context.PreConstructedElementContext;
 import org.tframework.core.elements.context.assembler.ClassElementContextAssembler;
 import org.tframework.core.elements.context.assembler.ElementContextAssembler;
 import org.tframework.core.elements.context.assembler.MethodElementContextAssembler;
@@ -52,17 +54,18 @@ public class DependencyInjectionProcess {
     //this should be used by the other 'initialize' method and during tests
     //here we can provide the components instead of creating a default one
     ElementsContainer initialize(DependencyInjectionInput input, ElementScannersBundle scannersBundle) {
-        ElementsContainer elementsContainer = ElementsContainer.empty();
+        var elementsContainer = ElementsContainer.empty();
 
         assembleElementContexts(elementsContainer, scannersBundle);
+        addPreConstructedElementContexts(elementsContainer, input.application());
         log.debug("Successfully assembled a total of {} element contexts", elementsContainer.elementCount());
 
         DependencyResolutionInput dependencyResolutionInput = DependencyResolutionInput.builder()
                 .elementsContainer(elementsContainer)
-                .propertiesContainer(input.propertiesContainer())
+                .propertiesContainer(input.application().getPropertiesContainer())
                 .build();
         elementsContainer.initializeElementContexts(dependencyResolutionInput);
-        log.debug("Successfully initialized {} element contexts", elementsContainer.elementCount());
+        log.info("Successfully initialized {} element contexts", elementsContainer.elementCount());
 
         return elementsContainer;
     }
@@ -123,5 +126,11 @@ public class DependencyInjectionProcess {
         }
     }
 
+    private void addPreConstructedElementContexts(ElementsContainer elementsContainer, Application application) {
+        elementsContainer.addElementContext(PreConstructedElementContext.of(elementsContainer));
+        elementsContainer.addElementContext(PreConstructedElementContext.of(application));
+        elementsContainer.addElementContext(PreConstructedElementContext.of(application.getProfilesContainer()));
+        elementsContainer.addElementContext(PreConstructedElementContext.of(application.getPropertiesContainer()));
+    }
 
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.dependency.DependencyResolutionInput;
+import org.tframework.core.elements.dependency.graph.DependencyGraph;
 
 /**
  * A special {@link ElementContext} for {@link org.tframework.core.elements.annotations.PreConstructedElement}s.
@@ -32,7 +33,7 @@ public class PreConstructedElementContext extends ElementContext {
     }
 
     @Override
-    public Object requestInstance() {
+    public Object requestInstance(DependencyGraph dependencyGraph) {
         return preConstructedInstance;
     }
 

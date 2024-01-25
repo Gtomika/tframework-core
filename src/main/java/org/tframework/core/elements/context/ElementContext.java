@@ -10,8 +10,8 @@ import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.assembler.ElementAssembler;
-import org.tframework.core.elements.assembler.ElementAssemblersFactory;
 import org.tframework.core.elements.context.source.ElementSource;
+import org.tframework.core.elements.dependency.graph.DependencyGraph;
 import org.tframework.core.elements.dependency.DependencyResolutionInput;
 import org.tframework.core.elements.dependency.DependencyResolver;
 
@@ -22,7 +22,6 @@ import org.tframework.core.elements.dependency.DependencyResolver;
 @Slf4j
 @Getter
 @ToString
-@EqualsAndHashCode
 public abstract class ElementContext {
 
     protected final String name;
@@ -61,7 +60,26 @@ public abstract class ElementContext {
      * Requests this element context to return with an instance of the element.
      * Depending on the implementation, this might reuse an existing instance, or create a new one.
      */
-    public abstract Object requestInstance();
+    public Object requestInstance() {
+        return requestInstance(DependencyGraph.empty());
+    }
+
+    /**
+     * Requests this element context to return with an instance of the element, continuing the
+     * dependency resolution process with the given {@link DependencyGraph}.
+     * @param dependencyGraph The {@link DependencyGraph} to use for dependency resolution.
+     */
+    public abstract Object requestInstance(DependencyGraph dependencyGraph);
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return obj instanceof ElementContext elementContext && elementContext.name.equals(name);
+    }
 
     /**
      * Creates an {@link ElementContext} from the given {@link Element} annotation and additional required input.

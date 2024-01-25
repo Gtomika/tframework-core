@@ -7,6 +7,7 @@ import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.assembler.ElementAssemblersFactory;
 import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.dependency.DependencyResolutionInput;
+import org.tframework.core.elements.dependency.graph.DependencyGraph;
 
 /**
  * An {@link ElementContext} that represents a singleton element.
@@ -25,14 +26,14 @@ public final class SingletonElementContext extends ElementContext {
     @Override
     public void initialize(DependencyResolutionInput input) {
         elementAssembler = ElementAssemblersFactory.createElementAssembler(name, type, source, input);
-        instance = elementAssembler.assemble();
+        instance = requestInstance();
         log.trace("Initialized singleton element context: {}. The instance was created: {}", name, instance);
     }
 
     @Override
-    public Object requestInstance() {
+    public Object requestInstance(DependencyGraph dependencyGraph) {
         if(instance == null) {
-            throw new IllegalStateException("The singleton element context has not been initialized yet");
+            instance = elementAssembler.assemble(); //TODO: add dependency graph
         }
         return instance;
     }

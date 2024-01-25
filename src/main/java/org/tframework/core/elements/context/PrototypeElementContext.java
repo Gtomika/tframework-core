@@ -7,6 +7,7 @@ import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.assembler.ElementAssemblersFactory;
 import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.dependency.DependencyResolutionInput;
+import org.tframework.core.elements.dependency.graph.DependencyGraph;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,15 +34,14 @@ public final class PrototypeElementContext extends ElementContext {
     public void initialize(DependencyResolutionInput input) {
         elementAssembler = ElementAssemblersFactory.createElementAssembler(name, type, source, input);
         log.trace("Initialized prototype element context: {}", name);
-        this.instances = new ArrayList<>();
     }
 
     @Override
-    public Object requestInstance() {
+    public Object requestInstance(DependencyGraph dependencyGraph) {
         if(instances == null) {
-            throw new IllegalStateException("The prototype element context has not been initialized yet");
+            instances = new ArrayList<>();
         }
-        Object instance = elementAssembler.assemble();
+        Object instance = elementAssembler.assemble(); //TODO: add dependency graph
         instances.add(instance);
         log.trace("Created new instance of prototype element: {}", name);
         return instance;

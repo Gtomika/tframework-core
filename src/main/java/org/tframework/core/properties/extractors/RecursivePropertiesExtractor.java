@@ -27,6 +27,7 @@ public class RecursivePropertiesExtractor implements PropertiesExtractor {
         return properties;
     }
 
+    @SuppressWarnings("unchecked")
     private void saveProperties(
             Map<String, PropertyValue> properties,
             String parentPropertyPath,

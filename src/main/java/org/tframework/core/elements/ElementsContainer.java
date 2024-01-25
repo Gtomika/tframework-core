@@ -55,6 +55,24 @@ public class ElementsContainer implements DependencySource {
     }
 
     /**
+     * Checks if the element with the given name is stored in this container.
+     * @param name Name of the element to check, must not be null.
+     */
+    public boolean hasElementContext(@NonNull String name) {
+        return elementContexts.containsKey(name);
+    }
+
+    /**
+     * Checks if the element with the given type is stored in this container.
+     * The type will be converted to a name using {@link ElementUtils#getElementNameByType(Class)
+     * @param elementType Type of the element to check, must not be null.
+     */
+    public boolean hasElementContext(@NonNull Class<?> elementType) {
+        String name = ElementUtils.getElementNameByType(elementType);
+        return hasElementContext(name);
+    }
+
+    /**
      * Adds the given {@code elementContext} to this container.
      * @param elementContext The element context to add, must not be null.
      * @throws ElementNameNotUniqueException If an element with the same name is already stored in this container.
@@ -101,14 +119,14 @@ public class ElementsContainer implements DependencySource {
     /**
      * Creates an {@link ElementsContainer} that has no elements.
      */
-    static ElementsContainer empty() {
+    public static ElementsContainer empty() {
         return new ElementsContainer(Map.of());
     }
 
     /**
      * Creates a new {@link ElementsContainer}, storing the given {@code elementContexts} as well.
      */
-    static ElementsContainer fromElementContexts(@NonNull Collection<ElementContext> elementContexts) {
+    public static ElementsContainer fromElementContexts(@NonNull Collection<ElementContext> elementContexts) {
         return new ElementsContainer(elementContexts.stream()
                 .collect(
                         Collectors.toMap(

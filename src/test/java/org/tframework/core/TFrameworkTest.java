@@ -17,16 +17,16 @@ class TFrameworkTest {
         };
         var application = TFramework.start(args);
 
-        assertTrue(application.profilesContainer().isProfileSet("default"));
-        assertTrue(application.profilesContainer().isProfileSet("unit-test"));
-        assertTrue(application.profilesContainer().isProfileSet("demo"));
+        assertTrue(application.getProfilesContainer().isProfileSet("default"));
+        assertTrue(application.getProfilesContainer().isProfileSet("unit-test"));
+        assertTrue(application.getProfilesContainer().isProfileSet("demo"));
 
-        assertEquals("test", application.propertiesContainer().getPropertyValue("custom.string-prop"));
-        assertEquals("1", application.propertiesContainer().getPropertyValue("custom.int-prop"));
-        assertEquals("true", application.propertiesContainer().getPropertyValue("custom.boolean-prop"));
+        assertEquals("test", application.getPropertiesContainer().getPropertyValue("custom.string-prop"));
+        assertEquals("1", application.getPropertiesContainer().getPropertyValue("custom.int-prop"));
+        assertEquals("true", application.getPropertiesContainer().getPropertyValue("custom.boolean-prop"));
         assertEquals(
                 List.of("test1", "test2", "test3"),
-                application.propertiesContainer().getPropertyValueList("custom.list-prop")
+                application.getPropertiesContainer().getPropertyValueList("custom.list-prop")
         );
     }
 

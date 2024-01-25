@@ -42,9 +42,10 @@ class CoreInitializationProcessTest {
                 .profilesContainer(ProfilesContainer.fromProfiles(Set.of("a, b")))
                 .propertiesContainer(PropertiesContainer.empty())
                 .build();
+        expectedApp.finalizeApplication();
 
-        when(profilesCoreInitializer.initialize(any())).thenReturn(expectedApp.profilesContainer());
-        when(propertiesCoreInitializer.initialize(any())).thenReturn(expectedApp.propertiesContainer());
+        when(profilesCoreInitializer.initialize(any())).thenReturn(expectedApp.getProfilesContainer());
+        when(propertiesCoreInitializer.initialize(any())).thenReturn(expectedApp.getPropertiesContainer());
 
         CoreInitializationInput input = CoreInitializationInput.builder()
                 .args(new String[]{"testArg"})

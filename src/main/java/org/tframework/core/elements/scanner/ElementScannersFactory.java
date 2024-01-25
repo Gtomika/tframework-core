@@ -37,11 +37,12 @@ public final class ElementScannersFactory {
      * @param input {@link DependencyInjectionInput}, not null.
      */
     public static List<ElementClassScanner> createDefaultElementClassScanners(@NonNull DependencyInjectionInput input) {
+        var propertiesContainer = input.application().getPropertiesContainer();
         return List.of(
-                createRootElementClassScanner(input.rootClass(), input.propertiesContainer()),
-                createInternalElementClassScanner(input.propertiesContainer()),
-                createPackagesElementClassScanner(input.propertiesContainer()),
-                createClassesElementClassScanner(input.propertiesContainer())
+                createRootElementClassScanner(input.rootClass(), propertiesContainer),
+                createInternalElementClassScanner(propertiesContainer),
+                createPackagesElementClassScanner(propertiesContainer),
+                createClassesElementClassScanner(propertiesContainer)
         );
     }
 

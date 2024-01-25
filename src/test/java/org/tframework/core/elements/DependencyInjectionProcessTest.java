@@ -1,7 +1,7 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.tframework.core.Application;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.ElementConstructor;
 import org.tframework.core.elements.context.ElementContext;
@@ -72,16 +73,21 @@ class DependencyInjectionProcessTest {
         var input = createDummyDependencyInjectionInput();
         var elementsContainer = dependencyInjectionProcess.initialize(input, elementScannersBundle);
 
-        assertEquals(ElementsContainer.fromElementContexts(
-                List.of(dummyClassElementContext, dummyStringMethodElementContext)
-        ), elementsContainer);
+        assertTrue(elementsContainer.hasElementContext(DummyClass.class)); //from element class
+        assertTrue(elementsContainer.hasElementContext(String.class)); //from element method
+        assertTrue(elementsContainer.hasElementContext(Application.class)); //from pre-constructed elements
+        assertTrue(elementsContainer.hasElementContext(ProfilesContainer.class));
+        assertTrue(elementsContainer.hasElementContext(PropertiesContainer.class));
+        assertTrue(elementsContainer.hasElementContext(ElementsContainer.class));
     }
 
     private DependencyInjectionInput createDummyDependencyInjectionInput() {
+        Application application = Application.empty();
+        application.setProfilesContainer(ProfilesContainer.empty());
+        application.setPropertiesContainer(PropertiesContainer.empty());
         return DependencyInjectionInput.builder()
                 .rootClass(DependencyInjectionProcessTest.class)
-                .profilesContainer(ProfilesContainer.empty())
-                .propertiesContainer(PropertiesContainer.empty())
+                .application(application)
                 .build();
     }
 
@@ -89,7 +95,7 @@ class DependencyInjectionProcessTest {
     This single element class and its method elements are used for testing the dependency injection process.
      */
     @Element
-    static class DummyClass {
+    public static class DummyClass {
 
         @ElementConstructor
         public DummyClass() {}

@@ -5,13 +5,20 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import org.junit.jupiter.api.Test;
+import org.tframework.core.Application;
 import org.tframework.core.elements.DependencyInjectionInput;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
 
 public class ElementScannersFactoryTest {
 
-    private final DependencyInjectionInput input = new DependencyInjectionInput(this.getClass(), ProfilesContainer.empty(), PropertiesContainer.empty());
+    private final DependencyInjectionInput input = new DependencyInjectionInput(
+            Application.builder()
+                    .propertiesContainer(PropertiesContainer.empty())
+                    .profilesContainer(ProfilesContainer.empty())
+                    .build(),
+            this.getClass()
+    );
 
     @Test
     public void shouldCreateDefaultElementScannersBundle() {

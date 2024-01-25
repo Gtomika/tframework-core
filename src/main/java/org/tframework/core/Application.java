@@ -1,7 +1,10 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core;
 
+import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.ToString;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.profiles.ProfilesContainer;
@@ -11,6 +14,8 @@ import org.tframework.core.properties.PropertiesContainer;
  * A bundle of information about a TFramework application.
  */
 @Getter
+@ToString
+@EqualsAndHashCode
 @PreConstructedElement
 public class Application {
 
@@ -66,8 +71,28 @@ public class Application {
         }
     }
 
+    /**
+     * Creates an empty application that has no data assigned. This application is not finalized and
+     * data should be set before finalization.
+     */
     public static Application empty() {
         return new Application();
+    }
+
+    /**
+     * Creates an application with the given data. This application is not finalized.
+     */
+    @Builder
+    public static Application from(
+            ProfilesContainer profilesContainer,
+            PropertiesContainer propertiesContainer,
+            ElementsContainer elementsContainer
+    ) {
+        var application = new Application();
+        application.profilesContainer = profilesContainer;
+        application.propertiesContainer = propertiesContainer;
+        application.elementsContainer = elementsContainer;
+        return application;
     }
 
 }

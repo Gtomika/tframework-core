@@ -10,6 +10,7 @@ import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.classes.ClassFilter;
 import org.tframework.core.reflection.classes.PackageClassScanner;
+import org.tframework.core.utils.Constants;
 
 /**
  * This {@link ElementClassScanner} scans all elements in the given packages. A list of packages
@@ -29,7 +30,7 @@ import org.tframework.core.reflection.classes.PackageClassScanner;
 @Slf4j
 public class PackagesElementClassScanner extends ElementClassScanner {
 
-    public static final String SCAN_PACKAGES_PROPERTY = "org.tframework.dependency-injection.scan-packages";
+    public static final String SCAN_PACKAGES_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".dependency-injection.scan-packages";
     private static final List<String> SCAN_PACKAGES_DEFAULT_VALUE = List.of();
 
     private final PackageClassScanner classScanner;

@@ -11,7 +11,7 @@ import org.tframework.core.properties.PropertiesContainer;
  * @param application The not yet finalized {@link Application} instance. It should already contain the
  *                    properties and profiles.
  * @param rootClass The root class where the application was started from
- *                 (where {@link org.tframework.core.TFramework#start(String[])}) was called from.
+ *                 (this is typically where {@link org.tframework.core.TFramework#start(String, Class, String[])}) was called from.
  * @see DependencyInjectionProcess
  */
 @Builder

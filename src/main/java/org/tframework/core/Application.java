@@ -11,7 +11,9 @@ import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
 
 /**
- * A bundle of information about a TFramework application.
+ * A bundle of information about a TFramework application. Includes profiles, properties, elements and other
+ * information. You may request these information from the application directly, but it is recommended to use
+ * dependency injection instead, where possible.
  */
 @Getter
 @ToString
@@ -21,12 +23,32 @@ public class Application {
 
     private boolean finalized;
 
+    private String name;
+    private Class<?> rootClass;
     private ProfilesContainer profilesContainer;
     private PropertiesContainer propertiesContainer;
     private ElementsContainer elementsContainer;
 
     private Application() {
         this.finalized = false;
+    }
+
+    /**
+     * Sets the name for this application. This method should only be called by the framework.
+     */
+    @TFrameworkInternal
+    public void setName(String name) {
+        checkForFinalization();
+        this.name = name;
+    }
+
+    /**
+     * Sets the root class for this application. This method should only be called by the framework.
+     */
+    @TFrameworkInternal
+    public void setRootClass(Class<?> rootClass) {
+        checkForFinalization();
+        this.rootClass = rootClass;
     }
 
     /**
@@ -84,11 +106,15 @@ public class Application {
      */
     @Builder
     public static Application from(
+            String name,
+            Class<?> rootClass,
             ProfilesContainer profilesContainer,
             PropertiesContainer propertiesContainer,
             ElementsContainer elementsContainer
     ) {
         var application = new Application();
+        application.name = name;
+        application.rootClass = rootClass;
         application.profilesContainer = profilesContainer;
         application.propertiesContainer = propertiesContainer;
         application.elementsContainer = elementsContainer;

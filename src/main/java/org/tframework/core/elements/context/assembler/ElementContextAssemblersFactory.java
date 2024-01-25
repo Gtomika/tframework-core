@@ -18,7 +18,7 @@ public final class ElementContextAssemblersFactory {
     /**
      * Creates a default {@link ElementContextAssembler} for elements that are defined as {@link Class}es.
      */
-    public static ElementContextAssembler<Class<?>> createDefaultClassElementContextAssembler() {
+    public static ClassElementContextAssembler createDefaultClassElementContextAssembler() {
         return ClassElementContextAssembler.builder()
                 .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())
                 .constructorScanner(ConstructorScannersFactory.createDefaultConstructorScanner())
@@ -29,7 +29,7 @@ public final class ElementContextAssemblersFactory {
     /**
      * Creates a default {@link ElementContextAssembler} for elements that are defined as {@link Method}s.
      */
-    public static ElementContextAssembler<Method> createDefaultMethodElementContextAssembler() {
+    public static MethodElementContextAssembler createDefaultMethodElementContextAssembler() {
         return MethodElementContextAssembler.builder()
                 .methodFilter(MethodFiltersFactory.createDefaultMethodFilter())
                 .build();

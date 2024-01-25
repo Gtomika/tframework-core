@@ -14,7 +14,7 @@ import org.tframework.core.utils.TimerUtils;
 
 /**
  * The {@link CoreInitializer} that is responsible for loading the properties.
- * @see PropertiesInitializationProcess
+ * All work is delegated to {@link PropertiesInitializationProcess}.
  */
 @Slf4j
 @TFrameworkInternal

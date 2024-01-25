@@ -12,6 +12,7 @@ import org.tframework.core.properties.converters.PropertyConverter;
 import org.tframework.core.properties.converters.PropertyConvertersFactory;
 import org.tframework.core.reflection.classes.ClassFilter;
 import org.tframework.core.reflection.classes.PackageClassScanner;
+import org.tframework.core.utils.Constants;
 
 /**
  * A {@link ElementClassScanner} which scans the root class' package and all its sub-packages.
@@ -21,7 +22,7 @@ import org.tframework.core.reflection.classes.PackageClassScanner;
 @Slf4j
 public class RootElementClassScanner extends ElementClassScanner {
 
-    public static final String ROOT_SCANNING_ENABLED_PROPERTY = "tframework.dependency-injection.scan-root";
+    public static final String ROOT_SCANNING_ENABLED_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".dependency-injection.scan-root";
     private static final SinglePropertyValue ROOT_SCANNING_ENABLED_DEFAULT_VALUE = new SinglePropertyValue("true");
 
     private final PackageClassScanner classScanner;

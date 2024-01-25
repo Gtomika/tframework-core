@@ -13,7 +13,7 @@ import org.tframework.core.utils.TimerUtils;
 
 /**
  * The profiles {@link CoreInitializer} scans for, cleans and validates profiles at application startup.
- * @see ProfileInitializationProcess
+ * All work is delegated to the {@link ProfileInitializationProcess}.
  */
 @Slf4j
 @TFrameworkInternal

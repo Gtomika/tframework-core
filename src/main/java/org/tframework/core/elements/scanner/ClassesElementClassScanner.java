@@ -11,6 +11,7 @@ import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.classes.ClassFilter;
 import org.tframework.core.reflection.classes.ClassScannersFactory;
 import org.tframework.core.utils.ClassLoaderUtils;
+import org.tframework.core.utils.Constants;
 import org.tframework.core.utils.LogUtils;
 
 /**
@@ -24,11 +25,11 @@ import org.tframework.core.utils.LogUtils;
  * during testing, it may be useful to pick up only a few classes instead of the entire application.
  * @see PackagesElementClassScanner
  */
-//well this is an obnoxious class name...
+//well this is an obnoxious name...
 @Slf4j
 public class ClassesElementClassScanner extends ElementClassScanner {
 
-    public static final String SCAN_CLASSES_PROPERTY = "org.tframework.dependency-injection.scan-classes";
+    public static final String SCAN_CLASSES_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".dependency-injection.scan-classes";
     private static final List<String> SCAN_CLASSES_DEFAULT_VALUE = List.of();
 
     @Builder

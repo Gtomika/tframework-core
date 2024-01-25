@@ -21,6 +21,8 @@ class ApplicationTest {
         Application application = Application.empty();
         application.finalizeApplication();
 
+        assertThrows(IllegalStateException.class, () -> application.setName("test"));
+        assertThrows(IllegalStateException.class, () -> application.setRootClass(this.getClass()));
         assertThrows(IllegalStateException.class, () -> application.setProfilesContainer(ProfilesContainer.empty()));
         assertThrows(IllegalStateException.class, () -> application.setPropertiesContainer(PropertiesContainer.empty()));
         assertThrows(IllegalStateException.class, () -> application.setElementsContainer(ElementsContainer.empty()));

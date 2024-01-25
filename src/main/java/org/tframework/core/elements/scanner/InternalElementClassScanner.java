@@ -11,6 +11,7 @@ import org.tframework.core.properties.converters.PropertyConverter;
 import org.tframework.core.properties.converters.PropertyConvertersFactory;
 import org.tframework.core.reflection.classes.ClassFilter;
 import org.tframework.core.reflection.classes.PackageClassScanner;
+import org.tframework.core.utils.Constants;
 
 /**
  * An {@link ElementClassScanner} implementation which scans the internal TFramework packages
@@ -29,7 +30,7 @@ public class InternalElementClassScanner extends ElementClassScanner {
     /**
      * The property that enables/disables this scanner.
      */
-    public static final String TFRAMEWORK_INTERNAL_PACKAGE_PROPERTY = "tframework.dependency-injection.scan-internal";
+    public static final String TFRAMEWORK_INTERNAL_PACKAGE_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".dependency-injection.scan-internal";
 
     private static final SinglePropertyValue TFRAMEWORK_INTERNAL_PACKAGE_DEFAULT_VALUE = new SinglePropertyValue("true");
 

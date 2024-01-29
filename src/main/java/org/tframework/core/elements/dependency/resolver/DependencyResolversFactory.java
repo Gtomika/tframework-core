@@ -1,15 +1,16 @@
-package org.tframework.core.elements.dependency;
+package org.tframework.core.elements.dependency.resolver;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.elements.ElementsContainer;
+import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 
 import java.util.List;
 
 /**
- * Utilities to create {@link DependencyResolver}s.
+ * Utilities to create {@link BasicDependencyResolver}s.
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class DependencyResolversFactory {
@@ -39,9 +40,9 @@ public final class DependencyResolversFactory {
         );
     }
 
-    private static ElementDependencyResolver createElementDependencyResolver(ElementsContainer elementsContainer) {
+    private static AnnotatedElementDependencyResolver createElementDependencyResolver(ElementsContainer elementsContainer) {
         var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
-        return new ElementDependencyResolver(elementsContainer, new InjectAnnotationScanner(annotationScanner));
+        return new AnnotatedElementDependencyResolver(elementsContainer, new InjectAnnotationScanner(annotationScanner));
     }
 
     private static PropertyDependencyResolver createPropertyDependencyResolver(PropertiesContainer propertiesContainer) {

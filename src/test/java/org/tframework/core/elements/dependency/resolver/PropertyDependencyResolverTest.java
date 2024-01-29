@@ -1,4 +1,4 @@
-package org.tframework.core.elements.dependency;
+package org.tframework.core.elements.dependency.resolver;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -6,6 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.annotations.InjectProperty;
+import org.tframework.core.elements.dependency.DependencyDefinition;
+import org.tframework.core.elements.dependency.InjectAnnotationScanner;
+import org.tframework.core.elements.dependency.resolver.PropertyDependencyResolver;
 import org.tframework.core.properties.PropertiesContainer;
 
 import java.lang.reflect.Field;

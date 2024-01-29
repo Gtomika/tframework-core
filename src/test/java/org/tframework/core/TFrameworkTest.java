@@ -12,6 +12,8 @@ import org.tframework.core.elements.annotations.ElementConstructor;
 /*
 This test does not mock the initialization process, but instead tests the framework as a whole.
  */
+//TODO: create integration test suite for these kind of tests and move this one there
+// Make this test use mocking instead
 class TFrameworkTest {
 
     @Test

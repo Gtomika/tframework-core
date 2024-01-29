@@ -1,7 +1,6 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.context;
 
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.ToString;
@@ -11,9 +10,9 @@ import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.assembler.ElementAssembler;
 import org.tframework.core.elements.context.source.ElementSource;
-import org.tframework.core.elements.dependency.graph.DependencyGraph;
-import org.tframework.core.elements.dependency.DependencyResolutionInput;
-import org.tframework.core.elements.dependency.DependencyResolver;
+import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
+import org.tframework.core.elements.dependency.resolver.BasicDependencyResolver;
 
 /**
  * A wrapper for an element, that keeps track of all the data of this element, and
@@ -52,7 +51,7 @@ public abstract class ElementContext {
 
     /**
      * Initializes this element context so that it is ready to create instances of the element.
-     * @param input The {@link DependencyResolutionInput} to use to create appropriate {@link DependencyResolver}s.
+     * @param input The {@link DependencyResolutionInput} to use to create appropriate {@link BasicDependencyResolver}s.
      */
     public abstract void initialize(DependencyResolutionInput input);
 
@@ -61,15 +60,15 @@ public abstract class ElementContext {
      * Depending on the implementation, this might reuse an existing instance, or create a new one.
      */
     public Object requestInstance() {
-        return requestInstance(DependencyGraph.empty());
+        return requestInstance(ElementDependencyGraph.empty());
     }
 
     /**
      * Requests this element context to return with an instance of the element, continuing the
-     * dependency resolution process with the given {@link DependencyGraph}.
-     * @param dependencyGraph The {@link DependencyGraph} to use for dependency resolution.
+     * dependency resolution process with the given {@link ElementDependencyGraph}.
+     * @param dependencyGraph The {@link ElementDependencyGraph} to use for dependency resolution.
      */
-    public abstract Object requestInstance(DependencyGraph dependencyGraph);
+    public abstract Object requestInstance(ElementDependencyGraph dependencyGraph);
 
     @Override
     public int hashCode() {

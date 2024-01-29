@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
-class DependencyGraphTest {
+class ElementDependencyGraphTest {
 
     @Mock
     private ElementContext elementA;
@@ -40,14 +40,14 @@ class DependencyGraphTest {
 
     @Test
     public void shouldNotDetectCycles_whenDependenciesAreValid() {
-        var dependencyGraph = DependencyGraph.empty();
+        var dependencyGraph = ElementDependencyGraph.empty();
         dependencyGraph.addDependency(elementA, elementB);
         assertDoesNotThrow(dependencyGraph::detectCircularDependencies);
     }
 
     @Test
     public void shouldThrowException_whenCyclicDependency() {
-        var dependencyGraph = DependencyGraph.empty();
+        var dependencyGraph = ElementDependencyGraph.empty();
         dependencyGraph.addDependency(elementA, elementB);
         dependencyGraph.addDependency(elementB, elementC);
         dependencyGraph.addDependency(elementC, elementA);
@@ -61,7 +61,7 @@ class DependencyGraphTest {
 
     @Test
     public void shouldThrowException_whenElementDependsOnItself() {
-        var dependencyGraph = DependencyGraph.empty();
+        var dependencyGraph = ElementDependencyGraph.empty();
         dependencyGraph.addDependency(elementA, elementA);
 
         var exception = assertThrows(CircularDependencyException.class, dependencyGraph::detectCircularDependencies);

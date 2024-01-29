@@ -9,38 +9,43 @@ import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.source.MethodElementSource;
 import org.tframework.core.elements.dependency.DependencyDefinition;
-import org.tframework.core.elements.dependency.DependencyResolver;
+import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
 
 import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MethodElementAssemblerTest {
 
     @Mock
+    private ElementContext elementContext;
+
+    @Mock
     private ElementContext parentElementContext;
 
     @Mock
-    private DependencyResolver dependencyResolver;
+    private DependencyResolverAggregator aggregator;
 
-    private MethodElementSource methodElementSource;
     private MethodElementAssembler methodElementAssembler;
     private DependencyDefinition dummyStringDependencyDefinition;
 
     @BeforeEach
     void setUp() throws Exception {
         Method method = MethodElementAssemblerTest.class.getDeclaredMethod("createDummyElement", String.class);
-        methodElementSource = new MethodElementSource(method, parentElementContext);
+        var methodElementSource = new MethodElementSource(method, parentElementContext);
+
+        when(elementContext.getName()).thenReturn("dummyElement");
+        doReturn(ClassElementAssemblerTest.DummyElement.class).when(elementContext).getType();
+        when(elementContext.getSource()).thenReturn(methodElementSource);
+
         methodElementAssembler = MethodElementAssembler.builder()
-                .elementName("dummyElement")
-                .elementType(DummyElement.class)
-                .methodElementSource(methodElementSource)
-                .dependencyResolvers(List.of(dependencyResolver))
+                .elementContext(elementContext)
+                .dependencyResolverAggregator(aggregator)
                 .build();
         dummyStringDependencyDefinition = DependencyDefinition.fromParameter(method.getParameters()[0]);
 
@@ -50,20 +55,34 @@ class MethodElementAssemblerTest {
 
     @Test
     public void shouldAssembleElementFromMethod() {
+        var dependencyGraph = ElementDependencyGraph.empty();
         DummyElement expectedElement = new DummyElement("dummyString");
-        when(dependencyResolver.resolveDependency(dummyStringDependencyDefinition))
-                .thenReturn(Optional.of(expectedElement.dummyString));
 
-        DummyElement actualElement = (DummyElement) methodElementAssembler.assemble();
+        when(aggregator.resolveDependency(
+                dummyStringDependencyDefinition,
+                elementContext,
+                dependencyGraph,
+                MethodElementAssembler.DEPENDENCY_DECLARED_AS
+        )).thenReturn(expectedElement);
+
+        DummyElement actualElement = (DummyElement) methodElementAssembler.assemble(dependencyGraph);
         assertEquals(expectedElement, actualElement);
     }
 
     @Test
     public void shouldThrowException_whenDependencyCannotBeResolved() {
-        when(dependencyResolver.resolveDependency(dummyStringDependencyDefinition))
-                .thenReturn(Optional.empty());
+        var dependencyGraph = ElementDependencyGraph.empty();
 
-        var exception = assertThrows(ElementAssemblingException.class, () -> methodElementAssembler.assemble());
+        when(aggregator.resolveDependency(
+                dummyStringDependencyDefinition,
+                elementContext,
+                dependencyGraph,
+                MethodElementAssembler.DEPENDENCY_DECLARED_AS
+        )).thenThrow(new RuntimeException("Failed to resolve dependency :("));
+
+        var exception = assertThrows(ElementAssemblingException.class, () -> {
+            methodElementAssembler.assemble(dependencyGraph);
+        });
 
         String expectedMessage = exception.getMessageTemplate().formatted(
                 "dummyElement",

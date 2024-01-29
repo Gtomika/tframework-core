@@ -5,10 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.source.MethodElementSource;
 import org.tframework.core.elements.dependency.DependencyDefinition;
-import org.tframework.core.elements.dependency.DependencyResolver;
-import org.tframework.core.elements.dependency.DependencyUtils;
-
-import java.util.List;
+import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
 
 /**
  * An {@link ElementAssembler} that creates instances of method elements (in other words: where methods are
@@ -26,28 +24,31 @@ public class MethodElementAssembler extends ElementAssembler {
     static final String ASSEMBLED_FROM = "Method";
     static final String DEPENDENCY_DECLARED_AS = "Method parameter";
 
+    /**
+     * Element context whose instances this assembler assembles.
+     */
+    private final ElementContext elementContext;
     private final MethodElementSource methodElementSource;
-    private final List<DependencyResolver> dependencyResolvers;
+    private final DependencyResolverAggregator dependencyResolverAggregator;
 
     private MethodElementAssembler(
-            String elementName,
-            Class<?> elementType,
-            MethodElementSource methodElementSource,
-            List<DependencyResolver> dependencyResolvers
+           ElementContext elementContext,
+           DependencyResolverAggregator dependencyResolverAggregator
     ) {
-        super(elementName, elementType);
-        this.methodElementSource = methodElementSource;
-        this.dependencyResolvers = dependencyResolvers;
+        super(elementContext.getName(), elementContext.getType());
+        this.elementContext = elementContext;
+        this.methodElementSource = (MethodElementSource) elementContext.getSource();
+        this.dependencyResolverAggregator = dependencyResolverAggregator;
     }
 
     @Override
-    public Object assemble() throws ElementAssemblingException {
+    public Object assemble(ElementDependencyGraph dependencyGraph) throws ElementAssemblingException {
         try {
             Object parentElementInstance = methodElementSource.parentElementContext().requestInstance();
             log.debug("Requested an instance of parent element '{}' for method element '{}'",
                     methodElementSource.parentElementContext().getName(), elementName);
 
-            Object[] methodArgs = resolveMethodInvocationDependencies();
+            Object[] methodArgs = resolveMethodInvocationDependencies(dependencyGraph);
             log.debug("Resolved {} method parameters that will be used to assemble element '{}'",
                     methodArgs.length, elementName);
 
@@ -65,23 +66,23 @@ public class MethodElementAssembler extends ElementAssembler {
         }
     }
 
-    private Object[] resolveMethodInvocationDependencies() {
+    private Object[] resolveMethodInvocationDependencies(ElementDependencyGraph dependencyGraph) {
         Object[] methodArgs = new Object[methodElementSource.elementConstructionParameters().size()];
         for (int i = 0; i < methodArgs.length; i++) {
             var methodParameter = methodElementSource.elementConstructionParameters().get(i);
             DependencyDefinition dependencyDefinition = DependencyDefinition.fromParameter(methodParameter);
-            methodArgs[i] = DependencyUtils.resolveDependency(dependencyDefinition, DEPENDENCY_DECLARED_AS, dependencyResolvers);
+            methodArgs[i] = dependencyResolverAggregator.resolveDependency(
+                    dependencyDefinition, elementContext, dependencyGraph, DEPENDENCY_DECLARED_AS
+            );
         }
         return methodArgs;
     }
 
     @Builder
     static MethodElementAssembler create(
-            String elementName,
-            Class<?> elementType,
-            MethodElementSource methodElementSource,
-            List<DependencyResolver> dependencyResolvers
+            ElementContext elementContext,
+            DependencyResolverAggregator dependencyResolverAggregator
     ) {
-        return new MethodElementAssembler(elementName, elementType, methodElementSource, dependencyResolvers);
+        return new MethodElementAssembler(elementContext, dependencyResolverAggregator);
     }
 }

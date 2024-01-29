@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.assembler.ElementAssemblersFactory;
 import org.tframework.core.elements.context.source.ElementSource;
-import org.tframework.core.elements.dependency.DependencyResolutionInput;
-import org.tframework.core.elements.dependency.graph.DependencyGraph;
+import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
+import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,16 +32,16 @@ public final class PrototypeElementContext extends ElementContext {
 
     @Override
     public void initialize(DependencyResolutionInput input) {
-        elementAssembler = ElementAssemblersFactory.createElementAssembler(name, type, source, input);
+        elementAssembler = ElementAssemblersFactory.createElementAssembler(this, input);
         log.trace("Initialized prototype element context: {}", name);
     }
 
     @Override
-    public Object requestInstance(DependencyGraph dependencyGraph) {
+    public Object requestInstance(ElementDependencyGraph dependencyGraph) {
         if(instances == null) {
             instances = new ArrayList<>();
         }
-        Object instance = elementAssembler.assemble(); //TODO: add dependency graph
+        Object instance = elementAssembler.assemble(dependencyGraph);
         instances.add(instance);
         log.trace("Created new instance of prototype element: {}", name);
         return instance;

@@ -1,11 +1,11 @@
-package org.tframework.core.elements.dependency;
+package org.tframework.core.elements.dependency.resolver;
 
 import lombok.Builder;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.properties.PropertiesContainer;
 
 /**
- * All input for creating {@link DependencyResolver}s.
+ * All input for creating {@link BasicDependencyResolver}s.
  */
 @Builder
 public record DependencyResolutionInput(

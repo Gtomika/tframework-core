@@ -21,7 +21,7 @@ import org.tframework.core.elements.annotations.InjectProperty;
  * This kind of annotation scanning is always strict, because multiple '@InjectX' annotations are not allowed on the same
  * component: it would be impossible to determine which one to use.
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@RequiredArgsConstructor
 public class InjectAnnotationScanner {
 
     public static final List<Class<? extends Annotation>> INJECT_ANNOTATIONS = List.of(

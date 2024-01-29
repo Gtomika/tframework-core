@@ -2,12 +2,14 @@ package org.tframework.core.elements.assembler;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.source.ClassElementSource;
 import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.context.source.MethodElementSource;
-import org.tframework.core.elements.dependency.DependencyResolutionInput;
-import org.tframework.core.elements.dependency.DependencyResolver;
-import org.tframework.core.elements.dependency.DependencyResolversFactory;
+import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
+import org.tframework.core.elements.dependency.resolver.BasicDependencyResolver;
+import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
+import org.tframework.core.elements.dependency.resolver.DependencyResolversFactory;
 
 /**
  * Utilities to create {@link ElementAssembler}s.
@@ -17,52 +19,39 @@ public final class ElementAssemblersFactory {
 
     /**
      * Creates a {@link ElementAssembler} that can assemble the given element.
-     * @param elementName The name of the element to assemble.
-     * @param elementType The type of the element to assemble.
-     * @param source The {@link ElementSource} of the element to assemble.
+     * @param elementContext {@link ElementContext} whose instances this assembler assembles.
      * @param dependencyResolutionInput The {@link DependencyResolutionInput} to use to
-     *                                  create appropriate {@link DependencyResolver}s.
+     *                                  create appropriate {@link BasicDependencyResolver}s.
      */
     public static ElementAssembler createElementAssembler(
-            String elementName,
-            Class<?> elementType,
-            ElementSource source,
+            ElementContext elementContext,
             DependencyResolutionInput dependencyResolutionInput
     ) {
-        return switch (source) {
-            case ClassElementSource ces -> createClassElementAssembler(elementName, elementType, ces, dependencyResolutionInput);
-            case MethodElementSource mes -> createMethodElementAssembler(elementName, elementType, mes, dependencyResolutionInput);
-            default -> throw new IllegalArgumentException("Unexpected element source: " + source);
+        var resolvers = DependencyResolversFactory.createParameterDependencyResolvers(dependencyResolutionInput);
+        var aggregator = DependencyResolverAggregator.usingResolvers(resolvers);
+        return switch (elementContext.getSource()) {
+            case ClassElementSource ces -> createClassElementAssembler(elementContext, aggregator);
+            case MethodElementSource mes -> createMethodElementAssembler(elementContext, aggregator);
+            default -> throw new IllegalArgumentException("Unexpected element source: " + elementContext.getSource());
         };
     }
 
     private static ClassElementAssembler createClassElementAssembler(
-            String elementName,
-            Class<?> elementType,
-            ClassElementSource source,
-            DependencyResolutionInput dependencyResolutionInput
+            ElementContext elementContext, DependencyResolverAggregator aggregator
     ) {
-        var resolvers = DependencyResolversFactory.createParameterDependencyResolvers(dependencyResolutionInput);
         return ClassElementAssembler.builder()
-                .elementName(elementName)
-                .elementType(elementType)
-                .classElementSource(source)
-                .dependencyResolvers(resolvers)
+                .elementContext(elementContext)
+                .dependencyResolverAggregator(aggregator)
                 .build();
     }
 
     private static MethodElementAssembler createMethodElementAssembler(
-            String elementName,
-            Class<?> elementType,
-            MethodElementSource source,
-            DependencyResolutionInput dependencyResolutionInput
+            ElementContext elementContext,
+            DependencyResolverAggregator aggregator
     ) {
-        var resolvers = DependencyResolversFactory.createParameterDependencyResolvers(dependencyResolutionInput);
         return MethodElementAssembler.builder()
-                .elementName(elementName)
-                .elementType(elementType)
-                .methodElementSource(source)
-                .dependencyResolvers(resolvers)
+                .elementContext(elementContext)
+                .dependencyResolverAggregator(aggregator)
                 .build();
     }
 

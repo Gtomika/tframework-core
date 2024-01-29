@@ -1,4 +1,4 @@
-package org.tframework.core.elements.dependency;
+package org.tframework.core.elements.dependency.resolver;
 
 import lombok.Builder;
 import org.tframework.core.TFrameworkException;
@@ -7,7 +7,7 @@ import org.tframework.core.utils.LogUtils;
 import java.util.List;
 
 /**
- * Thrown when no available {@link DependencyResolver} is able to resolve a dependency.
+ * Thrown when no available {@link BasicDependencyResolver} is able to resolve a dependency.
  */
 @Builder
 public class DependencyResolutionException extends TFrameworkException {
@@ -26,7 +26,7 @@ public class DependencyResolutionException extends TFrameworkException {
     private DependencyResolutionException(
             String declaredAs,
             Class<?> dependencyType,
-            List<? extends DependencyResolver> usedResolvers
+            List<? extends BasicDependencyResolver> usedResolvers
     ) {
         super(TEMPLATE.formatted(declaredAs, dependencyType.getName(), LogUtils.objectClassNames(usedResolvers)));
         this.declaredAs = declaredAs;

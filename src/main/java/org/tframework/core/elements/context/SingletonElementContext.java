@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.assembler.ElementAssemblersFactory;
 import org.tframework.core.elements.context.source.ElementSource;
-import org.tframework.core.elements.dependency.DependencyResolutionInput;
-import org.tframework.core.elements.dependency.graph.DependencyGraph;
+import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
+import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 
 /**
  * An {@link ElementContext} that represents a singleton element.
@@ -25,15 +25,15 @@ public final class SingletonElementContext extends ElementContext {
 
     @Override
     public void initialize(DependencyResolutionInput input) {
-        elementAssembler = ElementAssemblersFactory.createElementAssembler(name, type, source, input);
+        elementAssembler = ElementAssemblersFactory.createElementAssembler(this, input);
         instance = requestInstance();
         log.trace("Initialized singleton element context: {}. The instance was created: {}", name, instance);
     }
 
     @Override
-    public Object requestInstance(DependencyGraph dependencyGraph) {
+    public Object requestInstance(ElementDependencyGraph dependencyGraph) {
         if(instance == null) {
-            instance = elementAssembler.assemble(); //TODO: add dependency graph
+            instance = elementAssembler.assemble(dependencyGraph);
         }
         return instance;
     }

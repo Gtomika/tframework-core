@@ -1,10 +1,13 @@
-package org.tframework.core.elements.dependency;
+package org.tframework.core.elements.dependency.resolver;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.elements.dependency.DependencyDefinition;
+import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.utils.LogUtils;
 
 import java.lang.reflect.Field;
@@ -16,19 +19,28 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class DependencyUtilsTest {
+class DependencyResolverAggregatorTest {
 
     private static final String DEPENDENCY_DECLARED_AS = "Unit test";
 
     @Mock
-    private DependencyResolver dependencyResolver;
+    private ElementContext originalElementContext;
 
-    private List<DependencyResolver> dependencyResolvers;
+    @Mock
+    private BasicDependencyResolver basicDependencyResolver;
+
+    @Mock
+    private ElementDependencyResolver elementDependencyResolver;
+
+    private List<? extends DependencyResolver> dependencyResolvers;
+    private DependencyResolverAggregator aggregator;
     private DependencyDefinition dependencyDefinition;
 
     @BeforeEach
     void setUp() throws Exception {
-        dependencyResolvers = List.of(dependencyResolver);
+        dependencyResolvers = List.of(basicDependencyResolver, elementDependencyResolver);
+        aggregator = DependencyResolverAggregator.usingResolvers(dependencyResolvers);
+
         Field someField = this.getClass().getDeclaredField("someString");
         dependencyDefinition = DependencyDefinition.fromField(someField);
     }
@@ -36,13 +48,15 @@ class DependencyUtilsTest {
     @Test
     void shouldResolveDependency() {
         String dependencyValue = "someValue";
-        when(dependencyResolver.resolveDependency(dependencyDefinition))
+        when(basicDependencyResolver.resolveDependency(dependencyDefinition))
                 .thenReturn(Optional.of(dependencyValue));
 
-        Object resolvedDependency = DependencyUtils.resolveDependency(
+        var dependencyGraph = ElementDependencyGraph.empty();
+        Object resolvedDependency = aggregator.resolveDependency(
                 dependencyDefinition,
-                DEPENDENCY_DECLARED_AS,
-                dependencyResolvers
+                originalElementContext,
+                dependencyGraph,
+                DEPENDENCY_DECLARED_AS
         );
 
         assertEquals(dependencyValue, resolvedDependency);
@@ -50,13 +64,18 @@ class DependencyUtilsTest {
 
     @Test
     void shouldThrowDependencyResolutionException_whenDependencyCannotBeResolved() {
-        when(dependencyResolver.resolveDependency(dependencyDefinition))
+        var dependencyGraph = ElementDependencyGraph.empty();
+
+        when(basicDependencyResolver.resolveDependency(dependencyDefinition))
+                .thenReturn(Optional.empty());
+        when(elementDependencyResolver.resolveDependency(dependencyDefinition, originalElementContext, dependencyGraph))
                 .thenReturn(Optional.empty());
 
-        var e = assertThrows(DependencyResolutionException.class, () -> DependencyUtils.resolveDependency(
+        var e = assertThrows(DependencyResolutionException.class, () -> aggregator.resolveDependency(
                         dependencyDefinition,
-                        DEPENDENCY_DECLARED_AS,
-                        dependencyResolvers
+                        originalElementContext,
+                        dependencyGraph,
+                        DEPENDENCY_DECLARED_AS
                 )
         );
 
@@ -69,4 +88,5 @@ class DependencyUtilsTest {
     }
 
     private String someString;
+
 }

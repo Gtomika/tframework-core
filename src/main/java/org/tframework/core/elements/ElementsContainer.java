@@ -11,7 +11,7 @@ import lombok.NonNull;
 import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.context.ElementContext;
-import org.tframework.core.elements.dependency.DependencyResolutionInput;
+import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.dependency.DependencySource;
 
 /**

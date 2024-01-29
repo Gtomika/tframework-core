@@ -1,19 +1,20 @@
 /* Licensed under Apache-2.0 2024. */
-package org.tframework.core.elements.dependency;
+package org.tframework.core.elements.dependency.resolver;
 
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.tframework.core.elements.dependency.DependencyDefinition;
+import org.tframework.core.elements.dependency.DependencySource;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
 
 /**
- * Resolves dependency definitions into dependency values. Since the framework is based on annotations,
- * the dependency definitions are {@link AnnotatedElement}s: fields, parameters. The dependency values
- * are the objects that will be injected into those fields or parameters.
+ * Resolves basic (non-element) dependency definitions into dependency values. These dependency resolvers do
+ * not start additional resolutions recursively, instead they simply return the dependency value.
  */
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
-public abstract class DependencyResolver {
+public non-sealed abstract class BasicDependencyResolver implements DependencyResolver {
 
     /**
      * The {@link DependencySource} from which to request the dependency.

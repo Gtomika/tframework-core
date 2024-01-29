@@ -42,11 +42,11 @@ import java.util.stream.Collectors;
  *
  * In case of cyclic dependencies, the framework will throw a {@link CircularDependencyException}.
  */
-public class DependencyGraph {
+public class ElementDependencyGraph {
 
     private final DefaultDirectedGraph<ElementContext, DefaultEdge> graph;
 
-    private DependencyGraph() {
+    private ElementDependencyGraph() {
         this.graph = new DefaultDirectedGraph<>(DefaultEdge.class);
     }
 
@@ -60,6 +60,13 @@ public class DependencyGraph {
         graph.addVertex(original); //if vertexes or edges already exists, this will do nothing
         graph.addVertex(dependency);
         graph.addEdge(dependency, original);
+    }
+
+    /**
+     * Checks if the dependency graph contains the {@code dependency -> original} edge.
+     */
+    public boolean containsDependency(ElementContext original, ElementContext dependency) {
+        return graph.containsEdge(dependency, original);
     }
 
     /**
@@ -87,8 +94,8 @@ public class DependencyGraph {
     /**
      * Constructs a dependency graph that contains no dependencies.
      */
-    public static DependencyGraph empty() {
-        return new DependencyGraph();
+    public static ElementDependencyGraph empty() {
+        return new ElementDependencyGraph();
     }
 
 }

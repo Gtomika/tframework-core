@@ -3,12 +3,18 @@ package org.tframework.core.profiles;
 
 import java.util.Set;
 import lombok.AccessLevel;
+import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
+import org.tframework.core.elements.annotations.PreConstructedElement;
 
 /**
  * Read only container of the profiles, and some related utility methods.
  */
+@PreConstructedElement
+@EqualsAndHashCode
+@ToString
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class ProfilesContainer {
 
@@ -34,6 +40,13 @@ public final class ProfilesContainer {
      */
     public static ProfilesContainer fromProfiles(@NonNull Set<String> profiles) {
         return new ProfilesContainer(profiles);
+    }
+
+    /**
+     * Creates an empty {@link ProfilesContainer}.
+     */
+    public static ProfilesContainer empty() {
+        return new ProfilesContainer(Set.of());
     }
 
 }

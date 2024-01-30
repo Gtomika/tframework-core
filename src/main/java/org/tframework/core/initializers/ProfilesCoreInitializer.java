@@ -8,12 +8,11 @@ import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.profiles.ProfileInitializationProcess;
 import org.tframework.core.profiles.ProfilesContainer;
-import org.tframework.core.profiles.scanners.ProfileScannersFactory;
 import org.tframework.core.utils.TimerUtils;
 
 /**
  * The profiles {@link CoreInitializer} scans for, cleans and validates profiles at application startup.
- * @see ProfileInitializationProcess
+ * All work is delegated to the {@link ProfileInitializationProcess}.
  */
 @Slf4j
 @TFrameworkInternal
@@ -32,8 +31,7 @@ public class ProfilesCoreInitializer implements CoreInitializer<ProfileInitializ
         log.debug("Starting profiles initialization...");
         Instant start = Instant.now();
 
-        var profileScanners = ProfileScannersFactory.tframeworkProfileScanners(profileInitializationInput);
-        ProfilesContainer profilesContainer = profileInitializationProcess.initializeProfiles(profileScanners);
+        ProfilesContainer profilesContainer = profileInitializationProcess.initialize(profileInitializationInput);
 
         log.info("The profile initialization completed in {} ms, and found the following profiles: {}",
                 TimerUtils.msBetween(start, Instant.now()), profilesContainer.profiles());

@@ -13,7 +13,7 @@ class ProfileScannersFactoryTest {
         var input = ProfileInitializationInput.builder()
                 .args(new String[]{"testArg"})
                 .build();
-        var scanners = ProfileScannersFactory.tframeworkProfileScanners(input);
+        var scanners = ProfileScannersFactory.defaultProfileScanners(input);
 
         assertTrue(scanners.stream().anyMatch(s -> s.getClass().equals(DefaultProfileScanner.class)));
         assertTrue(scanners.stream().anyMatch(s -> s.getClass().equals(EnvironmentProfileScanner.class)));

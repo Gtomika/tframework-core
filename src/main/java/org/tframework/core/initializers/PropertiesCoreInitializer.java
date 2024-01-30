@@ -9,12 +9,11 @@ import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.PropertiesInitializationInput;
 import org.tframework.core.properties.PropertiesInitializationProcess;
-import org.tframework.core.properties.scanners.PropertyFileScannersFactory;
 import org.tframework.core.utils.TimerUtils;
 
 /**
  * The {@link CoreInitializer} that is responsible for loading the properties.
- * @see PropertiesInitializationProcess
+ * All work is delegated to {@link PropertiesInitializationProcess}.
  */
 @Slf4j
 @TFrameworkInternal
@@ -28,8 +27,7 @@ public class PropertiesCoreInitializer implements CoreInitializer<PropertiesInit
         log.info("Starting properties initialization...");
         Instant start = Instant.now();
 
-        var propertyFileScanners = PropertyFileScannersFactory.createTframeworkPropertyFileScanners(input);
-        var propertiesContainer = propertiesInitializationProcess.initialize(propertyFileScanners);
+        var propertiesContainer = propertiesInitializationProcess.initialize(input);
 
         log.info("The properties initialization completed in {} ms, and found {} properties.",
                 TimerUtils.msBetween(start, Instant.now()), propertiesContainer.size());

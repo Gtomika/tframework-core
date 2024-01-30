@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.Application;
+import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.profiles.InvalidProfileException;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
@@ -28,25 +29,36 @@ class CoreInitializationProcessTest {
     @Mock
     private PropertiesCoreInitializer propertiesCoreInitializer;
 
+    @Mock
+    private ElementsCoreInitializer elementsCoreInitializer;
+
     @BeforeEach
     public void setUp() {
         coreInitializationProcess = new CoreInitializationProcess(
                 profilesCoreInitializer,
-                propertiesCoreInitializer
+                propertiesCoreInitializer,
+                elementsCoreInitializer
         );
     }
 
     @Test
     public void shouldPerformCoreInitialization() {
         var expectedApp = Application.builder()
+                .name("testApp")
+                .rootClass(CoreInitializationProcessTest.class)
                 .profilesContainer(ProfilesContainer.fromProfiles(Set.of("a, b")))
                 .propertiesContainer(PropertiesContainer.empty())
+                .elementsContainer(ElementsContainer.empty())
                 .build();
+        expectedApp.finalizeApplication();
 
-        when(profilesCoreInitializer.initialize(any())).thenReturn(expectedApp.profilesContainer());
-        when(propertiesCoreInitializer.initialize(any())).thenReturn(expectedApp.propertiesContainer());
+        when(profilesCoreInitializer.initialize(any())).thenReturn(expectedApp.getProfilesContainer());
+        when(propertiesCoreInitializer.initialize(any())).thenReturn(expectedApp.getPropertiesContainer());
+        when(elementsCoreInitializer.initialize(any())).thenReturn(expectedApp.getElementsContainer());
 
         CoreInitializationInput input = CoreInitializationInput.builder()
+                .applicationName("testApp")
+                .rootClass(CoreInitializationProcessTest.class)
                 .args(new String[]{"testArg"})
                 .build();
 

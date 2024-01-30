@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.Application;
 import org.tframework.core.TFrameworkInternal;
+import org.tframework.core.elements.ElementsContainer;
+import org.tframework.core.elements.ElementsInitializationInput;
 import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
@@ -22,6 +24,7 @@ public class CoreInitializationProcess {
 
     private final ProfilesCoreInitializer profilesInitializer;
     private final PropertiesCoreInitializer propertiesCoreInitializer;
+    private final ElementsCoreInitializer elementsCoreInitializer;
 
     /**
      * Perform the core initialization.
@@ -34,13 +37,22 @@ public class CoreInitializationProcess {
         Instant start = Instant.now();
 
         try {
-            ProfilesContainer profilesContainer = initProfiles(coreInput);
-            PropertiesContainer propertiesContainer = initProperties(coreInput, profilesContainer);
+            Application application = Application.empty();
+            application.setName(coreInput.applicationName());
+            application.setRootClass(coreInput.rootClass());
 
-            return Application.builder()
-                    .profilesContainer(profilesContainer)
-                    .propertiesContainer(propertiesContainer)
-                    .build();
+            ProfilesContainer profilesContainer = initProfiles(coreInput);
+            application.setProfilesContainer(profilesContainer);
+
+            PropertiesContainer propertiesContainer = initProperties(coreInput, profilesContainer);
+            application.setPropertiesContainer(propertiesContainer);
+
+            ElementsContainer elementsContainer = initDependencyInjection(application, coreInput.rootClass());
+            application.setElementsContainer(elementsContainer);
+
+            application.finalizeApplication();
+            log.info("Successfully initialized the application '{}'! Let's get started!", application.getName());
+            return application;
         } catch (Exception e) {
             log.error("The core initialization has failed", e);
             throw new InitializationException(e);
@@ -62,6 +74,17 @@ public class CoreInitializationProcess {
                 .cliArgs(coreInput.args())
                 .build();
         return propertiesCoreInitializer.initialize(propertiesInput);
+    }
+
+    private ElementsContainer initDependencyInjection(
+            Application application,
+            Class<?> rootClass
+    ) {
+        var dependencyInjectionInput = ElementsInitializationInput.builder()
+                .application(application)
+                .rootClass(rootClass)
+                .build();
+        return elementsCoreInitializer.initialize(dependencyInjectionInput);
     }
 
 }

@@ -65,9 +65,71 @@ implementation 'org.yaml:snakeyaml:[version]'`
 ```
 ([latest version](https://mvnrepository.com/artifact/org.yaml/snakeyaml)).
 
-### Dependency Injection
+### Elements
 
-This feature is still in development.
+The framework supports the concept of **elements**, which are similar to what *beans* are in the
+Spring. These are components managed by the framework, have different names, types and scopes.
+
+#### Declaring elements
+
+There are several ways to declare elements. You can mark a class:
+
+```java
+@Element(name = "cool-service")
+public class CoolService {
+
+}
+```
+
+Name is optional, and if not provided, it will be deduced from the type of the element.
+
+Another useful way to declare an element is via method. This can be helpful if you have no access to the element
+class' source code. The method must be in another element class, usually some sort of configuration.
+
+```java
+import java.nio.file.Paths;
+
+@Element
+public class MyAppConfig {
+
+    @Element(name = "user-data-file")
+    public Path createUserName() {
+        return Paths.get("data/user.xml");
+    }
+
+}
+```
+
+Finally, some classes will be elements by default, and you can inject them without additional configuration. These are:
+`Application`, `ProfilesContainer`, `PropertiesContainer`, `ElementsContainer`.
+
+#### Injecting dependencies
+
+Elements support dependency injection. Right now only constructor injection is supported: all dependencies are
+passed at construction time. The following can be dependencies of an element:
+
+- Other elements: annotate the parameter with `@InjectElement` or leave it unannotated (in this case, the framework will
+try to infer the element name by type.
+- Properties: annotate the parameter with `@InjectProperty`.
+
+For example, here is how to define an element with dependencies. We will use elements and properties from above.
+
+```java
+@Element
+public class UserService {
+
+    public UserService(
+            @InjectElement("user-data-file") Path userDataFile, //inject element with explicit name
+            CoolService coolService, //inject element with name deduced from type
+            @InjectProperty("some.cool.property1") String someCoolProperty //inject property by name
+    ) {
+        //do something
+    }
+
+}
+```
+
+If you have multiple public constructors, the `@ElementConstructor` annotation may be used to select one.
 
 ### How to run
 
@@ -85,8 +147,9 @@ Then, the framework should be started from the `main` method:
 public class MyApplication {
 
     public static void main(String[] args) {
-        Application app = TFramework.start(args);
-        //profiles and properties are available from the 'app' object
+        Application app = TFramework.start("My cool app", MyApplication.class, args);
+        //profiles, properties and elements are available from the 'app' object
+        //however, they should be injected instead
     }
 }
 ```

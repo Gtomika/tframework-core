@@ -4,6 +4,7 @@ package org.tframework.core.initializers;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.TFrameworkInternal;
+import org.tframework.core.elements.ElementsInitializationProcessFactory;
 import org.tframework.core.profiles.ProfileInitializationProcessFactory;
 import org.tframework.core.properties.PropertiesInitializationProcessFactory;
 
@@ -20,9 +21,11 @@ public final class CoreInitializationFactory {
     public static CoreInitializationProcess createCoreInitializationProcess() {
         var profilesCoreInitializer = createProfilesCoreInitializer();
         var propertiesCoreInitializer = createPropertiesCoreInitializer();
+        var dependencyInjectionCoreInitializer = createDependencyInjectionCoreInitializer();
         return new CoreInitializationProcess(
                 profilesCoreInitializer,
-                propertiesCoreInitializer
+                propertiesCoreInitializer,
+                dependencyInjectionCoreInitializer
         );
     }
 
@@ -34,6 +37,11 @@ public final class CoreInitializationFactory {
     private static PropertiesCoreInitializer createPropertiesCoreInitializer() {
         var propertiesProcess = PropertiesInitializationProcessFactory.createProfileInitializationProcess();
         return new PropertiesCoreInitializer(propertiesProcess);
+    }
+
+    private static ElementsCoreInitializer createDependencyInjectionCoreInitializer() {
+        var dependencyInjectionProcess = ElementsInitializationProcessFactory.createElementInitializationProcess();
+        return new ElementsCoreInitializer(dependencyInjectionProcess);
     }
 
 }

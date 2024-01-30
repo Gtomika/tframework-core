@@ -2,7 +2,6 @@
 package org.tframework.core.initializers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.when;
 
 import java.util.Set;
@@ -22,14 +21,14 @@ class ProfilesCoreInitializerTest {
 
     @Test
     public void shouldInitializeProfiles() {
+        var input = ProfileInitializationInput.builder()
+                .args(new String[]{"-someArg"})
+                .build();
         var expectedProfiles = ProfilesContainer.fromProfiles(Set.of("a", "b"));
-        when(profileInitializationProcess.initializeProfiles(anyList()))
+        when(profileInitializationProcess.initialize(input))
                 .thenReturn(expectedProfiles);
 
         ProfilesCoreInitializer initializer = new ProfilesCoreInitializer(profileInitializationProcess);
-        ProfileInitializationInput input = ProfileInitializationInput.builder()
-                .args(new String[]{"-someArg"})
-                .build();
 
         var actualProfiles = initializer.initialize(input);
 

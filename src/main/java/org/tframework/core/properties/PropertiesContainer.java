@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,14 +11,17 @@ import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.annotations.PreConstructedElement;
+import org.tframework.core.elements.dependency.DependencySource;
 
 /**
  * A read-only container of the properties, and related utility methods.
  */
 @Slf4j
 @EqualsAndHashCode
+@PreConstructedElement
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
-public final class PropertiesContainer {
+public final class PropertiesContainer implements DependencySource {
 
     private final Map<String, PropertyValue> properties;
 
@@ -30,6 +34,20 @@ public final class PropertiesContainer {
     public PropertyValue getPropertyValueObject(String propertyName) {
         return Optional.ofNullable(properties.get(propertyName))
                 .orElseThrow(() -> new PropertyNotFoundException(propertyName));
+    }
+
+    /**
+     * Gets the {@link PropertyValue} of a property, or the provided default one. If interested only in the raw underlying value,
+     * it's possible to use {@link #getPropertyValue(String)} or {@link #getPropertyValueList(String)} instead.
+     * @param propertyName The property to get.
+     * @param defaultValue A default value to return if the property does not exist.
+     */
+    public PropertyValue getPropertyValueObject(String propertyName, PropertyValue defaultValue) {
+        return Optional.ofNullable(properties.get(propertyName))
+                .orElseGet(() -> {
+                    log.debug("Property '{}' not found. Returning default value '{}'", propertyName, defaultValue);
+                    return defaultValue;
+                });
     }
 
     /**
@@ -52,6 +70,7 @@ public final class PropertiesContainer {
         try {
             return getPropertyValue(propertyName);
         } catch (PropertyNotFoundException e) {
+            log.debug("Property '{}' not found. Returning default value '{}'", propertyName, defaultValue);
             return defaultValue;
         }
     }
@@ -63,7 +82,13 @@ public final class PropertiesContainer {
      */
     public List<String> getPropertyValueList(String propertyName) {
         return switch (getPropertyValueObject(propertyName)) {
-            case SinglePropertyValue(var value) -> List.of(value);
+            case SinglePropertyValue(var value) -> {
+                log.debug("Property '{}' is a single value. Converting it to a list with a single element", propertyName);
+                //List.of does not accept null, so we need to use ArrayList
+                List<String> singleValueList = new ArrayList<>();
+                singleValueList.add(value);
+                yield singleValueList;
+            }
             case ListPropertyValue(var values) -> values;
         };
     }
@@ -76,6 +101,7 @@ public final class PropertiesContainer {
         try {
             return getPropertyValueList(propertyName);
         } catch (PropertyNotFoundException e) {
+            log.debug("Property '{}' not found. Returning default value '{}'", propertyName, defaultValue);
             return defaultValue;
         }
     }
@@ -85,6 +111,17 @@ public final class PropertiesContainer {
      */
     public int size() {
         return properties.size();
+    }
+
+    /**
+     * Requests a property dependency from this container.
+     * @param dependencyName The name of the dependency to request.
+     * @return A {@link PropertyValue} with the requested property.
+     * @throws PropertyNotFoundException If no property with the given name is found.
+     */
+    @Override
+    public Object requestDependency(String dependencyName) {
+        return getPropertyValueObject(dependencyName);
     }
 
     /**

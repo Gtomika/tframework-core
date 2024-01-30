@@ -7,15 +7,15 @@ import org.tframework.core.elements.context.assembler.ElementContextAssemblersFa
 import org.tframework.core.elements.context.assembler.MethodElementContextAssembler;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class DependencyInjectionProcessFactory {
+public final class ElementsInitializationProcessFactory {
 
     /**
-     * Creates a {@link DependencyInjectionProcess} that performs dependency injection.
+     * Creates a {@link ElementsInitializationProcess}.
      */
-    public static DependencyInjectionProcess createDependencyInjectionProcess() {
+    public static ElementsInitializationProcess createElementInitializationProcess() {
         ClassElementContextAssembler classContextAssembler = ElementContextAssemblersFactory.createDefaultClassElementContextAssembler();
         MethodElementContextAssembler methodContextAssembler = ElementContextAssemblersFactory.createDefaultMethodElementContextAssembler();
-        return new DependencyInjectionProcess(classContextAssembler, methodContextAssembler);
+        return new ElementsInitializationProcess(classContextAssembler, methodContextAssembler);
     }
 
 }

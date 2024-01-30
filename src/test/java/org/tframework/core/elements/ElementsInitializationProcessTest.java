@@ -31,7 +31,7 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class DependencyInjectionProcessTest {
+class ElementsInitializationProcessTest {
 
     @Mock
     private ClassElementContextAssembler classElementContextAssembler;
@@ -51,7 +51,7 @@ class DependencyInjectionProcessTest {
     @Mock
     private ElementContext dummyStringMethodElementContext;
 
-    private DependencyInjectionProcess dependencyInjectionProcess;
+    private ElementsInitializationProcess elementsInitializationProcess;
     private ElementScannersBundle elementScannersBundle;
     private Method dummyStringMethod;
 
@@ -63,7 +63,7 @@ class DependencyInjectionProcessTest {
         when(dummyStringMethodElementContext.getName()).thenReturn("dummyMethodElement");
         //doReturn(String.class).when(dummyStringMethodElementContext).getType();
 
-        dependencyInjectionProcess = DependencyInjectionProcess.builder()
+        elementsInitializationProcess = ElementsInitializationProcess.builder()
                 .classElementContextAssembler(classElementContextAssembler)
                 .methodElementContextAssembler(methodElementContextAssembler)
                 .build();
@@ -91,7 +91,7 @@ class DependencyInjectionProcessTest {
                 .thenReturn(dummyStringMethodElementContext);
 
         var input = createDummyDependencyInjectionInput();
-        var elementsContainer = dependencyInjectionProcess.initialize(input, elementScannersBundle);
+        var elementsContainer = elementsInitializationProcess.initialize(input, elementScannersBundle);
 
         assertTrue(elementsContainer.hasElementContext("dummyClassElement")); //from element class
         assertTrue(elementsContainer.hasElementContext("dummyMethodElement")); //from element method
@@ -101,12 +101,12 @@ class DependencyInjectionProcessTest {
         assertTrue(elementsContainer.hasElementContext(ElementsContainer.class));
     }
 
-    private DependencyInjectionInput createDummyDependencyInjectionInput() {
+    private ElementsInitializationInput createDummyDependencyInjectionInput() {
         Application application = Application.empty();
         application.setProfilesContainer(ProfilesContainer.empty());
         application.setPropertiesContainer(PropertiesContainer.empty());
-        return DependencyInjectionInput.builder()
-                .rootClass(DependencyInjectionProcessTest.class)
+        return ElementsInitializationInput.builder()
+                .rootClass(ElementsInitializationProcessTest.class)
                 .application(application)
                 .build();
     }

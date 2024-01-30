@@ -6,13 +6,13 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import org.junit.jupiter.api.Test;
 import org.tframework.core.Application;
-import org.tframework.core.elements.DependencyInjectionInput;
+import org.tframework.core.elements.ElementsInitializationInput;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
 
 public class ElementScannersFactoryTest {
 
-    private final DependencyInjectionInput input = new DependencyInjectionInput(
+    private final ElementsInitializationInput input = new ElementsInitializationInput(
             Application.builder()
                     .propertiesContainer(PropertiesContainer.empty())
                     .profilesContainer(ProfilesContainer.empty())

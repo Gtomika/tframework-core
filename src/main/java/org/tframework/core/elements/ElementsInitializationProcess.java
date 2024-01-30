@@ -21,7 +21,7 @@ import org.tframework.core.elements.scanner.ElementScannersFactory;
 import java.util.List;
 
 /**
- * This class is responsible for the dependency injection process. This process consists of the following steps:
+ * This class is responsible for the elements initialization process. This process consists of the following steps:
  * <ul>
  *     <li>Scanning for elements (see {@link ElementScanner}s).</li>
  *     <li>Assembling {@link ElementContext}s (see {@link ElementContextAssembler}s).</li>
@@ -32,17 +32,17 @@ import java.util.List;
 @Slf4j
 @Builder
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class DependencyInjectionProcess {
+public class ElementsInitializationProcess {
 
     private final ClassElementContextAssembler classElementContextAssembler;
     private final MethodElementContextAssembler methodElementContextAssembler;
 
     /**
      * Initializes the dependency injection process.
-     * @param input The {@link DependencyInjectionInput} containing the input data for the process.
+     * @param input The {@link ElementsInitializationInput} containing the input data for the process.
      * @return the {@link ElementsContainer} containing the assembled {@link ElementContext}s
      */
-    public ElementsContainer initialize(DependencyInjectionInput input) {
+    public ElementsContainer initialize(ElementsInitializationInput input) {
         var classElementScanners = ElementScannersFactory.createDefaultElementClassScanners(input);
         var methodElementScanners = ElementScannersFactory.createDefaultElementMethodScanners(input);
         var bundle = ElementScannersBundle.builder()
@@ -54,7 +54,7 @@ public class DependencyInjectionProcess {
 
     //this should be used by the other 'initialize' method and during tests
     //here we can provide the components instead of creating a default one
-    ElementsContainer initialize(DependencyInjectionInput input, ElementScannersBundle scannersBundle) {
+    ElementsContainer initialize(ElementsInitializationInput input, ElementScannersBundle scannersBundle) {
         var elementsContainer = ElementsContainer.empty();
         DependencyResolutionInput dependencyResolutionInput = DependencyResolutionInput.builder()
                 .elementsContainer(elementsContainer)

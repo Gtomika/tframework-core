@@ -6,7 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
-import org.tframework.core.elements.DependencyInjectionInput;
+import org.tframework.core.elements.ElementsInitializationInput;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.classes.ClassFiltersFactory;
 import org.tframework.core.reflection.classes.ClassScannersFactory;
@@ -21,9 +21,9 @@ public final class ElementScannersFactory {
 
     /**
      * Creates an {@link ElementScannersBundle} with default {@link ElementScanner}s.
-     * @param input {@link DependencyInjectionInput}, not null.
+     * @param input {@link ElementsInitializationInput}, not null.
      */
-    public static ElementScannersBundle createDefaultElementScannersBundle(@NonNull DependencyInjectionInput input) {
+    public static ElementScannersBundle createDefaultElementScannersBundle(@NonNull ElementsInitializationInput input) {
         return ElementScannersBundle.builder()
                 .elementClassScanners(createDefaultElementClassScanners(input))
                 .elementMethodScanners(createDefaultElementMethodScanners(input))
@@ -34,9 +34,9 @@ public final class ElementScannersFactory {
      * Creates a list of {@link ElementScanner}s that scan for elements that are defined as classes, annotated
      * with {@link org.tframework.core.elements.annotations.Element}. Some scanners are enabled/disabled based on the
      * properties in the {@code input}.
-     * @param input {@link DependencyInjectionInput}, not null.
+     * @param input {@link ElementsInitializationInput}, not null.
      */
-    public static List<ElementClassScanner> createDefaultElementClassScanners(@NonNull DependencyInjectionInput input) {
+    public static List<ElementClassScanner> createDefaultElementClassScanners(@NonNull ElementsInitializationInput input) {
         var propertiesContainer = input.application().getPropertiesContainer();
         return List.of(
                 createRootElementClassScanner(input.rootClass(), propertiesContainer),
@@ -49,10 +49,10 @@ public final class ElementScannersFactory {
     /**
      * Creates a list of {@link ElementScanner}s that scan for elements that are defined as methods, annotated
      * with {@link org.tframework.core.elements.annotations.Element}. These classes are typically discovered by the
-     * element scanners of {@link #createDefaultElementClassScanners(DependencyInjectionInput)}.
-     * @param input {@link DependencyInjectionInput}, not null.
+     * element scanners of {@link #createDefaultElementClassScanners(ElementsInitializationInput)}.
+     * @param input {@link ElementsInitializationInput}, not null.
      */
-    public static List<ElementMethodScanner> createDefaultElementMethodScanners(@NonNull DependencyInjectionInput input) {
+    public static List<ElementMethodScanner> createDefaultElementMethodScanners(@NonNull ElementsInitializationInput input) {
         //input is not needed yet, but it might be in the future
         return List.of(createFixedClassesElementMethodScanner());
     }

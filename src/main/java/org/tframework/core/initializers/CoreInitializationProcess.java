@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.Application;
 import org.tframework.core.TFrameworkInternal;
-import org.tframework.core.elements.DependencyInjectionInput;
+import org.tframework.core.elements.ElementsInitializationInput;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.profiles.ProfilesContainer;
@@ -24,7 +24,7 @@ public class CoreInitializationProcess {
 
     private final ProfilesCoreInitializer profilesInitializer;
     private final PropertiesCoreInitializer propertiesCoreInitializer;
-    private final DependencyInjectionCoreInitializer dependencyInjectionCoreInitializer;
+    private final ElementsCoreInitializer elementsCoreInitializer;
 
     /**
      * Perform the core initialization.
@@ -80,11 +80,11 @@ public class CoreInitializationProcess {
             Application application,
             Class<?> rootClass
     ) {
-        var dependencyInjectionInput = DependencyInjectionInput.builder()
+        var dependencyInjectionInput = ElementsInitializationInput.builder()
                 .application(application)
                 .rootClass(rootClass)
                 .build();
-        return dependencyInjectionCoreInitializer.initialize(dependencyInjectionInput);
+        return elementsCoreInitializer.initialize(dependencyInjectionInput);
     }
 
 }

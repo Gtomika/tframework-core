@@ -30,14 +30,14 @@ class CoreInitializationProcessTest {
     private PropertiesCoreInitializer propertiesCoreInitializer;
 
     @Mock
-    private DependencyInjectionCoreInitializer dependencyInjectionCoreInitializer;
+    private ElementsCoreInitializer elementsCoreInitializer;
 
     @BeforeEach
     public void setUp() {
         coreInitializationProcess = new CoreInitializationProcess(
                 profilesCoreInitializer,
                 propertiesCoreInitializer,
-                dependencyInjectionCoreInitializer
+                elementsCoreInitializer
         );
     }
 
@@ -54,7 +54,7 @@ class CoreInitializationProcessTest {
 
         when(profilesCoreInitializer.initialize(any())).thenReturn(expectedApp.getProfilesContainer());
         when(propertiesCoreInitializer.initialize(any())).thenReturn(expectedApp.getPropertiesContainer());
-        when(dependencyInjectionCoreInitializer.initialize(any())).thenReturn(expectedApp.getElementsContainer());
+        when(elementsCoreInitializer.initialize(any())).thenReturn(expectedApp.getElementsContainer());
 
         CoreInitializationInput input = CoreInitializationInput.builder()
                 .applicationName("testApp")

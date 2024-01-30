@@ -21,12 +21,12 @@ public class DependencyResolutionException extends TFrameworkException {
 
     private final String declaredAs;
     private final Class<?> dependencyType;
-    private final List<? extends DependencyResolver> usedResolvers;
+    private final List<DependencyResolver> usedResolvers;
 
     private DependencyResolutionException(
             String declaredAs,
             Class<?> dependencyType,
-            List<? extends BasicDependencyResolver> usedResolvers
+            List<DependencyResolver> usedResolvers
     ) {
         super(TEMPLATE.formatted(declaredAs, dependencyType.getName(), LogUtils.objectClassNames(usedResolvers)));
         this.declaredAs = declaredAs;

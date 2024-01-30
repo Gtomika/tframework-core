@@ -36,6 +36,7 @@ public class ClassElementAssembler extends ElementAssembler {
     @Override
     public Object assemble(ElementDependencyGraph dependencyGraph) {
         try {
+            //this may add dependencies to the graph
             Object[] constructorArgs = resolveConstructionTimeDependencies(dependencyGraph);
             log.debug("Resolved {} constructor parameters that will be used to assemble element '{}'",
                     constructorArgs.length, elementName);

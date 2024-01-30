@@ -16,6 +16,7 @@ import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -40,7 +41,7 @@ class MethodElementAssemblerTest {
         var methodElementSource = new MethodElementSource(method, parentElementContext);
 
         when(elementContext.getName()).thenReturn("dummyElement");
-        doReturn(ClassElementAssemblerTest.DummyElement.class).when(elementContext).getType();
+        doReturn(DummyElement.class).when(elementContext).getType();
         when(elementContext.getSource()).thenReturn(methodElementSource);
 
         methodElementAssembler = MethodElementAssembler.builder()
@@ -63,9 +64,11 @@ class MethodElementAssemblerTest {
                 elementContext,
                 dependencyGraph,
                 MethodElementAssembler.DEPENDENCY_DECLARED_AS
-        )).thenReturn(expectedElement);
+        )).thenReturn(expectedElement.dummyString);
 
         DummyElement actualElement = (DummyElement) methodElementAssembler.assemble(dependencyGraph);
+
+        assertTrue(dependencyGraph.containsDependency(elementContext, parentElementContext));
         assertEquals(expectedElement, actualElement);
     }
 

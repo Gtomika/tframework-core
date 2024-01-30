@@ -1,18 +1,18 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.context.ElementContext;
-import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.dependency.DependencySource;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Stores all elements of the application.
@@ -93,16 +93,15 @@ public class ElementsContainer implements DependencySource {
     }
 
     /**
-     * Performs {@link ElementContext#initialize(DependencyResolutionInput)} on all contexts in this container.
+     * Performs {@link ElementContext#initialize()} on all contexts in this container.
      * This method can only be called once, which is done by the framework. It should be called after all element contexts have been added.
-     * @param input {@link DependencyResolutionInput} to use during initialization.
      */
     @TFrameworkInternal
-    public void initializeElementContexts(DependencyResolutionInput input) {
+    public void initializeElementContexts() {
         if(initialized) {
             throw new IllegalStateException("This container has already been initialized");
         }
-        elementContexts.values().forEach(elementContext -> elementContext.initialize(input));
+        elementContexts.values().forEach(ElementContext::initialize);
     }
 
     /**

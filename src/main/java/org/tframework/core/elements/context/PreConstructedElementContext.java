@@ -4,7 +4,6 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.ElementUtils;
-import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 
 /**
@@ -22,13 +21,14 @@ public class PreConstructedElementContext extends ElementContext {
                 ElementUtils.getElementNameByType(preConstructedInstance.getClass()),
                 preConstructedInstance.getClass(),
                 ElementScope.SINGLETON,
-                null //no source for pre-constructed elements
+                null, //no real source for pre-constructed elements
+                null //no real dependency resolution input for pre-constructed elements
         );
         this.preConstructedInstance = preConstructedInstance;
     }
 
     @Override
-    public void initialize(DependencyResolutionInput input) {
+    public void initialize() {
         log.trace("Pre-constructed element '{}' does not need to be initialized, skipping...", name);
     }
 

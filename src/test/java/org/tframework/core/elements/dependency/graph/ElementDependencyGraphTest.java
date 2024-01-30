@@ -41,8 +41,7 @@ class ElementDependencyGraphTest {
     @Test
     public void shouldNotDetectCycles_whenDependenciesAreValid() {
         var dependencyGraph = ElementDependencyGraph.empty();
-        dependencyGraph.addDependency(elementA, elementB);
-        assertDoesNotThrow(dependencyGraph::detectCircularDependencies);
+        assertDoesNotThrow(() ->  dependencyGraph.addDependency(elementA, elementB));
     }
 
     @Test
@@ -50,9 +49,10 @@ class ElementDependencyGraphTest {
         var dependencyGraph = ElementDependencyGraph.empty();
         dependencyGraph.addDependency(elementA, elementB);
         dependencyGraph.addDependency(elementB, elementC);
-        dependencyGraph.addDependency(elementC, elementA);
 
-        var exception = assertThrows(CircularDependencyException.class, dependencyGraph::detectCircularDependencies);
+        var exception = assertThrows(CircularDependencyException.class, () -> {
+            dependencyGraph.addDependency(elementC, elementA); //adding this would create a cycle
+        });
 
         var cycleRepresentation = List.of("elementA", "elementB", "elementC").toString();
         String expectedMessage = exception.getMessageTemplate().formatted(cycleRepresentation);
@@ -62,9 +62,10 @@ class ElementDependencyGraphTest {
     @Test
     public void shouldThrowException_whenElementDependsOnItself() {
         var dependencyGraph = ElementDependencyGraph.empty();
-        dependencyGraph.addDependency(elementA, elementA);
 
-        var exception = assertThrows(CircularDependencyException.class, dependencyGraph::detectCircularDependencies);
+        var exception = assertThrows(CircularDependencyException.class, () -> {
+            dependencyGraph.addDependency(elementA, elementA);
+        });
 
         var cycleRepresentation = List.of("elementA").toString();
         String expectedMessage = exception.getMessageTemplate().formatted(cycleRepresentation);

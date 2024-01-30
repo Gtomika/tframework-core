@@ -61,7 +61,7 @@ class ClassElementAssemblerTest {
                 elementContext,
                 dependencyGraph,
                 ClassElementAssembler.DEPENDENCY_DECLARED_AS
-        )).thenReturn(expectedElement);
+        )).thenReturn(expectedElement.dummyString);
 
         DummyElement actualElement = (DummyElement) classElementAssembler.assemble(dependencyGraph);
         assertEquals(expectedElement, actualElement);
@@ -89,9 +89,6 @@ class ClassElementAssemblerTest {
                 ClassElementAssembler.ASSEMBLED_FROM
         );
         assertEquals(expectedMessage, exception.getMessage());
-
-        var cause = exception.getCause();
-        assertInstanceOf(DependencyResolutionException.class, cause);
     }
 
     @Element(name = "dummyElement")

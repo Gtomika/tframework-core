@@ -1,22 +1,29 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.context.assembler;
 
+import org.junit.jupiter.api.Test;
+import org.tframework.core.elements.ElementsContainer;
+import org.tframework.core.elements.annotations.Element;
+import org.tframework.core.elements.annotations.ElementConstructor;
+import org.tframework.core.elements.context.source.ClassElementSource;
+import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
+import org.tframework.core.elements.scanner.ElementScanningResult;
+import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
+import org.tframework.core.reflection.constructor.ConstructorFiltersFactory;
+import org.tframework.core.reflection.constructor.ConstructorScannersFactory;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 
-import org.junit.jupiter.api.Test;
-import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
-import org.tframework.core.elements.annotations.Element;
-import org.tframework.core.elements.annotations.ElementConstructor;
-import org.tframework.core.elements.context.source.ClassElementSource;
-import org.tframework.core.elements.scanner.ElementScanningResult;
-import org.tframework.core.reflection.constructor.ConstructorFiltersFactory;
-import org.tframework.core.reflection.constructor.ConstructorScannersFactory;
-
 class ClassElementContextAssemblerTest {
 
-    //maybe mocking the dependencies would be better, but it would require a lot of work
+    private final DependencyResolutionInput dependencyResolutionInput = new DependencyResolutionInput(
+            ElementsContainer.empty(), PropertiesContainer.empty()
+    );
+
+    //TODO: update this test class to mock dependencies
     private final ClassElementContextAssembler assembler = ClassElementContextAssembler.builder()
             .constructorScanner(ConstructorScannersFactory.createDefaultConstructorScanner())
             .constructorFilter(ConstructorFiltersFactory.createDefaultConstructorFilter())
@@ -27,7 +34,9 @@ class ClassElementContextAssemblerTest {
     public void shouldThrowException_whenClassIsNotInstantiable() {
         var scanningResult = asScanningResult(NotInstantiable.class);
 
-        var exception = assertThrows(ElementContextAssemblingException.class, () -> assembler.assemble(scanningResult));
+        var exception = assertThrows(ElementContextAssemblingException.class, () -> {
+            assembler.assemble(scanningResult, dependencyResolutionInput);
+        });
 
         String expectedMessage = exception.getMessageTemplate().formatted(
                 NotInstantiable.class.getName(),
@@ -42,7 +51,9 @@ class ClassElementContextAssemblerTest {
     public void shouldThrowException_whenClassHasNoPublicConstructors() {
         var scanningResult = asScanningResult(NoPublicConstructors.class);
 
-        var exception = assertThrows(ElementContextAssemblingException.class, () -> assembler.assemble(scanningResult));
+        var exception = assertThrows(ElementContextAssemblingException.class, () -> {
+            assembler.assemble(scanningResult, dependencyResolutionInput);
+        });
 
         String expectedMessage = exception.getMessageTemplate().formatted(
                 NoPublicConstructors.class.getName(),
@@ -57,7 +68,9 @@ class ClassElementContextAssemblerTest {
     public void shouldThrowException_whenClassHasMultiplePublicConstructors_butTheyAreNotAnnotated() {
         var scanningResult = asScanningResult(MultiplePublicConstructors.class);
 
-        var exception = assertThrows(ElementContextAssemblingException.class, () -> assembler.assemble(scanningResult));
+        var exception = assertThrows(ElementContextAssemblingException.class, () -> {
+            assembler.assemble(scanningResult, dependencyResolutionInput);
+        });
 
         String expectedMessage = exception.getMessageTemplate().formatted(
                 MultiplePublicConstructors.class.getName(),
@@ -72,7 +85,9 @@ class ClassElementContextAssemblerTest {
     public void shouldThrowException_whenClassHasMultipleAnnotatedConstructors() {
         var scanningResult = asScanningResult(ClassWithMultipleAnnotatedConstructors.class);
 
-        var exception = assertThrows(ElementContextAssemblingException.class, () -> assembler.assemble(scanningResult));
+        var exception = assertThrows(ElementContextAssemblingException.class, () -> {
+            assembler.assemble(scanningResult, dependencyResolutionInput);
+        });
 
         String expectedMessage = exception.getMessageTemplate().formatted(
                 ClassWithMultipleAnnotatedConstructors.class.getName(),
@@ -87,7 +102,7 @@ class ClassElementContextAssemblerTest {
     public void shouldAssembleElementContext_whenClassIsAValidElement() {
         var scanningResult = asScanningResult(ValidElement.class);
 
-        var elementContext = assembler.assemble(scanningResult);
+        var elementContext = assembler.assemble(scanningResult, dependencyResolutionInput);
 
         assertEquals(ValidElement.class, elementContext.getType());
         if(elementContext.getSource() instanceof ClassElementSource source) {

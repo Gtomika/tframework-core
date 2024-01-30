@@ -1,29 +1,33 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.tframework.core.elements.context.ElementContext;
 
 import java.io.File;
 import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.tframework.core.elements.annotations.Element;
-import org.tframework.core.elements.context.PrototypeElementContext;
-import org.tframework.core.elements.context.SingletonElementContext;
-import org.tframework.core.elements.context.source.ClassElementSource;
-import org.tframework.core.elements.context.source.ElementSource;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
 class ElementsContainerTest {
+
+    private static final String ELEMENT_NAME = "test";
+
+    @Mock
+    private ElementContext elementContext;
 
     public ElementsContainerTest() {
     }
 
-    private static final String ELEMENT_NAME = "test";
-    private static final ElementSource TEST_SOURCE = new ClassElementSource(ElementsContainerTest.class.getConstructors()[0]);
-
     @Test
     public void shouldGetElementByName() {
-        var elementContext = new SingletonElementContext(ELEMENT_NAME, String.class, TEST_SOURCE);
+        when(elementContext.getName()).thenReturn(ELEMENT_NAME);
         var elementsContainer = ElementsContainer.fromElementContexts(List.of(elementContext));
         assertEquals(elementContext, elementsContainer.getElementContext(ELEMENT_NAME));
     }
@@ -43,7 +47,7 @@ class ElementsContainerTest {
     @Test
     public void shouldGetElementByType() {
         //not specified name will default to the class name
-        var elementContext = new PrototypeElementContext(Element.NAME_NOT_SPECIFIED, Integer.class, TEST_SOURCE);
+        when(elementContext.getName()).thenReturn(ElementUtils.getElementNameByType(Integer.class));
         var elementsContainer = ElementsContainer.fromElementContexts(List.of(elementContext));
         assertEquals(elementContext, elementsContainer.getElementContext(Integer.class));
     }
@@ -62,15 +66,15 @@ class ElementsContainerTest {
 
     @Test
     public void shouldAddElement_whenElementNameIsUnique() {
+        when(elementContext.getName()).thenReturn(ELEMENT_NAME);
         var elementsContainer = ElementsContainer.empty();
-        var elementContext = new SingletonElementContext(ELEMENT_NAME, String.class, TEST_SOURCE);
         elementsContainer.addElementContext(elementContext);
         assertEquals(elementContext, elementsContainer.getElementContext(ELEMENT_NAME));
     }
 
     @Test
     public void shouldThrowException_whenElementNameIsNotUnique() {
-        var elementContext = new SingletonElementContext(ELEMENT_NAME, String.class, TEST_SOURCE);
+        when(elementContext.getName()).thenReturn(ELEMENT_NAME);
         var elementsContainer = ElementsContainer.fromElementContexts(List.of(elementContext));
 
         var exception = assertThrows(ElementNameNotUniqueException.class, () -> {

@@ -1,8 +1,6 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.context.assembler;
 
-import java.lang.reflect.Method;
-import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -13,9 +11,13 @@ import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.context.source.MethodElementSource;
+import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.scanner.ElementScanningResult;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.utils.LogUtils;
+
+import java.lang.reflect.Method;
+import java.util.Objects;
 
 /**
  * An {@link ElementContextAssembler} that assembles {@link ElementContext}s from {@link Method}s, that
@@ -39,7 +41,10 @@ public class MethodElementContextAssembler implements ElementContextAssembler<Me
     private ElementContext parentElementContext;
 
     @Override
-    public ElementContext assemble(ElementScanningResult<Method> scanningResult) throws ElementContextAssemblingException {
+    public ElementContext assemble(
+            ElementScanningResult<Method> scanningResult,
+            DependencyResolutionInput dependencyResolutionInput
+    ) throws ElementContextAssemblingException {
         Objects.requireNonNull(parentElementContext, "parentElementContext must not be null when assembling element context from method");
 
         Method elementMethod = scanningResult.annotationSource();
@@ -51,7 +56,9 @@ public class MethodElementContextAssembler implements ElementContextAssembler<Me
 
         Element elementAnnotation = scanningResult.elementAnnotation();
 
-        ElementContext elementContext = ElementContext.from(elementAnnotation, elementType, elementSource);
+        ElementContext elementContext = ElementContext.from(
+                elementAnnotation, elementType, elementSource, dependencyResolutionInput
+        );
 
         log.debug("Created element context for element method '{}' annotated with '{}'",
                 LogUtils.niceExecutableName(elementMethod), ElementUtils.stringifyElementAnnotation(elementAnnotation));

@@ -4,6 +4,7 @@ import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedAcyclicGraph;
+import org.jgrapht.graph.GraphCycleProhibitedException;
 import org.tframework.core.elements.context.ElementContext;
 
 import java.util.stream.Collectors;
@@ -44,22 +45,31 @@ import java.util.stream.Collectors;
  */
 public class ElementDependencyGraph {
 
-    private final DefaultDirectedGraph<ElementContext, DefaultEdge> graph;
+    private final DirectedAcyclicGraph<ElementContext, DefaultEdge> graph;
 
     private ElementDependencyGraph() {
-        this.graph = new DefaultDirectedGraph<>(DefaultEdge.class);
+        this.graph = new DirectedAcyclicGraph<>(DefaultEdge.class);
     }
 
     /**
      * Adds a dependency to the graph. If the dependency already exists, this will do nothing.
-     * This allows to add circular dependencies, as validation will only happen in {@link #detectCircularDependencies()}.
+     * Circular dependencies will raise an exception.
      * @param original The element that depends on the other.
      * @param dependency The element that is depended on.
+     * @throws CircularDependencyException If a cycle is found. The exception message will have the details about
+     * the cycle.
      */
-    public void addDependency(ElementContext original, ElementContext dependency) {
+    public void addDependency(ElementContext original, ElementContext dependency) throws CircularDependencyException {
         graph.addVertex(original); //if vertexes or edges already exists, this will do nothing
         graph.addVertex(dependency);
-        graph.addEdge(dependency, original);
+        try {
+            graph.addEdge(dependency, original);
+        } catch(IllegalArgumentException e) {
+            //create a copy of the graph which has the circle
+            var copyAllowsCycles = GraphUtils.copyDependencyGraphAndAllowCycles(graph);
+            copyAllowsCycles.addEdge(dependency, original);
+            detectCircularDependencies(copyAllowsCycles);
+        }
     }
 
     /**
@@ -74,8 +84,8 @@ public class ElementDependencyGraph {
      * @throws CircularDependencyException If a cycle is found. The exception message will have the details about
      * the cycle.
      */
-    public void detectCircularDependencies() throws CircularDependencyException {
-        var cycleDetector = new CycleDetector<>(graph);
+    public void detectCircularDependencies(DefaultDirectedGraph<ElementContext, DefaultEdge> graphToCheck) throws CircularDependencyException {
+        var cycleDetector = new CycleDetector<>(graphToCheck);
         var cycle = cycleDetector.findCycles();
         if(!cycle.isEmpty()) {
             var cycleElementNames = cycle.stream()

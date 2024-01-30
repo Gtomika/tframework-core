@@ -1,23 +1,24 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.context.assembler;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Modifier;
-
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.ElementConstructor;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.source.ClassElementSource;
+import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.scanner.ElementScanningResult;
 import org.tframework.core.reflection.AnnotationFilteringResult;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.constructor.ConstructorFilter;
 import org.tframework.core.reflection.constructor.ConstructorScanner;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 
 /**
  * An {@link ElementContextAssembler} that assembles {@link ElementContext}s from {@link Class}es, that
@@ -47,14 +48,19 @@ public class ClassElementContextAssembler implements ElementContextAssembler<Cla
     private final AnnotationScanner annotationScanner;
 
     @Override
-    public ElementContext assemble(ElementScanningResult<Class<?>> scanningResult) throws ElementContextAssemblingException {
+    public ElementContext assemble(
+            ElementScanningResult<Class<?>> scanningResult,
+            DependencyResolutionInput dependencyResolutionInput
+    ) throws ElementContextAssemblingException {
         var elementClass = scanningResult.annotationSource();
         validateElementType(elementClass);
         var elementSource = new ClassElementSource(findAppropriateConstructor(elementClass));
         log.trace("Created element source for element class '{}': {}", elementClass.getName(), elementSource);
 
         Element elementAnnotation = scanningResult.elementAnnotation();
-        ElementContext elementContext = ElementContext.from(elementAnnotation, elementClass, elementSource);
+        ElementContext elementContext = ElementContext.from(
+                elementAnnotation, elementClass, elementSource, dependencyResolutionInput
+        );
         log.debug("Created element context for element class '{}' annotated with '{}'",
                 elementClass.getName(), ElementUtils.stringifyElementAnnotation(elementAnnotation));
         return elementContext;

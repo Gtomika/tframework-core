@@ -1,28 +1,36 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.context.assembler;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.tframework.core.elements.ElementsContainer;
+import org.tframework.core.elements.annotations.Element;
+import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.elements.context.source.MethodElementSource;
+import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
+import org.tframework.core.elements.scanner.ElementScanningResult;
+import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.reflection.methods.MethodFilter;
+
+import java.io.File;
+import java.lang.reflect.Method;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.elements.annotations.Element;
-import org.tframework.core.elements.context.ElementContext;
-import org.tframework.core.elements.context.source.MethodElementSource;
-import org.tframework.core.elements.scanner.ElementScanningResult;
-import org.tframework.core.reflection.methods.MethodFilter;
-
 @Element
 @ExtendWith(MockitoExtension.class)
 class MethodElementContextAssemblerTest {
+
+    private final DependencyResolutionInput dependencyResolutionInput = new DependencyResolutionInput(
+            ElementsContainer.empty(), PropertiesContainer.empty()
+    );
 
     @Mock
     private ElementContext parentElementContext;
@@ -45,7 +53,9 @@ class MethodElementContextAssemblerTest {
         when(methodFilter.isPublic(privateMethod)).thenReturn(false);
         var scanningResult = asScanningResult(privateMethod);
 
-        var exception = assertThrows(ElementContextAssemblingException.class, () -> assembler.assemble(scanningResult));
+        var exception = assertThrows(ElementContextAssemblingException.class, () -> {
+            assembler.assemble(scanningResult, dependencyResolutionInput);
+        });
 
         String expectedMessage = exception.getMessageTemplate().formatted(
                 int.class,
@@ -63,7 +73,9 @@ class MethodElementContextAssemblerTest {
         when(methodFilter.isStatic(staticMethod)).thenReturn(true);
         var scanningResult = asScanningResult(staticMethod);
 
-        var exception = assertThrows(ElementContextAssemblingException.class, () -> assembler.assemble(scanningResult));
+        var exception = assertThrows(ElementContextAssemblingException.class, () -> {
+            assembler.assemble(scanningResult, dependencyResolutionInput);
+        });
 
         String expectedMessage = exception.getMessageTemplate().formatted(
                 int.class,
@@ -82,7 +94,9 @@ class MethodElementContextAssemblerTest {
         when(methodFilter.hasVoidReturnType(voidMethod)).thenReturn(true);
         var scanningResult = asScanningResult(voidMethod);
 
-        var exception = assertThrows(ElementContextAssemblingException.class, () -> assembler.assemble(scanningResult));
+        var exception = assertThrows(ElementContextAssemblingException.class, () -> {
+            assembler.assemble(scanningResult, dependencyResolutionInput);
+        });
 
         String expectedMessage = exception.getMessageTemplate().formatted(
                 int.class,
@@ -101,7 +115,7 @@ class MethodElementContextAssemblerTest {
         when(methodFilter.hasVoidReturnType(elementMethod)).thenReturn(false);
         var scanningResult = asScanningResult(elementMethod);
 
-        var elementContext = assembler.assemble(scanningResult);
+        var elementContext = assembler.assemble(scanningResult, dependencyResolutionInput);
 
         assertEquals(elementMethod.getReturnType(), elementContext.getType());
         if (elementContext.getSource() instanceof MethodElementSource source) {

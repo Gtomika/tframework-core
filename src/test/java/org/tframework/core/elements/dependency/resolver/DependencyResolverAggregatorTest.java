@@ -32,7 +32,7 @@ class DependencyResolverAggregatorTest {
     @Mock
     private ElementDependencyResolver elementDependencyResolver;
 
-    private List<? extends DependencyResolver> dependencyResolvers;
+    private List<DependencyResolver> dependencyResolvers;
     private DependencyResolverAggregator aggregator;
     private DependencyDefinition dependencyDefinition;
 

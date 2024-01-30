@@ -10,7 +10,7 @@ class PreConstructedElementContextTest {
     public void shouldUseProvidedInstanceForPreConstructedElement() {
         var instance = new Object();
         var elementContext = PreConstructedElementContext.of(instance);
-        elementContext.initialize(null);
+        elementContext.initialize();
 
         var requestedInstance = elementContext.requestInstance();
 

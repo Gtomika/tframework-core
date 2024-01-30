@@ -44,10 +44,14 @@ public class MethodElementAssembler extends ElementAssembler {
     @Override
     public Object assemble(ElementDependencyGraph dependencyGraph) throws ElementAssemblingException {
         try {
+            //this is a special dependency between the method element and it's parent
+            dependencyGraph.addDependency(elementContext, methodElementSource.parentElementContext());
+
             Object parentElementInstance = methodElementSource.parentElementContext().requestInstance();
             log.debug("Requested an instance of parent element '{}' for method element '{}'",
                     methodElementSource.parentElementContext().getName(), elementName);
 
+            //this may add additional dependencies to the graph
             Object[] methodArgs = resolveMethodInvocationDependencies(dependencyGraph);
             log.debug("Resolved {} method parameters that will be used to assemble element '{}'",
                     methodArgs.length, elementName);

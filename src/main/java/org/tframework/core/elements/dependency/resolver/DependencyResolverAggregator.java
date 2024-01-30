@@ -18,7 +18,7 @@ import java.util.Optional;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class DependencyResolverAggregator {
 
-    private final List<? extends DependencyResolver> dependencyResolvers;
+    private final List<DependencyResolver> dependencyResolvers;
 
     /**
      * Resolves a dependency using all resolvers of this aggregator.
@@ -67,7 +67,7 @@ public class DependencyResolverAggregator {
      * Creates a {@link DependencyResolverAggregator} from the provided list of resolvers.
      * @param resolvers List of {@link DependencyResolver}s to use, must not be null.
      */
-    public static DependencyResolverAggregator usingResolvers(@NonNull List<? extends DependencyResolver> resolvers) {
+    public static DependencyResolverAggregator usingResolvers(@NonNull List<DependencyResolver> resolvers) {
         return new DependencyResolverAggregator(resolvers);
     }
 

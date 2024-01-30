@@ -9,7 +9,6 @@ import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.PropertiesInitializationInput;
 import org.tframework.core.properties.PropertiesInitializationProcess;
-import org.tframework.core.properties.scanners.PropertyFileScannersFactory;
 import org.tframework.core.utils.TimerUtils;
 
 /**

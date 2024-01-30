@@ -1,5 +1,10 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.initializers;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,11 +15,6 @@ import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.ElementsInitializationInput;
 import org.tframework.core.elements.ElementsInitializationProcess;
 import org.tframework.core.elements.context.ElementContext;
-
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ElementsCoreInitializerTest {

@@ -67,7 +67,7 @@ implementation 'org.yaml:snakeyaml:[version]'`
 
 ### Elements
 
-The framework supports the concept of **elements**, which are similar to what *beans* are in the 
+The framework supports the concept of **elements**, which are similar to what *beans* are in the
 Spring. These are components managed by the framework, have different names, types and scopes.
 
 #### Declaring elements
@@ -77,13 +77,13 @@ There are several ways to declare elements. You can mark a class:
 ```java
 @Element(name = "cool-service")
 public class CoolService {
-    
+
 }
 ```
 
 Name is optional, and if not provided, it will be deduced from the type of the element.
 
-Another useful way to declare an element is via method. This can be helpful if you have no access to the element 
+Another useful way to declare an element is via method. This can be helpful if you have no access to the element
 class' source code. The method must be in another element class, usually some sort of configuration.
 
 ```java
@@ -105,7 +105,7 @@ Finally, some classes will be elements by default, and you can inject them witho
 
 #### Injecting dependencies
 
-Elements support dependency injection. Right now only constructor injection is supported: all dependencies are 
+Elements support dependency injection. Right now only constructor injection is supported: all dependencies are
 passed at construction time. The following can be dependencies of an element:
 
 - Other elements: annotate the parameter with `@InjectElement` or leave it unannotated (in this case, the framework will

@@ -1,13 +1,13 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.assembler;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.source.ClassElementSource;
-import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.context.source.MethodElementSource;
-import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.dependency.resolver.BasicDependencyResolver;
+import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
 import org.tframework.core.elements.dependency.resolver.DependencyResolversFactory;
 

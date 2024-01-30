@@ -1,13 +1,11 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency.resolver;
 
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.DependencySource;
-
-import java.lang.reflect.AnnotatedElement;
-import java.util.Optional;
 
 /**
  * Resolves basic (non-element) dependency definitions into dependency values. These dependency resolvers do

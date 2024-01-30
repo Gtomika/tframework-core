@@ -1,13 +1,13 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency.resolver;
 
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
-
-import java.util.Optional;
 
 /**
  * Resolves element dependency definitions into element instances. This requires more complex logic

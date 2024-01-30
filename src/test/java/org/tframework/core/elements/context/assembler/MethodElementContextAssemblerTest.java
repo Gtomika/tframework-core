@@ -1,6 +1,14 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.context.assembler;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
+
+import java.io.File;
+import java.lang.reflect.Method;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,15 +22,6 @@ import org.tframework.core.elements.dependency.resolver.DependencyResolutionInpu
 import org.tframework.core.elements.scanner.ElementScanningResult;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.methods.MethodFilter;
-
-import java.io.File;
-import java.lang.reflect.Method;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 
 @Element
 @ExtendWith(MockitoExtension.class)

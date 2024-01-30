@@ -1,12 +1,13 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
-
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ApplicationTest {
 

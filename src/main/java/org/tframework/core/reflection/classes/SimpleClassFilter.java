@@ -5,8 +5,8 @@ import java.lang.annotation.Annotation;
 import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.AnnotationFilteringResult;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 
 /**
  * A reasonable default implementation for {@link ClassFilter}.

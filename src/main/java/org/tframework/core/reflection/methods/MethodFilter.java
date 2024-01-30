@@ -4,8 +4,8 @@ package org.tframework.core.reflection.methods;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.AnnotationFilteringResult;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 
 /**
  * A method filter selects methods based on some criteria. The methods are

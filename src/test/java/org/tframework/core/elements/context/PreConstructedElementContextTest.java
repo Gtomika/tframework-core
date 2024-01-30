@@ -1,8 +1,9 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.context;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertSame;
+
+import org.junit.jupiter.api.Test;
 
 class PreConstructedElementContextTest {
 

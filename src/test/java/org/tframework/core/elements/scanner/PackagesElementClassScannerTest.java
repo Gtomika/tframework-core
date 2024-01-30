@@ -12,11 +12,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.reflection.classes.ClassFiltersFactory;
 import org.tframework.core.reflection.classes.PackageClassScanner;
 

@@ -7,11 +7,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.reflection.classes.ClassFiltersFactory;
 
 class ClassesElementClassScannerTest {

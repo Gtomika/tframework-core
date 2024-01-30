@@ -13,9 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.reflection.AnnotationFilteringResult;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.reflection.methods.MethodScanner;
 

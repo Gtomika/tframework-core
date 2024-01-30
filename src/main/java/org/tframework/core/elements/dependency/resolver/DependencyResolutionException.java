@@ -1,10 +1,10 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency.resolver;
 
+import java.util.List;
 import lombok.Builder;
 import org.tframework.core.TFrameworkException;
 import org.tframework.core.utils.LogUtils;
-
-import java.util.List;
 
 /**
  * Thrown when no available {@link BasicDependencyResolver} is able to resolve a dependency.

@@ -7,13 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
-import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.annotations.InjectProperty;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
 
 /**
  * This class is a specialized {@link AnnotationScanner} that has useful methods for finding '@InjectX' annotations.

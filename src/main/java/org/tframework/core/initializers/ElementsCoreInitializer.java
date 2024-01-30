@@ -1,14 +1,14 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.initializers;
 
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.TFrameworkInternal;
+import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.ElementsInitializationInput;
 import org.tframework.core.elements.ElementsInitializationProcess;
-import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.utils.TimerUtils;
-
-import java.time.Instant;
 
 /**
  * A {@link CoreInitializer} that loads the elements (and performs dependency injection). All work is delegated to

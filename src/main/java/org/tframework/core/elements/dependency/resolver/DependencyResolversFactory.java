@@ -1,13 +1,13 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency.resolver;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
-
-import java.util.List;
 
 /**
  * Utilities to create {@link BasicDependencyResolver}s.

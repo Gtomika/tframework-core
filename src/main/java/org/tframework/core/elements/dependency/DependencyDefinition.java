@@ -1,11 +1,10 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency;
 
-import lombok.NonNull;
-
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Parameter;
+import lombok.NonNull;
 
 /**
  * A dependency definition is a combination of the annotated element that defines the dependency and the type of the

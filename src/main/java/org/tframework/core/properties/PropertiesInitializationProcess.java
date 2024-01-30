@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
-import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.properties.extractors.PropertiesExtractor;
 import org.tframework.core.properties.parsers.YamlParser;
 import org.tframework.core.properties.scanners.PropertyFileScanner;

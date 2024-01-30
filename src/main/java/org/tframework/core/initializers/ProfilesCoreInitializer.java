@@ -8,7 +8,6 @@ import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.profiles.ProfileInitializationProcess;
 import org.tframework.core.profiles.ProfilesContainer;
-import org.tframework.core.profiles.scanners.ProfileScannersFactory;
 import org.tframework.core.utils.TimerUtils;
 
 /**

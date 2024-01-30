@@ -1,20 +1,19 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency.resolver;
 
+import java.lang.reflect.AnnotatedElement;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.ElementUtils;
+import org.tframework.core.elements.ElementsContainer;
+import org.tframework.core.elements.annotations.Element;
+import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
-import org.tframework.core.elements.ElementUtils;
-import org.tframework.core.elements.ElementsContainer;
-import org.tframework.core.elements.annotations.Element;
-import org.tframework.core.elements.annotations.InjectElement;
-
-import java.lang.reflect.AnnotatedElement;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * This {@link ElementDependencyResolver} is responsible for resolving dependencies that are annotated with

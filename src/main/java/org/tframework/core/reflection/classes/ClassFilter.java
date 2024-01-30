@@ -3,8 +3,8 @@ package org.tframework.core.reflection.classes;
 
 import java.lang.annotation.Annotation;
 import java.util.Collection;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.AnnotationFilteringResult;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
 
 /**

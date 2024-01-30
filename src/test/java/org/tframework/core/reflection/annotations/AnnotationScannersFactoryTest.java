@@ -5,8 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import org.junit.jupiter.api.Test;
-import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
-import org.tframework.core.reflection.annotations.ExtendedAnnotationMatcher;
 
 class AnnotationScannersFactoryTest {
 

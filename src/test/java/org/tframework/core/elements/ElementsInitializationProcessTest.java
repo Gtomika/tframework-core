@@ -1,6 +1,15 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
+
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,16 +28,6 @@ import org.tframework.core.elements.scanner.ElementScannersBundle;
 import org.tframework.core.elements.scanner.ElementScanningResult;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
-
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ElementsInitializationProcessTest {

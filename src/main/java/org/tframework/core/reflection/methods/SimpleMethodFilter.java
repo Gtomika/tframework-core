@@ -7,8 +7,8 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.AnnotationFilteringResult;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 
 /**
  * A default {@link MethodFilter} implementation.

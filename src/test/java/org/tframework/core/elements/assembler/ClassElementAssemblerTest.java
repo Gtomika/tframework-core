@@ -1,4 +1,10 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.assembler;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.when;
 
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -13,14 +19,7 @@ import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.source.ClassElementSource;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
-import org.tframework.core.elements.dependency.resolver.DependencyResolutionException;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ClassElementAssemblerTest {

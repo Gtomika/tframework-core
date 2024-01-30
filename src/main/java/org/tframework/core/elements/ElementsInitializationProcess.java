@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,6 @@ import org.tframework.core.elements.scanner.ElementMethodScanner;
 import org.tframework.core.elements.scanner.ElementScanner;
 import org.tframework.core.elements.scanner.ElementScannersBundle;
 import org.tframework.core.elements.scanner.ElementScannersFactory;
-
-import java.util.List;
 
 /**
  * This class is responsible for the elements initialization process. This process consists of the following steps:

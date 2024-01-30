@@ -1,6 +1,8 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.context.assembler;
 
+import java.lang.reflect.Method;
+import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +17,6 @@ import org.tframework.core.elements.dependency.resolver.DependencyResolutionInpu
 import org.tframework.core.elements.scanner.ElementScanningResult;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.utils.LogUtils;
-
-import java.lang.reflect.Method;
-import java.util.Objects;
 
 /**
  * An {@link ElementContextAssembler} that assembles {@link ElementContext}s from {@link Method}s, that

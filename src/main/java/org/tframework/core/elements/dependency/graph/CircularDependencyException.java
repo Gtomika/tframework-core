@@ -1,9 +1,8 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency.graph;
 
 import lombok.Builder;
 import org.tframework.core.TFrameworkException;
-
-import java.util.Set;
 
 /**
  * Thrown when a dependency cycle is detected.

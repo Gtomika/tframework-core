@@ -1,13 +1,12 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency.graph;
 
+import java.util.stream.Collectors;
 import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.graph.DirectedAcyclicGraph;
-import org.jgrapht.graph.GraphCycleProhibitedException;
 import org.tframework.core.elements.context.ElementContext;
-
-import java.util.stream.Collectors;
 
 /**
  * The dependency graph wraps a {@link DirectedAcyclicGraph} and provides a few convenience methods.

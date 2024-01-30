@@ -1,18 +1,17 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencySource;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Stores all elements of the application.

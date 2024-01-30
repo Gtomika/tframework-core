@@ -1,14 +1,14 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency.resolver;
 
+import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * The dependency resolver aggregator combines multiple {@link DependencyResolver}s to

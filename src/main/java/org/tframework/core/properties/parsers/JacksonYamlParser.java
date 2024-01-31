@@ -3,7 +3,6 @@ package org.tframework.core.properties.parsers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 /**
  * A {@link YamlParser} implementation that uses the Jackson library.
  */
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class JacksonYamlParser implements YamlParser {
 
     private final ObjectMapper objectMapper;
@@ -29,12 +28,4 @@ public class JacksonYamlParser implements YamlParser {
         }
     }
 
-    //this is not in YamlParsersFactory, that class cannot use any Jackson or SnakeYaml classes.
-    /**
-     * Creates a {@link JacksonYamlParser}.
-     */
-    static JacksonYamlParser createJacksonYamlParser() {
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        return new JacksonYamlParser(objectMapper);
-    }
 }

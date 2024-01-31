@@ -43,22 +43,6 @@ jobs:
           path: "build/jacoco-report-html/"
           retention-days: 1
 
-  # special unit tests with optional dependencies on the classpath
-  unit-tests-custom-classpath:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: corretto
-          java-version: 21
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-      - name: Run unit tests with gradle
-        run: ./gradlew clean noOptionalDependencyTest snakeYamlTest
-
   spotless-check:
     runs-on: ubuntu-latest
     steps:

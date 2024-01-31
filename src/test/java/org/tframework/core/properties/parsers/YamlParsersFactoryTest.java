@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class YamlParsersFactoryTest {
 
     @Test
-    public void shouldCreateJacksonYamlParser_whenJacksonYamlIsOnClasspath() {
+    public void shouldCreateYamlParser() {
         var parser = YamlParsersFactory.createDefaultYamlParser();
         assertEquals(JacksonYamlParser.class, parser.getClass());
     }

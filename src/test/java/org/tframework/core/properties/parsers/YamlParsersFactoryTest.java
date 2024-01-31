@@ -11,7 +11,7 @@ class YamlParsersFactoryTest {
 
     @Test
     public void shouldCreateJacksonYamlParser_whenJacksonYamlIsOnClasspath() {
-        var parser = YamlParsersFactory.createAvailableYamlParser();
+        var parser = YamlParsersFactory.createDefaultYamlParser();
         assertEquals(JacksonYamlParser.class, parser.getClass());
     }
 

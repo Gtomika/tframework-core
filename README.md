@@ -46,25 +46,6 @@ There are several ways to provide property files:
 
 Note that the property files should always be specified as a path relative to the application resources.
 
-#### YAML parsing libraries
-
-The framework does not impose a single YAML parser library. Instead, it uses the first available library on
-the classpath from the following list:
-
-_Jackson YAML module_: Include it with Gradle as:
-
-```
-implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:[version]"'`
-```
-([latest version](https://mvnrepository.com/artifact/com.fasterxml.jackson.dataformat/jackson-dataformat-yaml)).
-
-_Snake Yaml_: Include it with Gradle as:
-
-```
-implementation 'org.yaml:snakeyaml:[version]'`
-```
-([latest version](https://mvnrepository.com/artifact/org.yaml/snakeyaml)).
-
 ### Elements
 
 The framework supports the concept of **elements**, which are similar to what *beans* are in the
@@ -133,12 +114,10 @@ If you have multiple public constructors, the `@ElementConstructor` annotation m
 
 ### How to run
 
-Include the framework in your dependencies. If not present already,
-also add one of the YAML parser libraries. For example, assuming you use Gradle:
+Include the framework in your dependencies. For example, assuming you use Gradle:
 
 ```
 TODO: public repo is not yet available
-implementation 'org.yaml:snakeyaml:[version]'
 ```
 
 Then, the framework should be started from the `main` method:

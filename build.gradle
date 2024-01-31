@@ -14,7 +14,6 @@ ext {
     classGraphVersion = "4.8.165"
     jgraphtVersion = "1.5.2"
     jacksonVersion = "2.16.1"
-    snakeYamlVersion = "1.8"
     junitJupiterVersion = "5.8.2"
     mockitoVersion = "5.8.0"
     log4jVersion = "2.17.2"
@@ -28,10 +27,7 @@ dependencies {
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation "io.github.classgraph:classgraph:${classGraphVersion}"
     implementation "org.jgrapht:jgrapht-core:${jgraphtVersion}"
-
-    //optional dependencies that the user can provide
-    compileOnly "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
-    compileOnly "org.yaml:snakeyaml:${snakeYamlVersion}"
+    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
 }
 
 testing {
@@ -57,10 +53,9 @@ testing {
             }
         }
 
-        //the standard unit test suite, which includes most unit tests
+        //the standard unit test suite
         test {
             dependencies {
-                implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
             }
             targets {
                 all {
@@ -71,19 +66,6 @@ testing {
             }
         }
 
-        //none of the optional dependencies are included to be able to test error cases in this suite
-        noOptionalDependencyTest(JvmTestSuite) {
-            dependencies {
-
-            }
-        }
-
-        //the test suite where the classpath includes the Snake YAML library
-        snakeYamlTest(JvmTestSuite) {
-            dependencies {
-                implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
-            }
-        }
     }
 }
 

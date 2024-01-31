@@ -17,7 +17,7 @@ import org.tframework.core.readers.ResourceFileReader;
 @Slf4j
 class JacksonYamlParserTest {
 
-    private final JacksonYamlParser parser = JacksonYamlParser.createJacksonYamlParser();
+    private final JacksonYamlParser parser = YamlParsersFactory.createJacksonYamlParser();
 
     private final ResourceFileReader reader = ReadersFactory.createResourceFileReader();
 

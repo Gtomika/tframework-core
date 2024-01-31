@@ -15,7 +15,7 @@ public final class PropertiesInitializationProcessFactory {
     public static PropertiesInitializationProcess createProfileInitializationProcess() {
         return PropertiesInitializationProcess.builder()
                 .resourceFileReader(ReadersFactory.createResourceFileReader())
-                .yamlParser(YamlParsersFactory.createAvailableYamlParser())
+                .yamlParser(YamlParsersFactory.createDefaultYamlParser())
                 .propertiesExtractor(PropertyExtractorsFactory.createPropertiesExtractor())
                 .build();
     }

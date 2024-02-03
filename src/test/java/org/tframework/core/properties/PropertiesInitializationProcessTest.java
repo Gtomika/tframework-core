@@ -13,8 +13,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.properties.extractors.PropertiesExtractor;
-import org.tframework.core.properties.parsers.YamlParser;
-import org.tframework.core.properties.scanners.PropertyFileScanner;
+import org.tframework.core.properties.filescanners.PropertyFileScanner;
+import org.tframework.core.properties.yamlparsers.YamlParser;
 import org.tframework.core.readers.ResourceFileReader;
 
 @ExtendWith(MockitoExtension.class)

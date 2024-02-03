@@ -3,7 +3,7 @@ package org.tframework.core.properties;
 
 import lombok.NoArgsConstructor;
 import org.tframework.core.properties.extractors.PropertyExtractorsFactory;
-import org.tframework.core.properties.parsers.YamlParsersFactory;
+import org.tframework.core.properties.yamlparsers.YamlParsersFactory;
 import org.tframework.core.readers.ReadersFactory;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)

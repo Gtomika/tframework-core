@@ -9,9 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.tframework.core.properties.extractors.PropertiesExtractor;
-import org.tframework.core.properties.parsers.YamlParser;
-import org.tframework.core.properties.scanners.PropertyFileScanner;
-import org.tframework.core.properties.scanners.PropertyFileScannersFactory;
+import org.tframework.core.properties.filescanners.PropertyFileScanner;
+import org.tframework.core.properties.filescanners.PropertyFileScannersFactory;
+import org.tframework.core.properties.yamlparsers.YamlParser;
 import org.tframework.core.readers.ResourceFileReader;
 import org.tframework.core.readers.ResourceNotFoundException;
 

@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.properties.parsers;
+package org.tframework.core.properties.yamlparsers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;

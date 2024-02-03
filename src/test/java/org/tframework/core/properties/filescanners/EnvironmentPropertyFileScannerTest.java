@@ -1,9 +1,9 @@
 /* Licensed under Apache-2.0 2024. */
-package org.tframework.core.properties.scanners;
+package org.tframework.core.properties.filescanners;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.tframework.core.properties.scanners.EnvironmentPropertyFileScanner.PROPERTY_FILES_ENVIRONMENT_VARIABLE;
+import static org.tframework.core.properties.filescanners.EnvironmentPropertyFileScanner.PROPERTY_FILES_ENVIRONMENT_VARIABLE;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

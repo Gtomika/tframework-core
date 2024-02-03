@@ -5,7 +5,7 @@ import java.util.Map;
 import org.tframework.core.properties.PropertyValue;
 
 /**
- * The properties extractor converts the "raw" result of a {@link org.tframework.core.properties.parsers.YamlParser}
+ * The properties extractor converts the "raw" result of a {@link org.tframework.core.properties.yamlparsers.YamlParser}
  * into the {@link PropertyValue} format (see {@link #extractProperties(Map)} for details).
  * @see PropertyExtractorsFactory
  */
@@ -25,7 +25,7 @@ public interface PropertiesExtractor {
 
     /**
      * Extracts the properties map from given "raw" YAML parsing result.
-     * @param parsedYaml Raw YAML parsing result produced by a {@link org.tframework.core.properties.parsers.YamlParser}.
+     * @param parsedYaml Raw YAML parsing result produced by a {@link org.tframework.core.properties.yamlparsers.YamlParser}.
      * @return Properties map where the keys are property names, and the values are {@link PropertyValue}s.
      */
     Map<String, PropertyValue> extractProperties(Map<String, Object> parsedYaml);

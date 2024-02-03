@@ -1,9 +1,9 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.properties.scanners;
+package org.tframework.core.properties.filescanners;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.tframework.core.properties.scanners.CliArgumentPropertyFileScanner.PROPERTY_FILE_ARGUMENT_KEY;
+import static org.tframework.core.properties.filescanners.CliArgumentPropertyFileScanner.PROPERTY_FILE_ARGUMENT_KEY;
 import static org.tframework.core.utils.CliUtils.CLI_KEY_VALUE_SEPARATOR;
 
 import java.util.List;

@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2023. */
-package org.tframework.core.properties.parsers;
+package org.tframework.core.properties.yamlparsers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;

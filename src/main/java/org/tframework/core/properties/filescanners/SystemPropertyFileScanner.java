@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2024. */
-package org.tframework.core.properties.scanners;
+package org.tframework.core.properties.filescanners;
 
 import java.util.Arrays;
 import java.util.List;

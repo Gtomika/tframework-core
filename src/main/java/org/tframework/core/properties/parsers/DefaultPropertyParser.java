@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.properties.ListPropertyValue;
+import org.tframework.core.properties.Property;
 import org.tframework.core.properties.PropertyValue;
 import org.tframework.core.properties.SinglePropertyValue;
 
@@ -18,14 +19,14 @@ import org.tframework.core.properties.SinglePropertyValue;
  *     <li>If single value, it is returned as is.</li>
  * </ul>
  */
-@Slf4j //TODO unit test
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class DefaultPropertyParser implements PropertyParser {
 
     static final String BLANK_NAME_ERROR = "The name of a property cannot be blank.";
 
     @Override
-    public ParsedProperty parseProperty(String rawProperty) {
+    public Property parseProperty(String rawProperty) {
         var separatedProperty = PropertyParsingUtils.separateNameValue(rawProperty);
         log.trace("Separated raw property '{}' into name: '{}', value: '{}'", rawProperty, separatedProperty.name(), separatedProperty.value());
 
@@ -40,11 +41,11 @@ public class DefaultPropertyParser implements PropertyParser {
             log.trace("Raw property '{}' has following list elements: {}", rawProperty, elements);
 
             PropertyValue propertyValue = new ListPropertyValue(elements);
-            return new ParsedProperty(separatedProperty.name(), propertyValue);
+            return new Property(separatedProperty.name(), propertyValue);
         } else {
             log.trace("Raw property '{}' has a single value", rawProperty);
             PropertyValue propertyValue = new SinglePropertyValue(separatedProperty.value());
-            return new ParsedProperty(separatedProperty.name(), propertyValue);
+            return new Property(separatedProperty.name(), propertyValue);
         }
     }
 }

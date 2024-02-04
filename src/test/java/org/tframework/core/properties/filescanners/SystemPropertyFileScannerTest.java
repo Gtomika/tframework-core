@@ -29,7 +29,7 @@ class SystemPropertyFileScannerTest {
     @Test
     public void shouldScanPropertyFiles_ifSystemPropertyIsProvided() {
         String systemProperty = "custom-properties.yaml,another-properties.yaml";
-        when(systemPropertyReader.readProperty(SystemPropertyFileScanner.PROPERTY_FILES_SYSTEM_PROPERTY))
+        when(systemPropertyReader.readSystemProperty(SystemPropertyFileScanner.PROPERTY_FILES_SYSTEM_PROPERTY))
                 .thenReturn(systemProperty);
 
         var propertyFiles = systemPropertyFileScanner.scan();
@@ -40,7 +40,7 @@ class SystemPropertyFileScannerTest {
     @Test
     public void shouldScanPropertyFiles_ifSystemPropertyIsProvided_withSpaces() {
         String systemProperty = "custom-properties.yaml, another-properties.yaml";
-        when(systemPropertyReader.readProperty(SystemPropertyFileScanner.PROPERTY_FILES_SYSTEM_PROPERTY))
+        when(systemPropertyReader.readSystemProperty(SystemPropertyFileScanner.PROPERTY_FILES_SYSTEM_PROPERTY))
                 .thenReturn(systemProperty);
 
         var propertyFiles = systemPropertyFileScanner.scan();
@@ -50,7 +50,7 @@ class SystemPropertyFileScannerTest {
 
     @Test
     public void shouldScanEmptyPropertyFiles_ifSystemPropertyIsNotProvided() {
-        when(systemPropertyReader.readProperty(SystemPropertyFileScanner.PROPERTY_FILES_SYSTEM_PROPERTY))
+        when(systemPropertyReader.readSystemProperty(SystemPropertyFileScanner.PROPERTY_FILES_SYSTEM_PROPERTY))
                 .thenThrow(new SystemPropertyNotFoundException(SystemPropertyFileScanner.PROPERTY_FILES_SYSTEM_PROPERTY));
 
         var propertyFiles = systemPropertyFileScanner.scan();

@@ -4,8 +4,8 @@ package org.tframework.core.readers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class EnvironmentVariableReaderTest {
@@ -16,7 +16,7 @@ class EnvironmentVariableReaderTest {
     @Test
     public void shouldGetVariable_whenExists() {
         var mockVariables = Map.of(TEST_VARIABLE_NAME, TEST_VARIABLE_VALUE);
-        var reader = new EnvironmentVariableReader(mockVariables::get, () -> mockVariables);
+        var reader = new EnvironmentVariableReader(mockVariables::get, mockVariables::keySet);
 
         String actualValue = reader.readVariable(TEST_VARIABLE_NAME);
 
@@ -26,7 +26,7 @@ class EnvironmentVariableReaderTest {
     @Test
     public void shouldThrowVariableNotFoundException_whenDoesNotExist() {
         Map<String, String> mockVariables = Map.of();
-        var reader = new EnvironmentVariableReader(mockVariables::get, () -> mockVariables);
+        var reader = new EnvironmentVariableReader(mockVariables::get, mockVariables::keySet);
 
         var exception = assertThrows(EnvironmentVariableNotFoundException.class, () -> {
             reader.readVariable(TEST_VARIABLE_NAME);
@@ -41,9 +41,9 @@ class EnvironmentVariableReaderTest {
     @Test
     public void shouldGetAllVariableNames() {
         var mockVariables = Map.of(TEST_VARIABLE_NAME, TEST_VARIABLE_VALUE);
-        var reader = new EnvironmentVariableReader(mockVariables::get, () -> mockVariables);
+        var reader = new EnvironmentVariableReader(mockVariables::get, mockVariables::keySet);
 
-        assertEquals(List.of(TEST_VARIABLE_NAME), reader.getAllVariableNames());
+        assertEquals(Set.of(TEST_VARIABLE_NAME), reader.getAllVariableNames());
     }
 
 }

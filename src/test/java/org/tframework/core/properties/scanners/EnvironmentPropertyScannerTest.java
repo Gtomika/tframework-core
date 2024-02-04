@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.tframework.core.properties.scanners.EnvironmentPropertyScanner.PROPERTY_VARIABLE_PREFIX;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,7 +30,7 @@ class EnvironmentPropertyScannerTest {
 
     @Test
     public void shouldDetectEnvironmentVariablesThatHoldProperties_andReturnRawProperties() {
-        when(environmentVariableReader.getAllVariableNames()).thenReturn(List.of(
+        when(environmentVariableReader.getAllVariableNames()).thenReturn(Set.of(
             PROPERTY_VARIABLE_PREFIX + "cool.prop",
             "TFRAMEWORK_PROFILES=test,debug",
             PROPERTY_VARIABLE_PREFIX + "test.prop"

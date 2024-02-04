@@ -2,7 +2,10 @@
 package org.tframework.core.readers;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +19,15 @@ import lombok.RequiredArgsConstructor;
 public class SystemPropertyReader {
 
     private final Function<String, String> systemPropertyAccessor;
+    private final Supplier<Set<String>> systemPropertySupplier;
+
+    SystemPropertyReader() {
+        systemPropertyAccessor = System::getProperty;
+        systemPropertySupplier = () -> System.getProperties().keySet()
+                .stream()
+                .map(Object::toString)
+                .collect(Collectors.toSet());
+    }
 
     /**
      * Fetch a property from the system.
@@ -23,9 +35,16 @@ public class SystemPropertyReader {
      * @return The value of the property, if it exists.
      * @throws SystemPropertyNotFoundException If a property by this name does not exist.
      */
-    public String readProperty(String name) {
+    public String readSystemProperty(String name) {
         return Optional.ofNullable(systemPropertyAccessor.apply(name))
                 .orElseThrow(() -> new SystemPropertyNotFoundException(name));
+    }
+
+    /**
+     * Gets the names of all system properties available.
+     */
+    public Set<String> getAllSystemPropertyNames() {
+        return systemPropertySupplier.get();
     }
 
 }

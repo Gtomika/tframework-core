@@ -28,7 +28,7 @@ public class SystemPropertyFileScanner implements PropertyFileScanner {
     @Override
     public List<String> scan() {
         try {
-            return Arrays.stream(systemPropertyReader.readProperty(PROPERTY_FILES_SYSTEM_PROPERTY).split(","))
+            return Arrays.stream(systemPropertyReader.readSystemProperty(PROPERTY_FILES_SYSTEM_PROPERTY).split(","))
                     .map(String::trim)
                     .peek(p -> log.debug("Adding property file '{}' as specified by the '{}' system property.", p, PROPERTY_FILES_SYSTEM_PROPERTY))
                     .toList();

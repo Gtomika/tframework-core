@@ -23,7 +23,7 @@ public final class ReadersFactory {
      * Creates a {@link SystemPropertyReader} to access system properties.
      */
     public static SystemPropertyReader createSystemPropertyReader() {
-        return new SystemPropertyReader(System::getProperty);
+        return new SystemPropertyReader();
     }
 
     /**

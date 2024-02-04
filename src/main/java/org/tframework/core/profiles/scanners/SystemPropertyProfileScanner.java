@@ -24,7 +24,7 @@ public class SystemPropertyProfileScanner implements ProfileScanner {
     @Override
     public Set<String> scan() {
         try {
-            String profilesRaw = systemPropertyReader.readProperty(PROFILES_SYSTEM_PROPERTY);
+            String profilesRaw = systemPropertyReader.readSystemProperty(PROFILES_SYSTEM_PROPERTY);
             log.debug("Found '{}' system property with value '{}'.", PROFILES_SYSTEM_PROPERTY, profilesRaw);
 
             var profiles = Set.of(profilesRaw.split(","));

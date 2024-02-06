@@ -1,8 +1,11 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.extractors;
 
-import java.util.Map;
+import org.tframework.core.properties.Property;
 import org.tframework.core.properties.PropertyValue;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * The properties extractor converts the "raw" result of a {@link org.tframework.core.properties.yamlparsers.YamlParser}
@@ -26,8 +29,8 @@ public interface PropertiesExtractor {
     /**
      * Extracts the properties map from given "raw" YAML parsing result.
      * @param parsedYaml Raw YAML parsing result produced by a {@link org.tframework.core.properties.yamlparsers.YamlParser}.
-     * @return Properties map where the keys are property names, and the values are {@link PropertyValue}s.
+     * @return List of {@link Property} objects extracted from the raw result.
      */
-    Map<String, PropertyValue> extractProperties(Map<String, Object> parsedYaml);
+    List<Property> extractProperties(Map<String, Object> parsedYaml);
 
 }

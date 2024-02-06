@@ -1,8 +1,6 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties;
 
-import java.util.List;
-import java.util.Map;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +12,8 @@ import org.tframework.core.properties.filescanners.PropertyFileScannersFactory;
 import org.tframework.core.properties.yamlparsers.YamlParser;
 import org.tframework.core.readers.ResourceFileReader;
 import org.tframework.core.readers.ResourceNotFoundException;
+
+import java.util.List;
 
 /**
  * This class is responsible for initializing the properties, by the following process:
@@ -75,14 +75,14 @@ public class PropertiesInitializationProcess {
         return propertiesContainer;
     }
 
-    private Map<String, PropertyValue> processPropertyFile(String propertyFile) {
+    private List<Property> processPropertyFile(String propertyFile) {
         try {
             var propertyFileContent = resourceFileReader.readResourceFile(propertyFile);
             var parsedYaml = yamlParser.parseYaml(propertyFileContent);
             return propertiesExtractor.extractProperties(parsedYaml);
         } catch (ResourceNotFoundException e) {
             log.debug("Property file '{}' not found, skipping...", propertyFile);
-            return Map.of();
+            return List.of();
         }
     }
 

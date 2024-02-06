@@ -1,11 +1,6 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.initializers;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +9,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.PropertiesInitializationInput;
 import org.tframework.core.properties.PropertiesInitializationProcess;
+import org.tframework.core.properties.Property;
 import org.tframework.core.properties.SinglePropertyValue;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PropertiesCoreInitializerTest {
@@ -31,10 +33,10 @@ class PropertiesCoreInitializerTest {
 
     @Test
     void shouldInitializeProperties() {
-        PropertiesContainer expectedProperties = PropertiesContainer.fromProperties(Map.of(
-                "property1", new SinglePropertyValue("value1"),
-                "property2", new SinglePropertyValue("value2"),
-                "property3", new SinglePropertyValue("value3")
+        PropertiesContainer expectedProperties = PropertiesContainer.fromProperties(List.of(
+                new Property("property1", new SinglePropertyValue("value1")),
+                new Property("property2", new SinglePropertyValue("value2")),
+                new Property("property3", new SinglePropertyValue("value3"))
         ));
         when(propertiesInitializationProcess.initialize(any())).thenReturn(expectedProperties);
 

@@ -1,18 +1,19 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.scanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.Property;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.reflection.classes.ClassFiltersFactory;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClassesElementClassScannerTest {
 
@@ -61,18 +62,18 @@ class ClassesElementClassScannerTest {
     }
 
     private void setUpScannerWithMultipleClassesProperty(List<String> classesToScan) {
-        var propertiesContainer = PropertiesContainer.fromProperties(Map.of(
+        var propertiesContainer = PropertiesContainer.fromProperties(List.of(new Property(
                 ClassesElementClassScanner.SCAN_CLASSES_PROPERTY,
                 new ListPropertyValue(classesToScan)
-        ));
+        )));
         scanner = buildScanner(propertiesContainer);
     }
 
     private void setUpScannerWithOneClassProperty(String classToScan) {
-        var propertiesContainer = PropertiesContainer.fromProperties(Map.of(
+        var propertiesContainer = PropertiesContainer.fromProperties(List.of(new Property(
                 ClassesElementClassScanner.SCAN_CLASSES_PROPERTY,
                 new SinglePropertyValue(classToScan)
-        ));
+        )));
         scanner = buildScanner(propertiesContainer);
     }
 

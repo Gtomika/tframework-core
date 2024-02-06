@@ -1,23 +1,25 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.scanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-import static org.tframework.core.elements.scanner.RootElementClassScanner.ROOT_SCANNING_ENABLED_PROPERTY;
-
-import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.Property;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.reflection.classes.ClassFiltersFactory;
 import org.tframework.core.reflection.classes.PackageClassScanner;
+
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+import static org.tframework.core.elements.scanner.RootElementClassScanner.ROOT_SCANNING_ENABLED_PROPERTY;
 
 @ExtendWith(MockitoExtension.class)
 class RootElementClassScannerTest {
@@ -64,13 +66,13 @@ class RootElementClassScannerTest {
         if(enabled == null) {
             properties = PropertiesContainer.empty();
         } else if(enabled) {
-            properties = PropertiesContainer.fromProperties(Map.of(
+            properties = PropertiesContainer.fromProperties(List.of(new Property(
                         ROOT_SCANNING_ENABLED_PROPERTY, new SinglePropertyValue("true")
-                ));
+                )));
         } else {
-            properties = PropertiesContainer.fromProperties(Map.of(
+            properties = PropertiesContainer.fromProperties(List.of(new Property(
                         ROOT_SCANNING_ENABLED_PROPERTY, new SinglePropertyValue("false")
-                ));
+                )));
         }
 
         //To reduce mocking noise, some of the classes are not mocked.

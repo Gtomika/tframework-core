@@ -1,13 +1,15 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.extractors;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import org.tframework.core.properties.Property;
 import org.tframework.core.properties.PropertyValue;
 import org.tframework.core.properties.extractors.leaves.LeafExtractor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A {@link PropertiesExtractor} implementation which walks the given parsed YAML
@@ -21,15 +23,15 @@ public class RecursivePropertiesExtractor implements PropertiesExtractor {
     private final List<LeafExtractor> leafExtractors;
 
     @Override
-    public Map<String, PropertyValue> extractProperties(Map<String, Object> parsedYaml) {
-        Map<String, PropertyValue> properties = new HashMap<>();
+    public List<Property> extractProperties(Map<String, Object> parsedYaml) {
+        List<Property> properties = new ArrayList<>();
         saveProperties(properties, ROOT_PROPERTY_PATH, parsedYaml);
         return properties;
     }
 
     @SuppressWarnings("unchecked")
     private void saveProperties(
-            Map<String, PropertyValue> properties,
+            List<Property> properties,
             String parentPropertyPath,
             Map<String, Object> parentNode
     ) {
@@ -41,7 +43,7 @@ public class RecursivePropertiesExtractor implements PropertiesExtractor {
             if(node instanceof Map<?, ?>) { // node is a Map, but not necessarily Map<String, Object>...
                 saveProperties(properties, newPropertyPath, (Map<String, Object>) node);
             } else { //this node is a leaf
-                properties.put(newPropertyPath, extractLeafValue(node));
+                properties.add(new Property(newPropertyPath, extractLeafValue(node)));
             }
         }
     }

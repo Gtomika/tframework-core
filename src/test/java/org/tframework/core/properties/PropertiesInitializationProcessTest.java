@@ -1,12 +1,6 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,6 +11,13 @@ import org.tframework.core.properties.filescanners.PropertyFileScanner;
 import org.tframework.core.properties.yamlparsers.YamlParser;
 import org.tframework.core.readers.ResourceFileReader;
 
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class PropertiesInitializationProcessTest {
 
@@ -26,9 +27,9 @@ class PropertiesInitializationProcessTest {
             "property1", "value1",
             "property2", "value2"
     );
-    private static final Map<String, PropertyValue> TEST_EXTRACTED_PROPERTIES_1 = Map.of(
-            "property1", new SinglePropertyValue("value1"),
-            "property2", new SinglePropertyValue("value2")
+    private static final List<Property> TEST_EXTRACTED_PROPERTIES_1 = List.of(
+            new Property("property1", new SinglePropertyValue("value1")),
+            new Property("property2", new SinglePropertyValue("value2"))
     );
 
     private static final String TEST_PROPERTIES_FILE_2 = "properties-dev.yaml";
@@ -37,9 +38,9 @@ class PropertiesInitializationProcessTest {
             "property2", "value2-override",
             "property3", "value3"
     );
-    private static final Map<String, PropertyValue> TEST_EXTRACTED_PROPERTIES_2 = Map.of(
-            "property2", new SinglePropertyValue("value2-override"),
-            "property3", new SinglePropertyValue("value3")
+    private static final List<Property> TEST_EXTRACTED_PROPERTIES_2 = List.of(
+            new Property("property2", new SinglePropertyValue("value2-override")),
+            new Property("property3", new SinglePropertyValue("value3"))
     );
 
     @Mock

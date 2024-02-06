@@ -1,19 +1,21 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.extractors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.tframework.core.properties.ListPropertyValue;
+import org.tframework.core.properties.Property;
+import org.tframework.core.properties.PropertyUtils;
+import org.tframework.core.properties.SinglePropertyValue;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import org.tframework.core.properties.ListPropertyValue;
-import org.tframework.core.properties.PropertyValue;
-import org.tframework.core.properties.SinglePropertyValue;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Common test data and methods for {@link PropertiesExtractor} implementations.
@@ -41,22 +43,24 @@ public class ExtractorTestUtils {
         TEST_PARSED_YAML.put("d", strings);
     }
 
-    public static void assertPropertyAIsCorrect(Map<String, PropertyValue> properties) {
-        if(properties.get("a") instanceof SinglePropertyValue spv) {
+    public static void assertPropertyAIsCorrect(List<Property> properties) {
+        if(PropertyUtils.getValueFromPropertyList(properties, "a") instanceof SinglePropertyValue spv) {
             assertEquals("1", spv.value());
         } else {
             fail();
         }
     }
 
-    public static void assertPropertyBIsCorrect(Map<String, PropertyValue> properties) {
-        if(properties.get("b" + PropertiesExtractor.PROPERTY_PATH_SEPARATOR + "b1") instanceof SinglePropertyValue spv) {
+    public static void assertPropertyBIsCorrect(List<Property> properties) {
+        String b1Name = "b" + PropertiesExtractor.PROPERTY_PATH_SEPARATOR + "b1";
+        if(PropertyUtils.getValueFromPropertyList(properties, b1Name) instanceof SinglePropertyValue spv) {
             assertEquals("2", spv.value());
         } else {
             fail();
         }
 
-        if(properties.get("b" + PropertiesExtractor.PROPERTY_PATH_SEPARATOR + "b2") instanceof ListPropertyValue lpv) {
+        String b2Name = "b" + PropertiesExtractor.PROPERTY_PATH_SEPARATOR + "b2";
+        if(PropertyUtils.getValueFromPropertyList(properties, b2Name) instanceof ListPropertyValue lpv) {
             List<String> values = lpv.values();
             assertEquals(2, values.size());
             assertEquals("3", values.get(0));
@@ -66,16 +70,16 @@ public class ExtractorTestUtils {
         }
     }
 
-    public static void assertPropertyCIsCorrect(Map<String, PropertyValue> properties) {
-        if(properties.get("c") instanceof SinglePropertyValue spv) {
+    public static void assertPropertyCIsCorrect(List<Property> properties) {
+        if(PropertyUtils.getValueFromPropertyList(properties, "c") instanceof SinglePropertyValue spv) {
             assertNull(spv.value());
         } else {
             fail();
         }
     }
 
-    public static void assertPropertyDIsCorrect(Map<String, PropertyValue> properties) {
-        if(properties.get("d") instanceof ListPropertyValue lpv) {
+    public static void assertPropertyDIsCorrect(List<Property> properties) {
+        if(PropertyUtils.getValueFromPropertyList(properties, "d") instanceof ListPropertyValue lpv) {
             List<String> values = lpv.values();
             assertEquals(2, values.size());
             assertEquals("5", values.get(0));

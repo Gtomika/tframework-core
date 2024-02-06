@@ -1,15 +1,14 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.extractors;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.tframework.core.properties.Property;
 import org.tframework.core.properties.PropertyValue;
 import org.tframework.core.properties.extractors.leaves.LeafExtractor;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * A {@link PropertiesExtractor} implementation which walks the given parsed YAML

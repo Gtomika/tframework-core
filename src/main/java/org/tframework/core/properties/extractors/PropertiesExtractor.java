@@ -1,11 +1,10 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.extractors;
 
-import org.tframework.core.properties.Property;
-import org.tframework.core.properties.PropertyValue;
-
 import java.util.List;
 import java.util.Map;
+import org.tframework.core.properties.Property;
+import org.tframework.core.properties.PropertyValue;
 
 /**
  * The properties extractor converts the "raw" result of a {@link org.tframework.core.properties.yamlparsers.YamlParser}

@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -9,11 +10,12 @@ import org.slf4j.MDC;
 import org.tframework.core.properties.extractors.PropertiesExtractor;
 import org.tframework.core.properties.filescanners.PropertyFileScanner;
 import org.tframework.core.properties.filescanners.PropertyFileScannersFactory;
+import org.tframework.core.properties.parsers.PropertyParser;
+import org.tframework.core.properties.scanners.PropertyScanner;
+import org.tframework.core.properties.scanners.PropertyScannersFactory;
 import org.tframework.core.properties.yamlparsers.YamlParser;
 import org.tframework.core.readers.ResourceFileReader;
 import org.tframework.core.readers.ResourceNotFoundException;
-
-import java.util.List;
 
 /**
  * This class is responsible for initializing the properties, by the following process:
@@ -26,6 +28,13 @@ import java.util.List;
  * Properties will be merged together into a {@link PropertiesContainer}. Properties found later will override
  * the ones found earlier, if they have the same name. Use debug level logging and the {@code MDC} to see the
  * overrides.
+ * <p>
+ * After all property files are found and handled, directly specified properties will be looked up and added.
+ * <ul>
+ *     <li>{@link org.tframework.core.properties.scanners.PropertyScanner}s detect them.</li>
+ *     <li>{@link org.tframework.core.properties.parsers.PropertyParser} will convert the raw properties into {@link Property} objects.</li>
+ *     <li>There will be added to the {@link PropertiesContainer}, overriding existing values.</li>
+ * </ul>
  */
 @Slf4j
 @Builder
@@ -38,6 +47,8 @@ public class PropertiesInitializationProcess {
     private final YamlParser yamlParser;                          //parses the YAML
     private final PropertiesExtractor propertiesExtractor;        //extracts the properties from the YAML
 
+    private final PropertyParser propertyParser;                  // parser raw property strings
+
     /**
      * Initializes the properties.
      * @param input {@link PropertiesInitializationInput} with the input parameters.
@@ -45,16 +56,21 @@ public class PropertiesInitializationProcess {
      */
     public PropertiesContainer initialize(PropertiesInitializationInput input) {
         var propertyFileScanners = PropertyFileScannersFactory.createTframeworkPropertyFileScanners(input);
-        return initialize(propertyFileScanners);
+        var propertyScanners = PropertyScannersFactory.createDefaultPropertyScanners(input);
+        return initialize(propertyFileScanners, propertyScanners);
     }
 
     /**
      * Initializes the properties according to the process documented on the class. This method
      * may be used by tests to perform the initialization with mocked scanners.
      * @param propertyFileScanners {@link PropertyFileScanner}s to find the property files to read.
+     * @param propertyScanners {@link PropertyScanner}s to find directly specified properties.
      * @return {@link PropertiesContainer} containing the properties found.
      */
-    PropertiesContainer initialize(List<PropertyFileScanner> propertyFileScanners) {
+    PropertiesContainer initialize(
+            List<PropertyFileScanner> propertyFileScanners,
+            List<PropertyScanner> propertyScanners
+    ) {
         PropertiesContainer propertiesContainer = PropertiesContainer.empty();
 
         for(PropertyFileScanner propertyFileScanner: propertyFileScanners) {
@@ -71,6 +87,8 @@ public class PropertiesInitializationProcess {
                 }
             }
         }
+
+        //TODO
 
         return propertiesContainer;
     }

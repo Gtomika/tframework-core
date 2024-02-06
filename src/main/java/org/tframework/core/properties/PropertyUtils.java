@@ -1,10 +1,10 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.properties;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-
-import java.util.List;
 
 /**
  * Utility methods for properties, such as working with lists

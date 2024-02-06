@@ -51,7 +51,7 @@ public abstract class ElementContext {
             this.elementAssembler = ElementAssemblersFactory.createElementAssembler(this, dependencyResolutionInput);
         } else {
             log.debug("Will not create assembler for element '{}', because the required " +
-                    "input was not provided", name);
+                    "input was not provided", this.name);
             this.elementAssembler = null;
         }
     }

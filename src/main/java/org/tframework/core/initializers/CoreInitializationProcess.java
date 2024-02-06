@@ -2,12 +2,14 @@
 package org.tframework.core.initializers;
 
 import java.time.Instant;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.Application;
 import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.ElementsInitializationInput;
+import org.tframework.core.elements.PreConstructedElementData;
 import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
@@ -47,7 +49,11 @@ public class CoreInitializationProcess {
             PropertiesContainer propertiesContainer = initProperties(coreInput, profilesContainer);
             application.setPropertiesContainer(propertiesContainer);
 
-            ElementsContainer elementsContainer = initDependencyInjection(application, coreInput.rootClass());
+            ElementsContainer elementsContainer = initDependencyInjection(
+                    application,
+                    coreInput.rootClass(),
+                    coreInput.preConstructedElementData()
+            );
             application.setElementsContainer(elementsContainer);
 
             application.finalizeApplication();
@@ -78,11 +84,13 @@ public class CoreInitializationProcess {
 
     private ElementsContainer initDependencyInjection(
             Application application,
-            Class<?> rootClass
+            Class<?> rootClass,
+            Set<PreConstructedElementData> preConstructedElementData
     ) {
         var dependencyInjectionInput = ElementsInitializationInput.builder()
                 .application(application)
                 .rootClass(rootClass)
+                .preConstructedElementData(preConstructedElementData)
                 .build();
         return elementsCoreInitializer.initialize(dependencyInjectionInput);
     }

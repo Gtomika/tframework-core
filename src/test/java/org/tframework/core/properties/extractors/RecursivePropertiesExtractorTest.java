@@ -1,9 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.extractors;
 
-import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.tframework.core.properties.PropertyValue;
 import org.tframework.core.properties.extractors.leaves.LeafExtractorsFactory;
 
 class RecursivePropertiesExtractorTest {
@@ -14,7 +12,7 @@ class RecursivePropertiesExtractorTest {
 
     @Test
     public void shouldExtractProperties_fromCommonTestParsedYaml() {
-        Map<String, PropertyValue> properties = extractor.extractProperties(ExtractorTestUtils.TEST_PARSED_YAML);
+        var properties = extractor.extractProperties(ExtractorTestUtils.TEST_PARSED_YAML);
 
         ExtractorTestUtils.assertPropertyAIsCorrect(properties);
         ExtractorTestUtils.assertPropertyBIsCorrect(properties);

@@ -1,14 +1,14 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties;
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
-
-import java.util.List;
-import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 
 class PropertiesContainerTest {
 
@@ -16,9 +16,9 @@ class PropertiesContainerTest {
 
     @BeforeEach
     public void setUp() {
-        container = PropertiesContainer.fromProperties(Map.of(
-                "p1", new SinglePropertyValue("v1"),
-                "p2", new ListPropertyValue(List.of("v2-1", "v2-2")
+        container = PropertiesContainer.fromProperties(List.of(
+                new Property("p1", new SinglePropertyValue("v1")),
+                new Property("p2", new ListPropertyValue(List.of("v2-1", "v2-2"))
         )));
     }
 
@@ -108,9 +108,9 @@ class PropertiesContainerTest {
 
     @Test
     public void shouldMergeProperties_andCreateNewContainer() {
-        PropertiesContainer newContainer = container.merge(Map.of(
-                "p2", new SinglePropertyValue("v2-override"),
-                "p3", new SinglePropertyValue("v3")
+        PropertiesContainer newContainer = container.merge(List.of(
+                new Property("p2", new SinglePropertyValue("v2-override")),
+                new Property("p3", new SinglePropertyValue("v3"))
         ));
 
         assertEquals("v1", ((SinglePropertyValue) newContainer.getPropertyValueObject("p1")).value());

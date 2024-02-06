@@ -1,13 +1,6 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.scanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -15,10 +8,18 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.Property;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.reflection.classes.ClassFiltersFactory;
 import org.tframework.core.reflection.classes.PackageClassScanner;
+
+import java.util.List;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PackagesElementClassScannerTest {
@@ -74,18 +75,18 @@ class PackagesElementClassScannerTest {
     }
 
     private void setUpScannerWithMultiplePackagesProperty(List<String> packagesToScan) {
-        var propertiesContainer = PropertiesContainer.fromProperties(Map.of(
+        var propertiesContainer = PropertiesContainer.fromProperties(List.of(new Property(
                 PackagesElementClassScanner.SCAN_PACKAGES_PROPERTY,
                 new ListPropertyValue(packagesToScan)
-        ));
+        )));
         packagesElementClassScanner = buildScanner(propertiesContainer);
     }
 
     private void setUpScannerWithOnePackageProperty(String packageToScan) {
-        var propertiesContainer = PropertiesContainer.fromProperties(Map.of(
+        var propertiesContainer = PropertiesContainer.fromProperties(List.of(new Property(
                 PackagesElementClassScanner.SCAN_PACKAGES_PROPERTY,
                 new SinglePropertyValue(packageToScan)
-        ));
+        )));
         packagesElementClassScanner = buildScanner(propertiesContainer);
     }
 

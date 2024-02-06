@@ -53,16 +53,23 @@ testing {
             }
         }
 
-        //the standard unit test suite
         test {
+            testType = TestSuiteType.UNIT_TEST
             dependencies {
             }
             targets {
                 all {
                     testTask.configure {
-                        finalizedBy("jacocoTestReport") // report + coverage check is always generated after tests run
+                        // report + coverage check is always generated after tests run
+                        finalizedBy("jacocoTestReport")
                     }
                 }
+            }
+        }
+
+        integrationTest(JvmTestSuite) {
+            testType = TestSuiteType.INTEGRATION_TEST
+            dependencies {
             }
         }
 

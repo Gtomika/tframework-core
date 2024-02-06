@@ -4,6 +4,7 @@ package org.tframework.core.elements.scanner;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.Application;
 import org.tframework.core.elements.ElementsInitializationInput;
@@ -12,13 +13,14 @@ import org.tframework.core.properties.PropertiesContainer;
 
 public class ElementScannersFactoryTest {
 
-    private final ElementsInitializationInput input = new ElementsInitializationInput(
-            Application.builder()
+    private final ElementsInitializationInput input = ElementsInitializationInput.builder()
+            .application(Application.builder()
                     .propertiesContainer(PropertiesContainer.empty())
                     .profilesContainer(ProfilesContainer.empty())
-                    .build(),
-            this.getClass()
-    );
+                    .build())
+            .rootClass(this.getClass())
+            .preConstructedElementData(Set.of())
+            .build();
 
     @Test
     public void shouldCreateDefaultElementScannersBundle() {

@@ -2,6 +2,7 @@
 package org.tframework.core.elements;
 
 import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -61,7 +62,7 @@ public class ElementsInitializationProcess {
                 .build();
 
         assembleElementContexts(elementsContainer, scannersBundle, dependencyResolutionInput);
-        addPreConstructedElementContexts(elementsContainer, input.application());
+        addPreConstructedElementContexts(elementsContainer, input.application(), input.preConstructedElementData());
         log.debug("Successfully assembled a total of {} element contexts", elementsContainer.elementCount());
 
         elementsContainer.initializeElementContexts();
@@ -136,11 +137,23 @@ public class ElementsInitializationProcess {
         }
     }
 
-    private void addPreConstructedElementContexts(ElementsContainer elementsContainer, Application application) {
+    private void addPreConstructedElementContexts(
+            ElementsContainer elementsContainer,
+            Application application,
+            Set<PreConstructedElementData> preConstructedElementData
+    ) {
+        //certain objects are added by default as pre-constructed elements
         elementsContainer.addElementContext(PreConstructedElementContext.of(elementsContainer));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application.getProfilesContainer()));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application.getPropertiesContainer()));
+
+        //custom pre-constructed elements may be provided as well
+        preConstructedElementData.forEach(data -> {
+            log.debug("Custom pre-constructed element '{}' will be added to elements container.", data.name());
+            var preConstructedContext = PreConstructedElementContext.of(data.preConstructedInstance(), data.name());
+            elementsContainer.addElementContext(preConstructedContext);
+        });
     }
 
 }

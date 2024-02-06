@@ -7,6 +7,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Set;
@@ -89,24 +90,28 @@ class ElementsInitializationProcessTest {
         when(methodElementContextAssembler.assemble(eq(methodScanningResult), any(DependencyResolutionInput.class)))
                 .thenReturn(dummyStringMethodElementContext);
 
-        var input = createDummyDependencyInjectionInput();
+        var preConstructedElementsData = Set.of(PreConstructedElementData.from(new File("."), "importantFile"));
+
+        var input = createDummyDependencyInjectionInput(preConstructedElementsData);
         var elementsContainer = elementsInitializationProcess.initialize(input, elementScannersBundle);
 
         assertTrue(elementsContainer.hasElementContext("dummyClassElement")); //from element class
         assertTrue(elementsContainer.hasElementContext("dummyMethodElement")); //from element method
-        assertTrue(elementsContainer.hasElementContext(Application.class)); //from pre-constructed elements
+        assertTrue(elementsContainer.hasElementContext(Application.class)); //from DEFAULT pre-constructed elements
         assertTrue(elementsContainer.hasElementContext(ProfilesContainer.class));
         assertTrue(elementsContainer.hasElementContext(PropertiesContainer.class));
         assertTrue(elementsContainer.hasElementContext(ElementsContainer.class));
+        assertTrue(elementsContainer.hasElementContext("importantFile")); //from CUSTOM pre-constructed elements
     }
 
-    private ElementsInitializationInput createDummyDependencyInjectionInput() {
+    private ElementsInitializationInput createDummyDependencyInjectionInput(Set<PreConstructedElementData> preConstructedElementData) {
         Application application = Application.empty();
         application.setProfilesContainer(ProfilesContainer.empty());
         application.setPropertiesContainer(PropertiesContainer.empty());
         return ElementsInitializationInput.builder()
                 .rootClass(ElementsInitializationProcessTest.class)
                 .application(application)
+                .preConstructedElementData(preConstructedElementData)
                 .build();
     }
 

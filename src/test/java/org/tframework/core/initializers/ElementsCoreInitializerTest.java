@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +35,11 @@ class ElementsCoreInitializerTest {
 
     @Test
     public void shouldPerformElementsCoreInitialization() {
-        var input = new ElementsInitializationInput(Application.empty(), this.getClass());
+        var input = ElementsInitializationInput.builder()
+                .application(Application.empty())
+                .rootClass(this.getClass())
+                .preConstructedElementData(Set.of())
+                .build();
         when(elementContext.getName()).thenReturn("testElement");
         var expectedElements = ElementsContainer.fromElementContexts(List.of(elementContext));
         when(elementsInitializationProcess.initialize(input)).thenReturn(expectedElements);

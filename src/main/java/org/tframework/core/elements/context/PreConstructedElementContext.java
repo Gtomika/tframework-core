@@ -4,7 +4,7 @@ package org.tframework.core.elements.context;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementScope;
-import org.tframework.core.elements.ElementUtils;
+import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 
 /**
@@ -17,9 +17,9 @@ public class PreConstructedElementContext extends ElementContext {
 
     private final Object preConstructedInstance;
 
-    private PreConstructedElementContext(Object preConstructedInstance) {
+    private PreConstructedElementContext(Object preConstructedInstance, String name) {
         super(
-                ElementUtils.getElementNameByType(preConstructedInstance.getClass()),
+                name,
                 preConstructedInstance.getClass(),
                 ElementScope.SINGLETON,
                 null, //no real source for pre-constructed elements
@@ -40,8 +40,17 @@ public class PreConstructedElementContext extends ElementContext {
 
     /**
      * Creates a new {@link PreConstructedElementContext} for the given pre-constructed instance.
+     * It will have a default name deduced from its type.
      */
     public static PreConstructedElementContext of(@NonNull Object preConstructedInstance) {
-        return new PreConstructedElementContext(preConstructedInstance);
+        return new PreConstructedElementContext(preConstructedInstance, Element.NAME_NOT_SPECIFIED);
     }
+
+    /**
+     * Creates a new {@link PreConstructedElementContext} for the given instance, with custom name.
+     */
+    public static PreConstructedElementContext of(@NonNull Object preConstructedInstance, @NonNull String name) {
+        return new PreConstructedElementContext(preConstructedInstance, name);
+    }
+
 }

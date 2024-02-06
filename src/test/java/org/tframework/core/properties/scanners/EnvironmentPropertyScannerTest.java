@@ -1,6 +1,12 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.properties.scanners;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
+import static org.tframework.core.properties.scanners.EnvironmentPropertyScanner.PROPERTY_VARIABLE_PREFIX;
+
+import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,13 +14,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.properties.parsers.PropertyParsingUtils;
 import org.tframework.core.readers.EnvironmentVariableReader;
-
-import java.util.List;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-import static org.tframework.core.properties.scanners.EnvironmentPropertyScanner.PROPERTY_VARIABLE_PREFIX;
 
 @ExtendWith(MockitoExtension.class)
 class EnvironmentPropertyScannerTest {

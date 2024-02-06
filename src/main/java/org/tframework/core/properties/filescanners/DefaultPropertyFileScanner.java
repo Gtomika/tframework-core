@@ -1,9 +1,8 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.filescanners;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A {@link PropertyFileScanner} that scans only for a default property file

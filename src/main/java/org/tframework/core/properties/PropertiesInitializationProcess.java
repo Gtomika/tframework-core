@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties;
 
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +16,6 @@ import org.tframework.core.properties.scanners.PropertyScannersFactory;
 import org.tframework.core.properties.yamlparsers.YamlParser;
 import org.tframework.core.readers.ResourceFileReader;
 import org.tframework.core.readers.ResourceNotFoundException;
-
-import java.util.List;
 
 /**
  * This class is responsible for initializing the properties, by the following process:

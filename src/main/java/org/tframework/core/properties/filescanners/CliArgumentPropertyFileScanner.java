@@ -1,13 +1,12 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.filescanners;
 
+import java.util.Arrays;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.utils.CliUtils;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * A {@link PropertyFileScanner} that scans for property files specified as command line arguments.

@@ -1,6 +1,6 @@
 org:
   tframework:
-    dependency-injection:
+    elements:
       scan-root: false
       scan-internal: false
       scan-classes:

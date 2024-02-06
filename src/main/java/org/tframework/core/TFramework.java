@@ -68,6 +68,6 @@ public final class TFramework {
      * @param application The {@link Application} to stop.
      */
     public static void stop(Application application) {
-        throw new UnsupportedOperationException("Not implemented yet");
+        //TODO
     }
 }

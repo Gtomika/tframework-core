@@ -30,7 +30,7 @@ public class InternalElementClassScanner extends ElementClassScanner {
     /**
      * The property that enables/disables this scanner.
      */
-    public static final String TFRAMEWORK_INTERNAL_PACKAGE_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".dependency-injection.scan-internal";
+    public static final String TFRAMEWORK_INTERNAL_PACKAGE_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.scan-internal";
 
     private static final SinglePropertyValue TFRAMEWORK_INTERNAL_PACKAGE_DEFAULT_VALUE = new SinglePropertyValue("true");
 

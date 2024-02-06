@@ -29,7 +29,7 @@ import org.tframework.core.utils.LogUtils;
 @Slf4j
 public class ClassesElementClassScanner extends ElementClassScanner {
 
-    public static final String SCAN_CLASSES_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".dependency-injection.scan-classes";
+    public static final String SCAN_CLASSES_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.scan-classes";
     private static final List<String> SCAN_CLASSES_DEFAULT_VALUE = List.of();
 
     @Builder

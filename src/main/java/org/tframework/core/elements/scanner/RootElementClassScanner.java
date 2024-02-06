@@ -15,14 +15,26 @@ import org.tframework.core.reflection.classes.PackageClassScanner;
 import org.tframework.core.utils.Constants;
 
 /**
- * A {@link ElementClassScanner} which scans the root class' package and all its sub-packages.
- * This scanner is enabled by default, but can be disabled by setting the {@value #ROOT_SCANNING_ENABLED_PROPERTY}
- * to {@code false}.
+ * A {@link ElementClassScanner} which scans the root class (including nested classes) and its hierarchy of packages:
+ * root classes package and all its sub-packages. This scanner is enabled by default.
+ * <ul>
+ *     <li>
+ *         To disable root class hierarchy scanning, set {@value #ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY}to {@code false}.
+ *         In this case, only the root class and its nested classes will be scanned, but not the package and the sub-packages.
+ *     </li>
+ *     <li>
+ *         To disable this scanner altogether (not even the root class should be scanned), use {@value ROOT_SCANNING_ENABLED_PROPERTY}
+ *         with {@code false} value.
+ *     </li>
+ * </ul>
  */
 @Slf4j
 public class RootElementClassScanner extends ElementClassScanner {
 
-    public static final String ROOT_SCANNING_ENABLED_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".dependency-injection.scan-root";
+    public static final String ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.scan-root-hierarchy";
+    private static final SinglePropertyValue ROOT_HIERARCHY_SCANNING_ENABLED_DEFAULT_VALUE = new SinglePropertyValue("true");
+
+    public static final String ROOT_SCANNING_ENABLED_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.scan-root";
     private static final SinglePropertyValue ROOT_SCANNING_ENABLED_DEFAULT_VALUE = new SinglePropertyValue("true");
 
     private final PackageClassScanner classScanner;
@@ -48,10 +60,10 @@ public class RootElementClassScanner extends ElementClassScanner {
     @Override
     public Set<Class<?>> scanPotentialElements() {
         var scanRootProperty = propertiesContainer.getPropertyValueObject(
-                ROOT_SCANNING_ENABLED_PROPERTY,
-                ROOT_SCANNING_ENABLED_DEFAULT_VALUE
+                ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY,
+                ROOT_HIERARCHY_SCANNING_ENABLED_DEFAULT_VALUE
         );
-        log.debug("The EFFECTIVE value of property '{}' is '{}'", ROOT_SCANNING_ENABLED_PROPERTY, scanRootProperty);
+        log.debug("The EFFECTIVE value of property '{}' is '{}'", ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY, scanRootProperty);
         if(propertyConverter.convert(scanRootProperty)) {
             return classScanner.scanClasses();
         } else {

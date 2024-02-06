@@ -4,7 +4,7 @@ package org.tframework.core.elements.scanner;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
-import static org.tframework.core.elements.scanner.RootElementClassScanner.ROOT_SCANNING_ENABLED_PROPERTY;
+import static org.tframework.core.elements.scanner.RootElementClassScanner.ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY;
 
 import java.util.List;
 import java.util.Set;
@@ -66,11 +66,11 @@ class RootElementClassScannerTest {
             properties = PropertiesContainer.empty();
         } else if(enabled) {
             properties = PropertiesContainer.fromProperties(List.of(new Property(
-                        ROOT_SCANNING_ENABLED_PROPERTY, new SinglePropertyValue("true")
+                    ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY, new SinglePropertyValue("true")
                 )));
         } else {
             properties = PropertiesContainer.fromProperties(List.of(new Property(
-                        ROOT_SCANNING_ENABLED_PROPERTY, new SinglePropertyValue("false")
+                    ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY, new SinglePropertyValue("false")
                 )));
         }
 

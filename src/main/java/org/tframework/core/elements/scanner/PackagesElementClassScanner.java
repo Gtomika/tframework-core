@@ -30,7 +30,7 @@ import org.tframework.core.utils.Constants;
 @Slf4j
 public class PackagesElementClassScanner extends ElementClassScanner {
 
-    public static final String SCAN_PACKAGES_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".dependency-injection.scan-packages";
+    public static final String SCAN_PACKAGES_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.scan-packages";
     private static final List<String> SCAN_PACKAGES_DEFAULT_VALUE = List.of();
 
     private final PackageClassScanner classScanner;

@@ -2,10 +2,8 @@
 package org.tframework.core.properties;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -15,7 +13,7 @@ import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.dependency.DependencySource;
 
 /**
- * A read-only container of the properties, and related utility methods.
+ * A read-only container of the properties, and related methods to access them.
  */
 @Slf4j
 @EqualsAndHashCode
@@ -23,7 +21,7 @@ import org.tframework.core.elements.dependency.DependencySource;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class PropertiesContainer implements DependencySource {
 
-    private final Map<String, PropertyValue> properties;
+    private final List<Property> properties;
 
     /**
      * Gets the {@link PropertyValue} of a property. If interested only in the raw underlying value,
@@ -32,8 +30,7 @@ public final class PropertiesContainer implements DependencySource {
      * @throws PropertyNotFoundException If the property does not exist.
      */
     public PropertyValue getPropertyValueObject(String propertyName) {
-        return Optional.ofNullable(properties.get(propertyName))
-                .orElseThrow(() -> new PropertyNotFoundException(propertyName));
+        return PropertyUtils.getValueFromPropertyList(properties, propertyName);
     }
 
     /**
@@ -43,11 +40,12 @@ public final class PropertiesContainer implements DependencySource {
      * @param defaultValue A default value to return if the property does not exist.
      */
     public PropertyValue getPropertyValueObject(String propertyName, PropertyValue defaultValue) {
-        return Optional.ofNullable(properties.get(propertyName))
-                .orElseGet(() -> {
-                    log.debug("Property '{}' not found. Returning default value '{}'", propertyName, defaultValue);
-                    return defaultValue;
-                });
+        try {
+            return PropertyUtils.getValueFromPropertyList(properties, propertyName);
+        } catch (PropertyNotFoundException e) {
+            log.debug("Property '{}' not found. Returning default value '{}'", propertyName, defaultValue);
+            return defaultValue;
+        }
     }
 
     /**
@@ -130,17 +128,29 @@ public final class PropertiesContainer implements DependencySource {
      * @param additionalProperties New properties to add to the current ones.
      * @return A new {@link PropertiesContainer} with the merged properties.
      */
-    PropertiesContainer merge(@NonNull Map<String, PropertyValue> additionalProperties) {
-        Map<String, PropertyValue> mergedProperties = new HashMap<>(properties);
-        for(String propertyName : additionalProperties.keySet()) {
-            var newValue = additionalProperties.get(propertyName);
-            if(mergedProperties.containsKey(propertyName)) {
-                var oldValue = mergedProperties.get(propertyName);
-                log.debug("Overriding property '{}'. Old value: '{}'. New value: '{}'", propertyName, oldValue, newValue);
+    PropertiesContainer merge(@NonNull List<Property> additionalProperties) {
+        List<Property> mergedProperties = new ArrayList<>(properties);
+        for(var property: additionalProperties) {
+            var newValue = property.value();
+            try {
+                var oldValue = PropertyUtils.getValueFromPropertyList(mergedProperties, property.name());
+                log.debug("Overriding property '{}'. Old value: '{}'. New value: '{}'", property.name(), oldValue, newValue);
+                PropertyUtils.replaceValueInPropertyList(mergedProperties, property);
+            } catch (PropertyNotFoundException e) {
+                mergedProperties.add(property);
             }
-            mergedProperties.put(propertyName, newValue);
         }
         return PropertiesContainer.fromProperties(mergedProperties);
+    }
+
+    /**
+     * Creates a new {@link PropertiesContainer} with the original ones merged with the ones found in
+     * the other container. Properties in the other container will override the current ones.
+     * @param otherContainer Non-null container to merge into this one.
+     * @return A new container with the merged properties.
+     */
+    PropertiesContainer merge(@NonNull PropertiesContainer otherContainer) {
+        return merge(otherContainer.properties);
     }
 
     /**
@@ -149,27 +159,19 @@ public final class PropertiesContainer implements DependencySource {
      */
     @Override
     public String toString() {
-        var propertyNames = properties.keySet()
-                .stream()
+        String containerString = "Properties container with the following properties:\n";
+        containerString += properties.stream()
                 .sorted()
-                .toList();
-        StringBuilder stringBuilder = new StringBuilder("Properties container with the following properties:\n");
-        for(String propertyName : propertyNames) {
-            stringBuilder.append(" - ")
-                    .append(propertyName)
-                    .append(": ")
-                    .append(properties.get(propertyName))
-                    .append("\n");
-        }
-        stringBuilder.deleteCharAt(stringBuilder.length() - 1); // Remove the last \n
-        return stringBuilder.toString();
+                .map(property -> " - " + property.toString())
+                .collect(Collectors.joining("\n"));
+        return containerString;
     }
 
     /**
-     * Creates a {@link PropertiesContainer} from the given {@link Map} of properties.
-     * @param properties Properties map, usually produced by a {@link org.tframework.core.properties.extractors.PropertiesExtractor}.
+     * Creates a {@link PropertiesContainer} from the given list of properties.
+     * @param properties Properties list to create the container from, cannot be null.
      */
-    public static PropertiesContainer fromProperties(Map<String, PropertyValue> properties) {
+    public static PropertiesContainer fromProperties(@NonNull List<Property> properties) {
         return new PropertiesContainer(properties);
     }
 
@@ -177,7 +179,7 @@ public final class PropertiesContainer implements DependencySource {
      * Creates an empty {@link PropertiesContainer}.
      */
     public static PropertiesContainer empty() {
-        return fromProperties(Map.of());
+        return fromProperties(List.of());
     }
 
 }

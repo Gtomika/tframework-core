@@ -29,7 +29,7 @@ class SystemPropertyProfileScannerTest {
 
     @Test
     public void shouldScanProfilesFromSystemProperty_ifProvided() {
-        when(systemPropertyReader.readProperty(PROFILES_SYSTEM_PROPERTY))
+        when(systemPropertyReader.readSystemProperty(PROFILES_SYSTEM_PROPERTY))
                 .thenReturn("dev,db");
 
         var profiles = scanner.scan();
@@ -39,7 +39,7 @@ class SystemPropertyProfileScannerTest {
 
     @Test
     public void shouldScanProfilesFromSystemProperty_ifNotProvided() {
-        when(systemPropertyReader.readProperty(PROFILES_SYSTEM_PROPERTY))
+        when(systemPropertyReader.readSystemProperty(PROFILES_SYSTEM_PROPERTY))
                 .thenThrow(new SystemPropertyNotFoundException(PROFILES_SYSTEM_PROPERTY));
 
         var profiles = scanner.scan();

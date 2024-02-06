@@ -2,7 +2,9 @@
 package org.tframework.core.readers;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +18,12 @@ import lombok.RequiredArgsConstructor;
 public class EnvironmentVariableReader {
 
     private final Function<String, String> variableAccessor;
+    private final Supplier<Set<String>> variablesIterator;
+
+    EnvironmentVariableReader() {
+        variableAccessor = System::getenv;
+        variablesIterator = () -> System.getenv().keySet();
+    }
 
     /**
      * Fetch a variable from the environment.
@@ -26,6 +34,13 @@ public class EnvironmentVariableReader {
     public String readVariable(String name) {
         return Optional.ofNullable(variableAccessor.apply(name))
                 .orElseThrow(() -> new EnvironmentVariableNotFoundException(name));
+    }
+
+    /**
+     * Gets all available variable names from the environment.
+     */
+    public Set<String> getAllVariableNames() {
+        return variablesIterator.get();
     }
 
 }

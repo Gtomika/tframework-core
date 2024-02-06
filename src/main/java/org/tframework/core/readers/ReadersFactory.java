@@ -16,14 +16,14 @@ public final class ReadersFactory {
      * Creates an {@link EnvironmentVariableReader} to access system variables.
      */
     public static EnvironmentVariableReader createEnvironmentVariableReader() {
-        return new EnvironmentVariableReader(System::getenv);
+        return new EnvironmentVariableReader();
     }
 
     /**
      * Creates a {@link SystemPropertyReader} to access system properties.
      */
     public static SystemPropertyReader createSystemPropertyReader() {
-        return new SystemPropertyReader(System::getProperty);
+        return new SystemPropertyReader();
     }
 
     /**

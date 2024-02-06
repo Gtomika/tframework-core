@@ -1,9 +1,10 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.filescanners;
 
+import lombok.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
-import lombok.NonNull;
 
 /**
  * The property file scanner finds property files that will be used by the framework.
@@ -17,6 +18,11 @@ public interface PropertyFileScanner {
      * @return The set of property files found. These paths are relative to the {@code resources} folder.
      */
     List<String> scan();
+
+    /**
+     * An informative string from where this file scanner finds the property files.
+     */
+    String sourceName();
 
     /**
      * Combines the results of multiple scanners into a single set of unique property files.

@@ -1,7 +1,6 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties;
 
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +16,8 @@ import org.tframework.core.properties.yamlparsers.YamlParser;
 import org.tframework.core.readers.ResourceFileReader;
 import org.tframework.core.readers.ResourceNotFoundException;
 
+import java.util.List;
+
 /**
  * This class is responsible for initializing the properties, by the following process:
  * <ul>
@@ -31,8 +32,8 @@ import org.tframework.core.readers.ResourceNotFoundException;
  * <p>
  * After all property files are found and handled, directly specified properties will be looked up and added.
  * <ul>
- *     <li>{@link org.tframework.core.properties.scanners.PropertyScanner}s detect them.</li>
- *     <li>{@link org.tframework.core.properties.parsers.PropertyParser} will convert the raw properties into {@link Property} objects.</li>
+ *     <li>{@link PropertyScanner}s detect them.</li>
+ *     <li>{@link PropertyParser} will convert the raw properties into {@link Property} objects.</li>
  *     <li>There will be added to the {@link PropertiesContainer}, overriding existing values.</li>
  * </ul>
  */
@@ -42,6 +43,7 @@ import org.tframework.core.readers.ResourceNotFoundException;
 public class PropertiesInitializationProcess {
 
     private static final String OVERRIDING_PROPERTY_FILE = "overridingPropertyFile";
+    private static final String OVERRIDING_PROPERTY_SOURCE = "overridingPropertySource";
 
     private final ResourceFileReader resourceFileReader;          //reads the property files
     private final YamlParser yamlParser;                          //parses the YAML
@@ -50,7 +52,7 @@ public class PropertiesInitializationProcess {
     private final PropertyParser propertyParser;                  // parser raw property strings
 
     /**
-     * Initializes the properties.
+     * Initializes the properties according to the process documented on the class.
      * @param input {@link PropertiesInitializationInput} with the input parameters.
      * @return {@link PropertiesContainer} containing the properties found.
      */
@@ -71,24 +73,32 @@ public class PropertiesInitializationProcess {
             List<PropertyFileScanner> propertyFileScanners,
             List<PropertyScanner> propertyScanners
     ) {
+        return PropertiesContainer.empty()
+                .merge(readPropertiesFromFiles(propertyFileScanners))
+                .merge(readDirectlySpecifiedProperties(propertyScanners));
+    }
+
+    private PropertiesContainer readPropertiesFromFiles(List<PropertyFileScanner> propertyFileScanners) {
         PropertiesContainer propertiesContainer = PropertiesContainer.empty();
 
         for(PropertyFileScanner propertyFileScanner: propertyFileScanners) {
             List<String> propertyFiles = propertyFileScanner.scan();
+            String source = propertyFileScanner.sourceName();
             for(String propertyFile : propertyFiles) {
-                log.debug("Attempting to read property file '{}', provided by scanner '{}'", propertyFile, propertyFileScanner.getClass().getName());
+                log.debug("Attempting to read property file '{}', from source '{}'", propertyFile, source);
 
                 var properties = processPropertyFile(propertyFile);
                 if(!properties.isEmpty()) {
-                    log.debug("Found {} properties in file '{}', merging them into current properties...", properties.size(), propertyFile);
+                    log.debug("Found {} properties in file '{}' from source '{}', merging them into current properties...",
+                            properties.size(), propertyFile, source);
                     MDC.put(OVERRIDING_PROPERTY_FILE, propertyFile);
                     propertiesContainer = propertiesContainer.merge(properties);
                     MDC.remove(OVERRIDING_PROPERTY_FILE);
+                } else {
+                    log.debug("Properties file '{}' from source '{}' did not contain any properties.", propertyFile, source);
                 }
             }
         }
-
-        //TODO
 
         return propertiesContainer;
     }
@@ -99,9 +109,32 @@ public class PropertiesInitializationProcess {
             var parsedYaml = yamlParser.parseYaml(propertyFileContent);
             return propertiesExtractor.extractProperties(parsedYaml);
         } catch (ResourceNotFoundException e) {
+            //this is not an error, it isn't required to use property files
             log.debug("Property file '{}' not found, skipping...", propertyFile);
             return List.of();
         }
+    }
+
+    private PropertiesContainer readDirectlySpecifiedProperties(List<PropertyScanner> propertyScanners) {
+        PropertiesContainer propertiesContainer = PropertiesContainer.empty();
+
+        for(PropertyScanner propertyScanner: propertyScanners) {
+            var properties = propertyScanner.scanProperties().stream()
+                    .map(propertyParser::parseProperty)
+                    .toList();
+
+            String source = propertyScanner.sourceName();
+            if(!properties.isEmpty()) {
+                log.debug("Found {} directly specified properties at source: {}", properties.size(), source);
+                MDC.put(OVERRIDING_PROPERTY_SOURCE, source);
+                propertiesContainer = propertiesContainer.merge(properties);
+                MDC.remove(OVERRIDING_PROPERTY_SOURCE);
+            } else {
+                log.debug("Found no directly specified properties at source: {}", source);
+            }
+        }
+
+        return propertiesContainer;
     }
 
 }

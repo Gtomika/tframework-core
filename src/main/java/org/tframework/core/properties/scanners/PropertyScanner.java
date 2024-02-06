@@ -15,4 +15,9 @@ public interface PropertyScanner {
      */
     List<String> scanProperties();
 
+    /**
+     * An informative name from where this scanner looks up properties.
+     */
+    String sourceName();
+
 }

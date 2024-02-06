@@ -1,13 +1,14 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.properties;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.fail;
 
 class PropertyUtilsTest {
 
@@ -20,8 +21,8 @@ class PropertyUtilsTest {
     @Test
     public void shouldGetValueFromPropertyList() {
         var value = PropertyUtils.getValueFromPropertyList(properties, "a");
-        if(value instanceof SinglePropertyValue spv) {
-            assertEquals("a value", spv.value());
+        if(value instanceof SinglePropertyValue(String actualValue)) {
+            assertEquals("a value", actualValue);
         } else {
             fail("single property value expected");
         }
@@ -47,8 +48,8 @@ class PropertyUtilsTest {
         PropertyUtils.replaceValueInPropertyList(propertiesCopy, newProperty);
 
         var value = PropertyUtils.getValueFromPropertyList(propertiesCopy, "a");
-        if(value instanceof SinglePropertyValue spv) {
-            assertEquals("updated a", spv.value());
+        if(value instanceof SinglePropertyValue(String actualValue)) {
+            assertEquals("updated a", actualValue);
         } else {
             fail("single property value expected");
         }

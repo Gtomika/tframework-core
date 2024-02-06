@@ -1,9 +1,6 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -12,8 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.dependency.DependencySource;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 /**
- * A read-only container of the properties, and related utility methods.
+ * A read-only container of the properties, and related methods to access them.
  */
 @Slf4j
 @EqualsAndHashCode
@@ -141,6 +142,16 @@ public final class PropertiesContainer implements DependencySource {
             }
         }
         return PropertiesContainer.fromProperties(mergedProperties);
+    }
+
+    /**
+     * Creates a new {@link PropertiesContainer} with the original ones merged with the ones found in
+     * the other container. Properties in the other container will override the current ones.
+     * @param otherContainer Non-null container to merge into this one.
+     * @return A new container with the merged properties.
+     */
+    PropertiesContainer merge(@NonNull PropertiesContainer otherContainer) {
+        return merge(otherContainer.properties);
     }
 
     /**

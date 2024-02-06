@@ -2,12 +2,13 @@
 package org.tframework.core.properties.scanners;
 
 
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.properties.parsers.PropertyParsingUtils;
 import org.tframework.core.readers.SystemPropertyReader;
+
+import java.util.List;
 
 /**
  * A {@link PropertyScanner} that finds <b>framework</b> properties to set in the <b>system</b> properties.
@@ -40,5 +41,10 @@ public class SystemPropertyScanner implements PropertyScanner {
                 })
                 .peek(rawProperty -> log.debug("Found '{}' raw property in system properties", rawProperty))
                 .toList();
+    }
+
+    @Override
+    public String sourceName() {
+        return "System Properties (where name starts with " + PROPERTY_PREFIX + ")";
     }
 }

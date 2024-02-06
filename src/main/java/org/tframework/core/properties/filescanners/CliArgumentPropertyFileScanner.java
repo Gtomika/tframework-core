@@ -1,12 +1,13 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.filescanners;
 
-import java.util.Arrays;
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.utils.CliUtils;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * A {@link PropertyFileScanner} that scans for property files specified as command line arguments.
@@ -22,7 +23,7 @@ import org.tframework.core.utils.CliUtils;
  * For example
  * <pre>{@code tframework.propertyFile=custom-properties.yaml}</pre>
  * will be picked up if this file exists in the {@code resources} folder. The file name can
- * be anything, but underneath, it still must be an existing, valid YAML file.
+ * be anything, but underneath, it still should be an existing, valid YAML file.
  */
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
@@ -43,5 +44,10 @@ public class CliArgumentPropertyFileScanner implements PropertyFileScanner {
                 .map(String::trim)
                 .peek(arg -> log.debug("Adding property file activated by CLI argument: '{}'", arg))
                 .toList();
+    }
+
+    @Override
+    public String sourceName() {
+        return "Command Line Arguments (with key " + PROPERTY_FILE_ARGUMENT_KEY + ")";
     }
 }

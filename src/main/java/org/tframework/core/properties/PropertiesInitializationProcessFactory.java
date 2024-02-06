@@ -3,6 +3,7 @@ package org.tframework.core.properties;
 
 import lombok.NoArgsConstructor;
 import org.tframework.core.properties.extractors.PropertyExtractorsFactory;
+import org.tframework.core.properties.parsers.PropertyParsersFactory;
 import org.tframework.core.properties.yamlparsers.YamlParsersFactory;
 import org.tframework.core.readers.ReadersFactory;
 
@@ -17,6 +18,7 @@ public final class PropertiesInitializationProcessFactory {
                 .resourceFileReader(ReadersFactory.createResourceFileReader())
                 .yamlParser(YamlParsersFactory.createDefaultYamlParser())
                 .propertiesExtractor(PropertyExtractorsFactory.createPropertiesExtractor())
+                .propertyParser(PropertyParsersFactory.createDefaultPropertyParser())
                 .build();
     }
 

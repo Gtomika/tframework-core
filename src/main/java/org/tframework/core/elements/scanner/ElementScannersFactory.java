@@ -1,7 +1,6 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.scanner;
 
-import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
@@ -12,6 +11,8 @@ import org.tframework.core.reflection.classes.ClassFiltersFactory;
 import org.tframework.core.reflection.classes.ClassScannersFactory;
 import org.tframework.core.reflection.methods.MethodFiltersFactory;
 import org.tframework.core.reflection.methods.MethodScannersFactory;
+
+import java.util.List;
 
 /**
  * Factory for creating various {@link ElementScanner}s.
@@ -66,7 +67,8 @@ public final class ElementScannersFactory {
         return RootElementClassScanner.builder()
                 .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())
                 .classFilter(ClassFiltersFactory.createDefaultClassFilter())
-                .classScanner(ClassScannersFactory.createPackageClassScanner())
+                .packageClassScanner(ClassScannersFactory.createPackageClassScanner())
+                .rootClassScanner(ClassScannersFactory.createNestedClassScanner(rootClass))
                 .propertiesContainer(properties)
                 .rootClass(rootClass)
                 .build();

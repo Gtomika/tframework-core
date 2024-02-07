@@ -1,5 +1,7 @@
 /* Licensed under Apache-2.0 2024. */
-package org.tframework.test;
+package org.tframework.test.annotations;
+
+import org.tframework.test.TFrameworkExtension;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -15,7 +17,7 @@ import java.lang.annotation.RetentionPolicy;
  * </pre>
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Properties {
+public @interface SetProperties {
 
     /**
      * The raw property string that should be set.

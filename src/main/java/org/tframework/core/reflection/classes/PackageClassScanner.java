@@ -3,18 +3,18 @@ package org.tframework.core.reflection.classes;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.utils.ClassLoaderUtils;
+
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * A {@link ClassScanner} implementation that scans for classes in packages. The {@link ClassGraph} library
@@ -47,19 +47,21 @@ public class PackageClassScanner implements ClassScanner {
         ClassGraph classGraph = new ClassGraph()
                 .enableClassInfo()
                 .acceptPackages(packageNames.toArray(new String[] {}));
-        ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
-        try(ScanResult scanResult = classGraph.scan(executor, THREAD_COUNT)) {
-            return scanResult.getAllClasses().stream()
-                    .map(info -> {
-                        try {
-                            return ClassLoaderUtils.loadClass(info.getName(), PackageClassScanner.class);
-                        } catch (ClassNotFoundException e) {
-                            log.warn("Could not load class '{}'", info.getName(), e);
-                            return null;
-                        }
-                    })
-                    .filter(Objects::nonNull)
-                    .collect(Collectors.toSet());
+
+        try(ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+            try(ScanResult scanResult = classGraph.scan(executor, THREAD_COUNT)) {
+                return scanResult.getAllClasses().stream()
+                        .map(info -> {
+                            try {
+                                return info.loadClass(); //important to use class graph's own loader here
+                            } catch (IllegalArgumentException e) {
+                                log.warn("Could not load class '{}'", info.getName(), e);
+                                return null;
+                            }
+                        })
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
+            }
         }
     }
 }

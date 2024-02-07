@@ -1,9 +1,6 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.scanner;
 
-import java.util.Collection;
-import java.util.Set;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.tframework.core.elements.annotations.Element;
@@ -11,6 +8,10 @@ import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.AnnotationFilteringResult;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.classes.ClassFilter;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Abstract base class for all implementations that search for the {@link Element} annotation on classes.
@@ -38,14 +39,17 @@ public abstract class ElementClassScanner implements ElementScanner<Class<?>> {
      */
     public Set<ElementScanningResult<Class<?>>> scanElements() {
         return filterElements(scanPotentialElements())
-                .stream()
                 .map(result -> new ElementScanningResult<Class<?>>(result.annotation(), result.annotationSource()))
                 .collect(Collectors.toSet());
     }
 
     //performs strict scanning for the Element annotation on the given classes
     //at most one Element annotation is allowed per class, to avoid ambiguity
-    protected Collection<AnnotationFilteringResult<Element, Class<?>>> filterElements(Set<Class<?>> classes) {
-        return classFilter.filterByAnnotation(classes, Element.class, annotationScanner, true);
+    protected Stream<AnnotationFilteringResult<Element, Class<?>>> filterElements(Set<Class<?>> classes) {
+        return classFilter.filterByAnnotation(classes, Element.class, annotationScanner, true)
+                .stream()
+                // don't want to find annotations as possible elements
+                // if an annotation is annotated with @Element, that is a composed annotation, not an element
+                .filter(result -> !result.annotationSource().isAnnotation());
     }
 }

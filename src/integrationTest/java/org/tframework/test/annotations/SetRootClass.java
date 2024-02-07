@@ -11,6 +11,9 @@ import java.lang.annotation.RetentionPolicy;
  * one attribute of this annotation can be used to specify the root class. For example if {@link #useTestClassAsRoot()}
  * is set to true, then {@link #findRootClassOnClasspath()} should be false, and {@link #rootClass()} should be
  * left unspecified.
+ * <p><br>
+ * If you specify {@link #findRootClassOnClasspath()}, then also provide a {@link BasePackage} annotation together
+ * with this one.
  */
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SetRootClass {
@@ -31,6 +34,6 @@ public @interface SetRootClass {
     /**
      * Directly specify the root class.
      */
-    Class<?> rootClass() default ROOT_CLASS_NOT_DIRECTLY_SPECIFIED;
+    Class<?> rootClass() default Void.class; //compiler does not allow to use variable here
 
 }

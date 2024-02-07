@@ -1,7 +1,6 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.scanner;
 
-import java.util.Set;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.properties.PropertiesContainer;
@@ -13,10 +12,12 @@ import org.tframework.core.reflection.classes.ClassFilter;
 import org.tframework.core.reflection.classes.PackageClassScanner;
 import org.tframework.core.utils.Constants;
 
+import java.util.Set;
+
 /**
  * An {@link ElementClassScanner} implementation which scans the internal TFramework packages
  * ({@value TFRAMEWORK_INTERNAL_PACKAGE}). By default, this scanner is enabled, but can be enabled by setting the
- * {@value TFRAMEWORK_INTERNAL_PACKAGE_PROPERTY} to {@code false}.
+ * {@value TFRAMEWORK_INTERNAL_SCAN_ENABLED_PROPERTY} to {@code false}.
  */
 @Slf4j
 public class InternalElementClassScanner extends ElementClassScanner {
@@ -30,7 +31,7 @@ public class InternalElementClassScanner extends ElementClassScanner {
     /**
      * The property that enables/disables this scanner.
      */
-    public static final String TFRAMEWORK_INTERNAL_PACKAGE_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.scan-internal";
+    public static final String TFRAMEWORK_INTERNAL_SCAN_ENABLED_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.scan-internal";
 
     private static final SinglePropertyValue TFRAMEWORK_INTERNAL_PACKAGE_DEFAULT_VALUE = new SinglePropertyValue("true");
 
@@ -55,7 +56,7 @@ public class InternalElementClassScanner extends ElementClassScanner {
     @Override
     public Set<Class<?>> scanPotentialElements() {
         var scanInternalProperty = propertiesContainer.getPropertyValueObject(
-                TFRAMEWORK_INTERNAL_PACKAGE_PROPERTY,
+                TFRAMEWORK_INTERNAL_SCAN_ENABLED_PROPERTY,
                 TFRAMEWORK_INTERNAL_PACKAGE_DEFAULT_VALUE
         );
         if(propertyConverter.convert(scanInternalProperty)) {

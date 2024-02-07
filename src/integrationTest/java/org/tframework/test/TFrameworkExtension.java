@@ -9,16 +9,23 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
+import org.slf4j.MDC;
 import org.tframework.core.Application;
 import org.tframework.core.TFramework;
+import org.tframework.core.TFrameworkRootClass;
 import org.tframework.core.elements.PreConstructedElementData;
-import org.tframework.core.properties.parsers.PropertyParsingUtils;
-import org.tframework.core.properties.parsers.SeparatedProperty;
+import org.tframework.core.elements.scanner.ClassesElementClassScanner;
+import org.tframework.core.elements.scanner.InternalElementClassScanner;
+import org.tframework.core.elements.scanner.PackagesElementClassScanner;
+import org.tframework.core.elements.scanner.RootElementClassScanner;
 import org.tframework.core.readers.ReadersFactory;
 import org.tframework.core.readers.SystemPropertyNotFoundException;
 import org.tframework.core.readers.SystemPropertyReader;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
+import org.tframework.core.reflection.classes.ClassScannersFactory;
+import org.tframework.core.reflection.classes.PackageClassScanner;
+import org.tframework.test.annotations.BasePackage;
 import org.tframework.test.annotations.SetApplicationName;
 import org.tframework.test.annotations.SetCommandLineArguments;
 import org.tframework.test.annotations.SetElements;
@@ -32,9 +39,9 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.tframework.core.profiles.scanners.SystemPropertyProfileScanner.PROFILES_SYSTEM_PROPERTY;
-import static org.tframework.core.properties.scanners.SystemPropertyScanner.PROPERTY_PREFIX;
 
 /**
  * This is a JUnit 5 extension that allows to easily start TFramework applications. <b>The test instance created by JUnit will
@@ -66,8 +73,11 @@ import static org.tframework.core.properties.scanners.SystemPropertyScanner.PROP
 @Slf4j
 public class TFrameworkExtension implements Extension, TestInstancePostProcessor, AfterAllCallback, ParameterResolver {
 
+    private static final String SOURCE_ANNOTATION = "sourceAnnotation";
+
     private final AnnotationScanner annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
     private final SystemPropertyReader systemPropertyReader = ReadersFactory.createSystemPropertyReader();
+    private final PackageClassScanner classpathScanner = ClassScannersFactory.createPackageClassScanner();
 
     private Application application;
 
@@ -140,7 +150,7 @@ public class TFrameworkExtension implements Extension, TestInstancePostProcessor
                         new PredicateExecutor<SetRootClass, Class<?>>(
                                 "findRootClassOnClasspath",
                                 SetRootClass::findRootClassOnClasspath,
-                                this::findRootClassOnClasspath
+                                () -> findRootClassOnClasspath(testClass)
                         )
                 ));
             }
@@ -151,8 +161,33 @@ public class TFrameworkExtension implements Extension, TestInstancePostProcessor
         }
     }
 
-    private Class<?> findRootClassOnClasspath() {
-        return null; //TODO
+    private static final String TOO_MANY_ROOT_CLASSES_ERROR_TEMPLATE = "More than one class was found to annotated with '" +
+            TFrameworkRootClass.class.getName() + "' on the classpath: %s";
+    private static final String NO_ROOT_CLASS_ERROR = "No root class was found that is annotated with '" +
+            TFrameworkRootClass.class.getName() + "', but exactly one is required.";
+
+    private Class<?> findRootClassOnClasspath(Class<?> testClass) {
+        String basePackage = annotationScanner.scanOneStrict(testClass, BasePackage.class)
+                .map(BasePackage::value)
+                .orElseThrow(() -> new IllegalStateException(
+                        BasePackage.class.getName() + " annotation must also be provided if root class is to be scanned."
+                ));
+
+        classpathScanner.setPackageNames(Set.of(basePackage));
+        var rootClassCandidates = classpathScanner.scanClasses().stream()
+                .filter(clazz -> annotationScanner.hasAnnotation(clazz, TFrameworkRootClass.class))
+                .toList();
+
+        String candidatesString = rootClassCandidates.stream()
+                .map(Class::getName)
+                .collect(Collectors.joining(", "));
+        if(rootClassCandidates.size() > 1) {
+            throw new IllegalStateException(TOO_MANY_ROOT_CLASSES_ERROR_TEMPLATE.formatted(candidatesString));
+        }
+        if(rootClassCandidates.isEmpty()) {
+            throw new IllegalStateException(NO_ROOT_CLASS_ERROR);
+        }
+        return rootClassCandidates.getFirst();
     }
 
     private String[] findCommandLineArguments(Class<?> testClass) {
@@ -193,19 +228,44 @@ public class TFrameworkExtension implements Extension, TestInstancePostProcessor
             var properties = Arrays.asList(propertiesAnnotation.value());
             if(properties.isEmpty()) return;
 
-            properties.forEach(property -> {
-                SeparatedProperty separatedProperty = PropertyParsingUtils.separateNameValue(property);
-                log.debug("The following property will be set by the '{}' test annotation: {} = {}",
-                        SetProperties.class.getName(), separatedProperty.name(), separatedProperty.value());
-
-                //if it exists, it will simply be overridden
-                System.setProperty(PROPERTY_PREFIX + separatedProperty.name(), separatedProperty.value());
-            });
+            MDC.put(SOURCE_ANNOTATION, SetProperties.class.getName());
+            properties.forEach(TestActionsUtils::setRawFrameworkPropertyIntoSystemProperties);
+            MDC.remove(SOURCE_ANNOTATION);
         });
     }
 
     private void placeElementSettingsForApplication(Class<?> testClass) {
-        //TODO
+        annotationScanner.scan(testClass, SetElements.class).forEach(setElementsAnnotation -> {
+            MDC.put(SOURCE_ANNOTATION, SetElements.class.getName());
+
+            TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
+                    RootElementClassScanner.ROOT_SCANNING_ENABLED_PROPERTY,
+                    String.valueOf(setElementsAnnotation.rootScanningEnabled())
+            );
+
+            TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
+                    RootElementClassScanner.ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY,
+                    String.valueOf(setElementsAnnotation.rootHierarchyScanningEnabled())
+            );
+
+            TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
+                    InternalElementClassScanner.TFRAMEWORK_INTERNAL_SCAN_ENABLED_PROPERTY,
+                    String.valueOf(setElementsAnnotation.internalScanningEnabled())
+            );
+
+            TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
+                    PackagesElementClassScanner.SCAN_PACKAGES_PROPERTY,
+                    setElementsAnnotation.scanAdditionalPackages()
+            );
+
+            TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
+                    ClassesElementClassScanner.SCAN_CLASSES_PROPERTY,
+                    setElementsAnnotation.scanAdditionalClasses()
+            );
+
+            MDC.remove(SOURCE_ANNOTATION);
+        });
+
     }
 
 }

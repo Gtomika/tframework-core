@@ -44,30 +44,46 @@ class RootElementClassScannerTest {
 
     private RootElementClassScanner scanner;
 
-    private final Set<Class<?>> elements = Set.of(SomeElement.class, OtherElement.class);
-    private final Set<AnnotationFilteringResult<Element, Class<?>>> elementAnnotationFilterResults = Set.of(
-        new AnnotationFilteringResult<>(SomeElement.class.getAnnotation(Element.class), SomeElement.class) ,
-        new AnnotationFilteringResult<>(OtherElement.class.getAnnotation(Element.class), OtherElement.class)
+    private final AnnotationFilteringResult<Element, Class<?>> rootFilteringResult =
+            new AnnotationFilteringResult<>(RootClass.class.getAnnotation(Element.class), RootClass.class);
+    private final AnnotationFilteringResult<Element, Class<?>> nestedFilteringResult =
+            new AnnotationFilteringResult<>(RootClass.NestedElement.class.getAnnotation(Element.class), RootClass.NestedElement.class);
+    private final AnnotationFilteringResult<Element, Class<?>> someElementFilteringResult =
+            new AnnotationFilteringResult<>(SomeElement.class.getAnnotation(Element.class), SomeElement.class);
+    private final AnnotationFilteringResult<Element, Class<?>> otherElementFilteringResult =
+            new AnnotationFilteringResult<>(OtherElement.class.getAnnotation(Element.class), OtherElement.class);
+
+    private final Set<Class<?>> fullClassesSet = Set.of(RootClass.class, RootClass.NestedElement.class, SomeElement.class, OtherElement.class);
+    private final Set<AnnotationFilteringResult<Element, Class<?>>> fullFilterResults = Set.of(
+       rootFilteringResult, nestedFilteringResult, someElementFilteringResult, otherElementFilteringResult
+    );
+
+    private final Set<Class<?>> rootAndNestedClassesSet = Set.of(RootClass.class, RootClass.NestedElement.class);
+    private final Set<AnnotationFilteringResult<Element, Class<?>>> rootAndNestedFilteringResults = Set.of(
+            rootFilteringResult, nestedFilteringResult
     );
 
     private final Set<Class<?>> rootClassSet = Set.of(RootClass.class);
-    private final Set<AnnotationFilteringResult<Element, Class<?>>> rootClassAnnotationFilteringResults = Set.of(
-            new AnnotationFilteringResult<>(RootClass.class.getAnnotation(Element.class), RootClass.class)
+    private final Set<AnnotationFilteringResult<Element, Class<?>>> rootFilteringResults = Set.of(
+            rootFilteringResult
     );
 
-    @Test
-    public void shouldScanRootHierarchy_whenEnableProperty_isProvidedAsTrue_andHierarchyProperty_isProvidedAsTrue() {
-        var properties = setUpBooleanPropertyProperty(ROOT_SCANNING_ENABLED_PROPERTY, BoolPropertyState.ENABLED)
-                .merge(setUpBooleanPropertyProperty(ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY, BoolPropertyState.ENABLED));
+    @ParameterizedTest
+    @EnumSource(value = BoolPropertyState.class, names = {"ENABLED", "NOT_SET"})
+    public void shouldScanRootHierarchy_whenEnableProperty_isTrue_andHierarchyProperty_isTrue(BoolPropertyState rootScanningState) {
+        var properties = setUpBooleanPropertyProperty(ROOT_SCANNING_ENABLED_PROPERTY, rootScanningState)
+                .merge(setUpBooleanPropertyProperty(ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY, rootScanningState));
         setUpScanner(properties);
 
-        when(packageClassScanner.scanClasses()).thenReturn(elements);
-        when(classFilter.filterByAnnotation(elements, Element.class, annotationScanner, true))
-                .thenReturn(elementAnnotationFilterResults);
+        when(packageClassScanner.scanClasses()).thenReturn(fullClassesSet);
+        when(classFilter.filterByAnnotation(fullClassesSet, Element.class, annotationScanner, true))
+                .thenReturn(fullFilterResults);
 
         var results = scanner.scanElements();
 
-        assertEquals(2, results.size());
+        assertEquals(4, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(RootClass.class)));
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(RootClass.NestedElement.class)));
         assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(SomeElement.class)));
         assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(OtherElement.class)));
     }
@@ -78,46 +94,32 @@ class RootElementClassScannerTest {
                 .merge(setUpBooleanPropertyProperty(ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY, BoolPropertyState.DISABLED));
         setUpScanner(properties);
 
-        doReturn(rootClassSet).when(rootClassScanner).scanClasses();
-        when(classFilter.filterByAnnotation(rootClassSet, Element.class, annotationScanner, true))
-                .thenReturn(rootClassAnnotationFilteringResults);
+        doReturn(rootAndNestedClassesSet).when(rootClassScanner).scanClasses();
+        when(classFilter.filterByAnnotation(rootAndNestedClassesSet, Element.class, annotationScanner, true))
+                .thenReturn(rootAndNestedFilteringResults);
 
         var results = scanner.scanElements();
 
-        assertEquals(1, results.size());
+        assertEquals(2, results.size());
         assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(RootClass.class)));
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(RootClass.NestedElement.class)));
     }
 
     @ParameterizedTest
     @EnumSource(BoolPropertyState.class)
-    public void shouldScanElementsAsEmpty_whenEnableProperty_isProvidedAsFalse(BoolPropertyState hierarchyState) {
+    public void shouldNotScanAndOnlyReturnRootClass_whenEnableProperty_isProvidedAsFalse(BoolPropertyState hierarchyState) {
         var properties = setUpBooleanPropertyProperty(ROOT_SCANNING_ENABLED_PROPERTY, BoolPropertyState.DISABLED)
                 //in this case hierarchy state will be ignored, because root scanning is disabled altogether
                 .merge(setUpBooleanPropertyProperty(ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY, hierarchyState));
         setUpScanner(properties);
 
-        when(classFilter.filterByAnnotation(Set.of(), Element.class, annotationScanner, true)).thenReturn(Set.of());
+        when(classFilter.filterByAnnotation(rootClassSet, Element.class, annotationScanner, true))
+                .thenReturn(rootFilteringResults);
 
         var results = scanner.scanElements();
 
-        assertTrue(results.isEmpty());
-    }
-
-    @Test
-    public void shouldScanElements_whenEnableProperty_isNotProvided_defaultValue() {
-        var properties = setUpBooleanPropertyProperty(ROOT_SCANNING_ENABLED_PROPERTY, BoolPropertyState.NOT_SET)
-                .merge(setUpBooleanPropertyProperty(ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY, BoolPropertyState.ENABLED));
-        setUpScanner(properties);
-
-        when(packageClassScanner.scanClasses()).thenReturn(elements);
-        when(classFilter.filterByAnnotation(elements, Element.class, annotationScanner, true))
-                .thenReturn(elementAnnotationFilterResults);
-
-        var results = scanner.scanElements();
-
-        assertEquals(2, results.size());
-        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(SomeElement.class)));
-        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(OtherElement.class)));
+        assertEquals(1, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(RootClass.class)));
     }
 
     private PropertiesContainer setUpBooleanPropertyProperty(String propertyName, BoolPropertyState boolPropertyState) {
@@ -148,7 +150,12 @@ class RootElementClassScannerTest {
     }
 
     @Element
-    static class RootClass {}
+    static class RootClass {
+
+        @Element
+        static class NestedElement {}
+
+    }
 
     @Element
     static class SomeElement {}

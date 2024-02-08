@@ -26,6 +26,7 @@ import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.reflection.classes.ClassScannersFactory;
 import org.tframework.core.reflection.classes.PackageClassScanner;
 import org.tframework.test.annotations.BasePackage;
+import org.tframework.test.annotations.IsolatedTFrameworkTest;
 import org.tframework.test.annotations.SetApplicationName;
 import org.tframework.test.annotations.SetCommandLineArguments;
 import org.tframework.test.annotations.SetElements;
@@ -68,7 +69,7 @@ import static org.tframework.core.profiles.scanners.SystemPropertyProfileScanner
  *     <li><b>Recommended:</b> it can be field injected into the test class, because the test class is an element.</li>
  *     <li>It can be added as a parameter to JUnit methods such as {@link org.junit.jupiter.api.BeforeEach} and {@link org.junit.jupiter.api.Test}.</li>
  * </ul>
- * @see org.tframework.test.annotations.SingleClassTFrameworkTest
+ * @see IsolatedTFrameworkTest
  */
 @Slf4j
 public class TFrameworkExtension implements Extension, TestInstancePostProcessor, AfterAllCallback, ParameterResolver {
@@ -108,7 +109,7 @@ public class TFrameworkExtension implements Extension, TestInstancePostProcessor
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
         if(parameterContext.getDeclaringExecutable() instanceof Constructor<?>) {
-            log.debug("Injecting the application into the test instance constructor is not supported, because " +
+            log.error("Injecting the application into the test instance constructor is not supported, because " +
                     "the application is not yet started.");
             return false;
         }
@@ -235,7 +236,7 @@ public class TFrameworkExtension implements Extension, TestInstancePostProcessor
     }
 
     private void placeElementSettingsForApplication(Class<?> testClass) {
-        annotationScanner.scan(testClass, SetElements.class).forEach(setElementsAnnotation -> {
+        annotationScanner.scanOneStrict(testClass, SetElements.class).ifPresent(setElementsAnnotation -> {
             MDC.put(SOURCE_ANNOTATION, SetElements.class.getName());
 
             TestActionsUtils.setFrameworkPropertyIntoSystemProperties(

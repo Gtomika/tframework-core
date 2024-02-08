@@ -7,6 +7,7 @@ import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.elements.ElementsInitializationProcessFactory;
 import org.tframework.core.profiles.ProfileInitializationProcessFactory;
 import org.tframework.core.properties.PropertiesInitializationProcessFactory;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 
 /**
  * Factory methods to instantiate {@link CoreInitializer}s and the {@link CoreInitializationProcess}.
@@ -19,13 +20,11 @@ public final class CoreInitializationFactory {
      * Creates a {@link CoreInitializationProcess} that performs framework initialization.
      */
     public static CoreInitializationProcess createCoreInitializationProcess() {
-        var profilesCoreInitializer = createProfilesCoreInitializer();
-        var propertiesCoreInitializer = createPropertiesCoreInitializer();
-        var dependencyInjectionCoreInitializer = createDependencyInjectionCoreInitializer();
         return new CoreInitializationProcess(
-                profilesCoreInitializer,
-                propertiesCoreInitializer,
-                dependencyInjectionCoreInitializer
+                createProfilesCoreInitializer(),
+                createPropertiesCoreInitializer(),
+                createDependencyInjectionCoreInitializer(),
+                AnnotationScannersFactory.createComposedAnnotationScanner()
         );
     }
 

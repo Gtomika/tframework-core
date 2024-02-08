@@ -3,6 +3,7 @@ package org.tframework.test.annotations;
 
 import org.tframework.test.TFrameworkExtension;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -16,6 +17,7 @@ import java.lang.annotation.RetentionPolicy;
  * {@literal @Properties({"cool.prop=cool", "test.prop=test"})}
  * </pre>
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SetProperties {
 

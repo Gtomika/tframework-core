@@ -15,6 +15,8 @@ import org.tframework.core.reflection.classes.PackageClassScanner;
 import org.tframework.core.utils.Constants;
 
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A {@link ElementClassScanner} which scans the root class (including nested classes) and its hierarchy of packages:
@@ -25,8 +27,11 @@ import java.util.Set;
  *         In this case, only the root class and its nested classes will be scanned, but not the package and the sub-packages.
  *     </li>
  *     <li>
- *         To disable this scanner altogether (not even the root class should be scanned), use {@value ROOT_SCANNING_ENABLED_PROPERTY}
- *         with {@code false} value.
+ *         To disable root class nested scanning, use {@value ROOT_SCANNING_ENABLED_PROPERTY} with {@code false} value.
+ *     </li>
+ *     <li>
+ *         There is no way to disable scanning at least the root class itself. The root class will be an element
+ *         of all TFramework applications.
  *     </li>
  * </ul>
  */
@@ -77,15 +82,20 @@ public class RootElementClassScanner extends ElementClassScanner {
                 String packageName = rootClass.getPackageName();
                 this.packageClassScanner.setPackageNames(Set.of(packageName));
                 log.debug("The root element scanner will scan the package '{}' and all its sub-packages", packageName);
-                return packageClassScanner.scanClasses();
+                return mergeWithRootClass(packageClassScanner.scanClasses());
             } else {
                 log.debug("The root element scanner will scan only the root class '{}'", rootClass.getName());
-                return rootClassScanner.scanClasses();
+                return mergeWithRootClass(rootClassScanner.scanClasses());
             }
         } else {
-            log.debug("The root element scanner is disabled, no classes will be scanned");
-            return Set.of();
+            log.debug("The root element will not do any additional scanning, only the root class '{}' itself will be scanned", rootClass.getName());
+            return mergeWithRootClass(Set.of());
         }
+    }
+
+    private Set<Class<?>> mergeWithRootClass(Set<Class<?>> classes) {
+        return Stream.concat(classes.stream(), Stream.of(rootClass))
+                .collect(Collectors.toSet());
     }
 
     @Builder

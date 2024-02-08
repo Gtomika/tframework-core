@@ -1,14 +1,17 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.annotations;
 
+import org.tframework.core.elements.ElementScope;
+
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import org.tframework.core.elements.ElementScope;
 
 /**
  * This annotation is used to mark a class as an element of the dependency injection. An element
  * is managed by the framework, and can be injected into other elements.
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Element {
 

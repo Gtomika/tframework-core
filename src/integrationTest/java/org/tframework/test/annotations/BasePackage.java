@@ -1,5 +1,6 @@
 package org.tframework.test.annotations;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -7,6 +8,7 @@ import java.lang.annotation.RetentionPolicy;
  * Allows to specify the base package in which your root class should be scanned.
  * This is used in conjunction with {@link SetRootClass} if you enabled {@link SetRootClass#findRootClassOnClasspath()}.
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BasePackage {
 

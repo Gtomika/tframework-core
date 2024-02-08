@@ -2,6 +2,7 @@
 package org.tframework.test.annotations;
 
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.tframework.core.TFrameworkRootClass;
 import org.tframework.test.TFrameworkExtension;
 
 import java.lang.annotation.ElementType;
@@ -26,7 +27,8 @@ import java.lang.annotation.Target;
         rootHierarchyScanningEnabled = false,
         internalScanningEnabled = false
 )
+@TFrameworkRootClass
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface SingleClassTFrameworkTest {
+public @interface IsolatedTFrameworkTest {
 }

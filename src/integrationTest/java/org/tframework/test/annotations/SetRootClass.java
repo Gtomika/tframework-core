@@ -3,6 +3,7 @@ package org.tframework.test.annotations;
 
 import org.tframework.test.TFrameworkExtension;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -15,6 +16,7 @@ import java.lang.annotation.RetentionPolicy;
  * If you specify {@link #findRootClassOnClasspath()}, then also provide a {@link BasePackage} annotation together
  * with this one.
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface SetRootClass {
 

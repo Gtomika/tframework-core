@@ -38,6 +38,15 @@ public class PreConstructedElementContext extends ElementContext {
         return preConstructedInstance;
     }
 
+    @Override
+    public String toString() {
+        return "PreConstructedElementContext{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", scope=" + scope +
+                '}';
+    }
+
     /**
      * Creates a new {@link PreConstructedElementContext} for the given pre-constructed instance.
      * It will have a default name deduced from its type.

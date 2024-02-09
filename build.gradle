@@ -70,6 +70,7 @@ testing {
         integrationTest(JvmTestSuite) {
             testType = TestSuiteType.INTEGRATION_TEST
             dependencies {
+                implementation "io.github.classgraph:classgraph:${classGraphVersion}"
             }
         }
 

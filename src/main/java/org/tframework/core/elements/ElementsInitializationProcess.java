@@ -1,6 +1,8 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements;
 
+import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.AccessLevel;
@@ -19,6 +21,7 @@ import org.tframework.core.elements.scanner.ElementMethodScanner;
 import org.tframework.core.elements.scanner.ElementScanner;
 import org.tframework.core.elements.scanner.ElementScannersBundle;
 import org.tframework.core.elements.scanner.ElementScannersFactory;
+import org.tframework.core.elements.scanner.ElementScanningResult;
 
 /**
  * This class is responsible for the elements initialization process. This process consists of the following steps:
@@ -91,21 +94,24 @@ public class ElementsInitializationProcess {
             ElementScannersBundle scannersBundle,
             DependencyResolutionInput dependencyResolutionInput
     ) {
+        Set<ElementScanningResult<Class<?>>> allScannedClassElements = new HashSet<>();
         for(ElementClassScanner elementClassScanner : scannersBundle.elementClassScanners()) {
-            List<ElementContext> elementContexts = elementClassScanner.scanElements()
-                    .stream()
-                    .map(scanResult -> classElementContextAssembler.assemble(scanResult, dependencyResolutionInput))
-                    .peek(elementsContainer::addElementContext)
-                    .toList();
-
-            log.debug("Assembled {} element contexts from class scanner '{}'", elementContexts.size(), elementClassScanner.getClass().getName());
-            assembleMethodElementContexts(
-                    elementsContainer,
-                    elementContexts,
-                    scannersBundle.elementMethodScanners(),
-                    dependencyResolutionInput
-            );
+            var scannedElements = elementClassScanner.scanElements();
+            allScannedClassElements.addAll(scannedElements);
+            log.debug("Scanned {} elements from class scanner '{}'", scannedElements, elementClassScanner.getClass().getName());
         }
+
+        List<ElementContext> elementContexts = allScannedClassElements.stream()
+                .map(scanResult -> classElementContextAssembler.assemble(scanResult, dependencyResolutionInput))
+                .peek(elementsContainer::addElementContext)
+                .toList();
+
+        assembleMethodElementContexts(
+                elementsContainer,
+                elementContexts,
+                scannersBundle.elementMethodScanners(),
+                dependencyResolutionInput
+        );
     }
 
     /**
@@ -121,19 +127,21 @@ public class ElementsInitializationProcess {
         for(ElementContext parentElementContext : parentElementContexts) {
             methodElementContextAssembler.setParentElementContext(parentElementContext);
 
+            Set<ElementScanningResult<Method>> allScannedMethodElements = new HashSet<>();
             for(var elementMethodScanner : elementMethodScanners) {
                 elementMethodScanner.setClassToScan(parentElementContext.getType());
+                var scannedMethodElements = elementMethodScanner.scanElements();
+                allScannedMethodElements.addAll(scannedMethodElements);
 
-                List<ElementContext> elementContexts = elementMethodScanner.scanElements().stream()
-                        .map(scanResult -> methodElementContextAssembler.assemble(scanResult, dependencyResolutionInput))
-                        .peek(elementsContainer::addElementContext)
-                        .toList();
-
-                if(!elementContexts.isEmpty()) {
-                    log.debug("Assembled {} element contexts from methods of parent element context '{}' ({})",
-                            elementContexts.size(), parentElementContext.getName(), parentElementContext.getType().getName());
+                if(!scannedMethodElements.isEmpty()) {
+                    log.debug("Scanned {} elements from methods of parent element context '{}' ({})",
+                            scannedMethodElements.size(), parentElementContext.getName(), parentElementContext.getType().getName());
                 }
             }
+
+            allScannedMethodElements.stream()
+                    .map(scanResult -> methodElementContextAssembler.assemble(scanResult, dependencyResolutionInput))
+                    .forEach(elementsContainer::addElementContext);
         }
     }
 
@@ -152,7 +160,11 @@ public class ElementsInitializationProcess {
         preConstructedElementData.forEach(data -> {
             log.debug("Custom pre-constructed element '{}' will be added to elements container.", data.name());
             var preConstructedContext = PreConstructedElementContext.of(data.preConstructedInstance(), data.name());
-            elementsContainer.addElementContext(preConstructedContext);
+            if(data.overrideExistingElement()) {
+                elementsContainer.overrideElementContext(preConstructedContext);
+            } else {
+                elementsContainer.addElementContext(preConstructedContext);
+            }
         });
     }
 

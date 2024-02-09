@@ -90,7 +90,11 @@ class ElementsInitializationProcessTest {
         when(methodElementContextAssembler.assemble(eq(methodScanningResult), any(DependencyResolutionInput.class)))
                 .thenReturn(dummyStringMethodElementContext);
 
-        var preConstructedElementsData = Set.of(PreConstructedElementData.from(new File("."), "importantFile"));
+        var preConstructedElementsData = Set.of(PreConstructedElementData.builder()
+                .preConstructedInstance(new File("."))
+                .name("importantFile")
+                .overrideExistingElement(false)
+                .build());
 
         var input = createDummyDependencyInjectionInput(preConstructedElementsData);
         var elementsContainer = elementsInitializationProcess.initialize(input, elementScannersBundle);

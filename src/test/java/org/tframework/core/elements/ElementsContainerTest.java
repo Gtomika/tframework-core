@@ -1,17 +1,19 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.when;
-
-import java.io.File;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.context.ElementContext;
+
+import java.io.File;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ElementsContainerTest {
@@ -80,9 +82,19 @@ class ElementsContainerTest {
             elementsContainer.addElementContext(elementContext);
         });
         assertEquals(
-                exception.getMessageTemplate().formatted(ELEMENT_NAME),
+                exception.getMessageTemplate().formatted(ELEMENT_NAME, elementContext, elementContext),
                 exception.getMessage()
         );
+    }
+
+    @Test
+    public void shouldOverrideElement() {
+        when(elementContext.getName()).thenReturn(ELEMENT_NAME);
+        var elementsContainer = ElementsContainer.fromElementContexts(List.of(elementContext));
+
+        //overriding it with itself
+        boolean overrideHappened = elementsContainer.overrideElementContext(elementContext);
+        assertTrue(overrideHappened);
     }
 
 }

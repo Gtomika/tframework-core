@@ -1,6 +1,8 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.initializers;
 
+import java.time.Instant;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.Application;
@@ -15,9 +17,6 @@ import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.PropertiesInitializationInput;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.utils.TimerUtils;
-
-import java.time.Instant;
-import java.util.Set;
 
 /**
  * The process that bootstraps the framework is described by this class.

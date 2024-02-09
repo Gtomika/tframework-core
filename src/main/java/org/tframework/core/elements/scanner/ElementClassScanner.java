@@ -1,6 +1,9 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.scanner;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import org.tframework.core.elements.annotations.Element;
@@ -8,10 +11,6 @@ import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.AnnotationFilteringResult;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.classes.ClassFilter;
-
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Abstract base class for all implementations that search for the {@link Element} annotation on classes.

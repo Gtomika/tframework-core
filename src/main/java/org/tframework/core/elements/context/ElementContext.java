@@ -92,6 +92,7 @@ public abstract class ElementContext {
                 "name='" + name + '\'' +
                 ", type=" + type +
                 ", scope=" + scope +
+                ", source=" + source +
                 '}';
     }
 

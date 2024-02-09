@@ -3,18 +3,17 @@ package org.tframework.core.reflection.classes;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ScanResult;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 /**
  * A {@link ClassScanner} implementation that scans for classes in packages. The {@link ClassGraph} library

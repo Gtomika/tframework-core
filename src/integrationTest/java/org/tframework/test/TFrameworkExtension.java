@@ -1,6 +1,15 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.test;
 
+import static org.tframework.core.profiles.scanners.SystemPropertyProfileScanner.PROFILES_SYSTEM_PROPERTY;
+
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.Extension;
@@ -13,6 +22,7 @@ import org.slf4j.MDC;
 import org.tframework.core.Application;
 import org.tframework.core.TFramework;
 import org.tframework.core.TFrameworkRootClass;
+import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.PreConstructedElementData;
 import org.tframework.core.elements.scanner.ClassesElementClassScanner;
 import org.tframework.core.elements.scanner.InternalElementClassScanner;
@@ -23,9 +33,6 @@ import org.tframework.core.readers.SystemPropertyNotFoundException;
 import org.tframework.core.readers.SystemPropertyReader;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
-import org.tframework.core.reflection.classes.ClassScannersFactory;
-import org.tframework.core.reflection.classes.PackageClassScanner;
-import org.tframework.test.annotations.BasePackage;
 import org.tframework.test.annotations.IsolatedTFrameworkTest;
 import org.tframework.test.annotations.SetApplicationName;
 import org.tframework.test.annotations.SetCommandLineArguments;
@@ -35,14 +42,6 @@ import org.tframework.test.annotations.SetProperties;
 import org.tframework.test.annotations.SetRootClass;
 import org.tframework.test.utils.PredicateExecutor;
 import org.tframework.test.utils.TestActionsUtils;
-
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-
-import static org.tframework.core.profiles.scanners.SystemPropertyProfileScanner.PROFILES_SYSTEM_PROPERTY;
 
 /**
  * This is a JUnit 5 extension that allows to easily start TFramework applications. <b>The test instance created by JUnit will
@@ -78,28 +77,35 @@ public class TFrameworkExtension implements Extension, TestInstancePostProcessor
 
     private final AnnotationScanner annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
     private final SystemPropertyReader systemPropertyReader = ReadersFactory.createSystemPropertyReader();
-    private final PackageClassScanner classpathScanner = ClassScannersFactory.createPackageClassScanner();
 
     private Application application;
 
     @Override
-    public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
+    public void postProcessTestInstance(Object testInstance, ExtensionContext context) {
         var testClass = testInstance.getClass();
         placeProfilesForApplication(testClass);
         placePropertiesForApplication(testClass);
         placeElementSettingsForApplication(testClass);
+
+        var preConstructedTestClassElement = PreConstructedElementData.builder()
+                .preConstructedInstance(testInstance)
+                .name(ElementUtils.getElementNameByType(testClass))
+                //if the test class is also the root class, then we override it with this pre-constructed element
+                //otherwise it would fail because the element name might not be unique
+                .overrideExistingElement(true)
+                .build();
 
         log.debug("Starting TFramework application for test instance '{}'...", testClass.getName());
         application = TFramework.start(
                 findApplicationName(testClass),
                 findRootClass(testClass),
                 findCommandLineArguments(testClass),
-                Set.of(PreConstructedElementData.from(testInstance))
+                Set.of(preConstructedTestClassElement)
         );
     }
 
     @Override
-    public void afterAll(ExtensionContext context) throws Exception {
+    public void afterAll(ExtensionContext context) {
         if(application != null) {
             log.debug("Shutting down the '{}' application after all tests", application.getName());
             TFramework.stop(application);
@@ -143,15 +149,15 @@ public class TFrameworkExtension implements Extension, TestInstancePostProcessor
                 //root class was not specified, let's check the boolean fields
                 //this will run only of exactly one field is true, and the corresponding action will be used to find root class
                 return TestActionsUtils.executeIfExactlyOneIsTrue(rootClassAnnotation, List.of(
-                        new PredicateExecutor<SetRootClass, Class<?>>(
+                        new PredicateExecutor<>(
                                 "useTestClassAsRoot",
                                 SetRootClass::useTestClassAsRoot,
                                 () -> testClass
                         ),
-                        new PredicateExecutor<SetRootClass, Class<?>>(
+                        new PredicateExecutor<>(
                                 "findRootClassOnClasspath",
                                 SetRootClass::findRootClassOnClasspath,
-                                () -> findRootClassOnClasspath(testClass)
+                                this::findRootClassOnClasspath
                         )
                 ));
             }
@@ -166,29 +172,32 @@ public class TFrameworkExtension implements Extension, TestInstancePostProcessor
             TFrameworkRootClass.class.getName() + "' on the classpath: %s";
     private static final String NO_ROOT_CLASS_ERROR = "No root class was found that is annotated with '" +
             TFrameworkRootClass.class.getName() + "', but exactly one is required.";
+    private static final int SCAN_THREAD_AMOUNT = 5;
 
-    private Class<?> findRootClassOnClasspath(Class<?> testClass) {
-        String basePackage = annotationScanner.scanOneStrict(testClass, BasePackage.class)
-                .map(BasePackage::value)
-                .orElseThrow(() -> new IllegalStateException(
-                        BasePackage.class.getName() + " annotation must also be provided if root class is to be scanned."
-                ));
+    private Class<?> findRootClassOnClasspath() {
+        ClassGraph classGraph = new ClassGraph()
+                .enableClassInfo()
+                .enableAnnotationInfo();
 
-        classpathScanner.setPackageNames(Set.of(basePackage));
-        var rootClassCandidates = classpathScanner.scanClasses().stream()
-                .filter(clazz -> annotationScanner.hasAnnotation(clazz, TFrameworkRootClass.class))
-                .toList();
+        try(var scanResult = classGraph.scan(Executors.newFixedThreadPool(SCAN_THREAD_AMOUNT), SCAN_THREAD_AMOUNT)) {
+            var rootClassCandidates = scanResult.getAllClasses()
+                    .filter(this::isClassDirectlyAnnotatedWithTframeworkRoot);
 
-        String candidatesString = rootClassCandidates.stream()
-                .map(Class::getName)
-                .collect(Collectors.joining(", "));
-        if(rootClassCandidates.size() > 1) {
-            throw new IllegalStateException(TOO_MANY_ROOT_CLASSES_ERROR_TEMPLATE.formatted(candidatesString));
+            if(rootClassCandidates.size() > 1) {
+                throw new IllegalStateException(TOO_MANY_ROOT_CLASSES_ERROR_TEMPLATE.formatted(rootClassCandidates.getNames()));
+            }
+            if(rootClassCandidates.isEmpty()) {
+                throw new IllegalStateException(NO_ROOT_CLASS_ERROR);
+            }
+            return rootClassCandidates.getFirst().loadClass();
         }
-        if(rootClassCandidates.isEmpty()) {
-            throw new IllegalStateException(NO_ROOT_CLASS_ERROR);
-        }
-        return rootClassCandidates.getFirst();
+    }
+
+    private boolean isClassDirectlyAnnotatedWithTframeworkRoot(ClassInfo info) {
+        boolean isDirectlyAnnotated = info.getAnnotationInfo().directOnly().stream().anyMatch(annotationInfo -> {
+            return annotationInfo.getName().equals(TFrameworkRootClass.class.getName());
+        });
+        return isDirectlyAnnotated && info.isStandardClass();
     }
 
     private String[] findCommandLineArguments(Class<?> testClass) {
@@ -199,11 +208,6 @@ public class TFrameworkExtension implements Extension, TestInstancePostProcessor
                     return new String[] {};
                 });
     }
-
-    /*
-    Profiles and properties are set through the System properties. I'm not sure if this is a great approach,
-    but it is what seems to be best, considering all scanners that the framework supports.
-     */
 
     private void placeProfilesForApplication(Class<?> testClass) {
         annotationScanner.scan(testClass, SetProfiles.class).forEach(profilesAnnotation -> {

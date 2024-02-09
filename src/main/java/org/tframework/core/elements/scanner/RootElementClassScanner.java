@@ -1,6 +1,9 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.scanner;
 
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +16,6 @@ import org.tframework.core.reflection.classes.ClassFilter;
 import org.tframework.core.reflection.classes.NestedClassScanner;
 import org.tframework.core.reflection.classes.PackageClassScanner;
 import org.tframework.core.utils.Constants;
-
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * A {@link ElementClassScanner} which scans the root class (including nested classes) and its hierarchy of packages:

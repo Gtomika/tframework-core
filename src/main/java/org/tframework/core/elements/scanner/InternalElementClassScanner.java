@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.scanner;
 
+import java.util.Set;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.properties.PropertiesContainer;
@@ -11,8 +12,6 @@ import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.classes.ClassFilter;
 import org.tframework.core.reflection.classes.PackageClassScanner;
 import org.tframework.core.utils.Constants;
-
-import java.util.Set;
 
 /**
  * An {@link ElementClassScanner} implementation which scans the internal TFramework packages

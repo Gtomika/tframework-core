@@ -1,11 +1,9 @@
 org:
   tframework:
-    dependency-injection:
-      scan-root: false
+    elements:
+      scan-root: true
+      scan-root-hierarchy: false
       scan-internal: false
-      scan-classes:
-        - org.tframework.core.TFrameworkTest$DummyElement
-        - org.tframework.core.TFrameworkTest$FakeElement
 
 custom:
   string-prop: test

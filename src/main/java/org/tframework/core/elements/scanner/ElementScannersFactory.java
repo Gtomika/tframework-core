@@ -66,7 +66,8 @@ public final class ElementScannersFactory {
         return RootElementClassScanner.builder()
                 .annotationScanner(AnnotationScannersFactory.createComposedAnnotationScanner())
                 .classFilter(ClassFiltersFactory.createDefaultClassFilter())
-                .classScanner(ClassScannersFactory.createPackageClassScanner())
+                .packageClassScanner(ClassScannersFactory.createPackageClassScanner())
+                .rootClassScanner(ClassScannersFactory.createNestedClassScanner(rootClass))
                 .propertiesContainer(properties)
                 .rootClass(rootClass)
                 .build();

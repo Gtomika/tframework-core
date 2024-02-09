@@ -46,4 +46,13 @@ public final class PrototypeElementContext extends ElementContext {
         log.debug("Created new instance of prototype element: {}", name);
         return instance;
     }
+
+    @Override
+    public String toString() {
+        return "PrototypeElementContext{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", source=" + source +
+                '}';
+    }
 }

@@ -10,12 +10,9 @@ import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.ElementConstructor;
 import org.tframework.core.elements.annotations.InjectElement;
 
-/*
-This test does not mock the initialization process, but instead tests the framework as a whole.
- */
-//TODO: create integration test suite for these kind of tests and move this one there
-// Make this test use mocking instead
-class TFrameworkTest {
+//TODO: change to using mocking here when this functionality is covered in integration tests
+@TFrameworkRootClass
+public class TFrameworkTest {
 
     @Test
     public void shouldInitializeFramework() {
@@ -41,9 +38,10 @@ class TFrameworkTest {
                 application.getPropertiesContainer().getPropertyValueList("custom.list-prop")
         );
 
-        assertTrue(application.getElementsContainer().hasElementContext(DummyElement.class));
+        assertTrue(application.getElementsContainer().hasElementContext(TFrameworkTest.class)); //the root class
+        assertTrue(application.getElementsContainer().hasElementContext(DummyElement.class)); //from element annotations
         assertTrue(application.getElementsContainer().hasElementContext("importantInteger"));
-        assertTrue(application.getElementsContainer().hasElementContext(Application.class));
+        assertTrue(application.getElementsContainer().hasElementContext(Application.class)); //pre-constructed
     }
 
     @Element

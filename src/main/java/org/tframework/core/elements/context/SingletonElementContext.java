@@ -53,4 +53,13 @@ public final class SingletonElementContext extends ElementContext {
         }
         return instance;
     }
+
+    @Override
+    public String toString() {
+        return "SingletonElementContext{" +
+                "name='" + name + '\'' +
+                ", type=" + type +
+                ", source=" + source +
+                '}';
+    }
 }

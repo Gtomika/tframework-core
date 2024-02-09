@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.Application;
 import org.tframework.core.TFrameworkInternal;
+import org.tframework.core.TFrameworkRootClass;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.ElementsInitializationInput;
 import org.tframework.core.elements.PreConstructedElementData;
@@ -14,6 +15,7 @@ import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.PropertiesInitializationInput;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.utils.TimerUtils;
 
 /**
@@ -24,9 +26,13 @@ import org.tframework.core.utils.TimerUtils;
 @RequiredArgsConstructor
 public class CoreInitializationProcess {
 
+    public static final String ROOT_CLASS_NOT_ANNOTATED_ERROR_TEMPLATE = "The root class '%s' must be annotated " +
+            "with '" + TFrameworkRootClass.class.getName() + "'.";
+
     private final ProfilesCoreInitializer profilesInitializer;
     private final PropertiesCoreInitializer propertiesCoreInitializer;
     private final ElementsCoreInitializer elementsCoreInitializer;
+    private final AnnotationScanner annotationScanner;
 
     /**
      * Perform the core initialization.
@@ -39,6 +45,10 @@ public class CoreInitializationProcess {
         Instant start = Instant.now();
 
         try {
+            if(annotationScanner.scanOneStrict(coreInput.rootClass(), TFrameworkRootClass.class).isEmpty()) {
+                throw new InitializationException(ROOT_CLASS_NOT_ANNOTATED_ERROR_TEMPLATE.formatted(coreInput.rootClass().getName()));
+            }
+
             Application application = Application.empty();
             application.setName(coreInput.applicationName());
             application.setRootClass(coreInput.rootClass());
@@ -59,6 +69,8 @@ public class CoreInitializationProcess {
             application.finalizeApplication();
             log.info("Successfully initialized the application '{}'! Let's get started!", application.getName());
             return application;
+        } catch (InitializationException e) {
+            throw e;
         } catch (Exception e) {
             log.error("The core initialization has failed", e);
             throw new InitializationException(e);

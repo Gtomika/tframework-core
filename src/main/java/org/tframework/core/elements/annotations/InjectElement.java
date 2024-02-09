@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.annotations;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -8,6 +9,7 @@ import java.lang.annotation.RetentionPolicy;
  * This annotation is used to mark a field or parameter as an element dependency. The framework will
  * look up the element by name and inject it into the field or parameter.
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface InjectElement {
 

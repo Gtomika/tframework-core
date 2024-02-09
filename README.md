@@ -123,6 +123,7 @@ TODO: public repo is not yet available
 Then, the framework should be started from the `main` method:
 
 ```java
+@TFrameworkRootClass
 public class MyApplication {
 
     public static void main(String[] args) {

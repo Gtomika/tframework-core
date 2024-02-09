@@ -128,7 +128,7 @@ public final class PropertiesContainer implements DependencySource {
      * @param additionalProperties New properties to add to the current ones.
      * @return A new {@link PropertiesContainer} with the merged properties.
      */
-    PropertiesContainer merge(@NonNull List<Property> additionalProperties) {
+    public PropertiesContainer merge(@NonNull List<Property> additionalProperties) {
         List<Property> mergedProperties = new ArrayList<>(properties);
         for(var property: additionalProperties) {
             var newValue = property.value();
@@ -149,7 +149,7 @@ public final class PropertiesContainer implements DependencySource {
      * @param otherContainer Non-null container to merge into this one.
      * @return A new container with the merged properties.
      */
-    PropertiesContainer merge(@NonNull PropertiesContainer otherContainer) {
+    public PropertiesContainer merge(@NonNull PropertiesContainer otherContainer) {
         return merge(otherContainer.properties);
     }
 

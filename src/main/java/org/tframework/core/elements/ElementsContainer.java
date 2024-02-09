@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.context.ElementContext;
@@ -16,6 +17,7 @@ import org.tframework.core.elements.dependency.DependencySource;
 /**
  * Stores all elements of the application.
  */
+@Slf4j
 @EqualsAndHashCode
 @PreConstructedElement
 public class ElementsContainer implements DependencySource {
@@ -72,16 +74,38 @@ public class ElementsContainer implements DependencySource {
     }
 
     /**
-     * Adds the given {@code elementContext} to this container.
+     * Adds the given {@link ElementContext} to this container. The container cannot have another element context
+     * with this name. If that is the case, and it should be overridden, use {@link #overrideElementContext(ElementContext)}.
      * @param elementContext The element context to add, must not be null.
      * @throws ElementNameNotUniqueException If an element with the same name is already stored in this container.
      */
-    public synchronized void addElementContext(@NonNull ElementContext elementContext) throws ElementNameNotUniqueException {
+    public void addElementContext(@NonNull ElementContext elementContext) throws ElementNameNotUniqueException {
         if(elementContexts.containsKey(elementContext.getName())) {
-            throw new ElementNameNotUniqueException(elementContext.getName());
+            var existingContext = elementContexts.get(elementContext.getName());
+            throw new ElementNameNotUniqueException(existingContext, elementContext);
         } else {
             elementContexts.put(elementContext.getName(), elementContext);
         }
+    }
+
+    /**
+     * Adds the given {@link ElementContext} to the container. If the container already has a context with this name,
+     * it will be overridden.
+     * @param elementContext The element context to add, must not be null.
+     * @return True if there was an override, false if there was no element context with this name.
+     */
+    public boolean overrideElementContext(@NonNull ElementContext elementContext) {
+        boolean override = false;
+        if(log.isDebugEnabled() && elementContexts.containsKey(elementContext.getName())) {
+            var existingContext = elementContexts.get(elementContext.getName());
+            log.debug("""
+                    Overriding element context with name '{}:
+                    - Existing context: {}
+                    - Overriding context: {}""", existingContext.getName(), existingContext, elementContext);
+            override = true;
+        }
+        elementContexts.put(elementContext.getName(), elementContext);
+        return override;
     }
 
     /**

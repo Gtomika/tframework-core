@@ -15,6 +15,10 @@ public class InitializationException extends TFrameworkException {
         super(TEMPLATE.formatted(cause.getClass().getName()), cause);
     }
 
+    public InitializationException(String message) {
+        super(TEMPLATE.formatted(message));
+    }
+
     @Override
     public String getMessageTemplate() {
         return TEMPLATE;

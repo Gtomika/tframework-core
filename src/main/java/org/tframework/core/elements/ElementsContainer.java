@@ -2,20 +2,19 @@
 package org.tframework.core.elements;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.LinkedList;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.AmbiguousElementTypeException;
 import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencySource;
 
 /**
- * Stores all elements of the application.
+ * Stores all elements of the application, and provides ways to access them by name or by type.
  */
 @Slf4j
 @EqualsAndHashCode
@@ -24,25 +23,22 @@ public class ElementsContainer implements DependencySource {
 
     /**
      * All elements of the application, wrapped in {@link ElementContext}s.
-     * The key is the name of the element.
      */
-    private final Map<String, ElementContext> elementContexts;
+    private final List<ElementContext> elementContexts;
     private final boolean initialized;
+    private final ElementByTypeResolver elementByTypeResolver;
 
-    private ElementsContainer(Map<String, ElementContext> elementContexts) {
-        this.elementContexts = new HashMap<>(elementContexts);
+    private ElementsContainer(List<ElementContext> elementContexts) {
+        this.elementContexts = new LinkedList<>(elementContexts);
         this.initialized = false;
+        this.elementByTypeResolver = new ElementByTypeResolver();
     }
 
-    /**
-     * Returns the {@link ElementContext} of the element with the given type.
-     * The type will be converted to a name using {@link ElementUtils#getElementNameByType(Class)
-     * @param elementType Type of the requested element, must not be null.
-     * @throws ElementNotFoundException If no element with the given type is found.
-     */
-    public ElementContext getElementContext(@NonNull Class<?> elementType) {
-        String name = ElementUtils.getElementNameByType(elementType);
-        return getElementContext(name);
+    //this constructor is to be able to provide a mocked resolver for tests
+    ElementsContainer(List<ElementContext> elementContexts, ElementByTypeResolver resolver) {
+        this.elementContexts = new LinkedList<>(elementContexts);
+        this.initialized = false;
+        this.elementByTypeResolver = resolver;
     }
 
     /**
@@ -51,8 +47,22 @@ public class ElementsContainer implements DependencySource {
      * @throws ElementNotFoundException If no element with the given name is found.
      */
     public ElementContext getElementContext(@NonNull String name) {
-        return Optional.ofNullable(elementContexts.get(name))
+        return elementContexts.stream()
+                .filter(context -> context.getName().equals(name))
+                .findAny()
                 .orElseThrow(() -> new ElementNotFoundException(name));
+    }
+
+    /**
+     * Returns the {@link ElementContext} of the element with the given type.
+     * See {@link ElementByTypeResolver#getElementByType(List, Class)} for the rules on how this type is resolved.
+     * @param elementType Type of the requested element, must not be null.
+     * @throws ElementNotFoundException If no element is found which is assignable to the required type.
+     * @throws AmbiguousElementTypeException If there are multiple candidate elements that can be assigned to
+     *            the type, and it cannot be determined which one to choose.
+     */
+    public ElementContext getElementContext(@NonNull Class<?> elementType) {
+        return elementByTypeResolver.getElementByType(elementContexts, elementType);
     }
 
     /**
@@ -60,17 +70,18 @@ public class ElementsContainer implements DependencySource {
      * @param name Name of the element to check, must not be null.
      */
     public boolean hasElementContext(@NonNull String name) {
-        return elementContexts.containsKey(name);
+        return elementContexts.stream()
+                .anyMatch(context -> context.getName().equals(name));
     }
 
     /**
      * Checks if the element with the given type is stored in this container.
-     * The type will be converted to a name using {@link ElementUtils#getElementNameByType(Class)
+     * See {@link ElementByTypeResolver#hasElementByType(List, Class)} for the rules on how this type is resolved.
      * @param elementType Type of the element to check, must not be null.
+     * @return True only if there is at least element that is assignable to the type.
      */
     public boolean hasElementContext(@NonNull Class<?> elementType) {
-        String name = ElementUtils.getElementNameByType(elementType);
-        return hasElementContext(name);
+        return elementByTypeResolver.hasElementByType(elementContexts, elementType);
     }
 
     /**
@@ -78,13 +89,18 @@ public class ElementsContainer implements DependencySource {
      * with this name. If that is the case, and it should be overridden, use {@link #overrideElementContext(ElementContext)}.
      * @param elementContext The element context to add, must not be null.
      * @throws ElementNameNotUniqueException If an element with the same name is already stored in this container.
+     * @throws IllegalStateException If the container is already initialized.
      */
+    @TFrameworkInternal
     public void addElementContext(@NonNull ElementContext elementContext) throws ElementNameNotUniqueException {
-        if(elementContexts.containsKey(elementContext.getName())) {
-            var existingContext = elementContexts.get(elementContext.getName());
+        if(initialized) {
+            throw new IllegalStateException("New element context cannot be added after the container is initialized.");
+        }
+        try {
+            var existingContext = getElementContext(elementContext.getName());
             throw new ElementNameNotUniqueException(existingContext, elementContext);
-        } else {
-            elementContexts.put(elementContext.getName(), elementContext);
+        } catch (ElementNotFoundException e) {
+            elementContexts.add(elementContext);
         }
     }
 
@@ -93,19 +109,26 @@ public class ElementsContainer implements DependencySource {
      * it will be overridden.
      * @param elementContext The element context to add, must not be null.
      * @return True if there was an override, false if there was no element context with this name.
+     * @throws IllegalStateException If the container is already initialized.
      */
+    @TFrameworkInternal
     public boolean overrideElementContext(@NonNull ElementContext elementContext) {
-        boolean override = false;
-        if(log.isDebugEnabled() && elementContexts.containsKey(elementContext.getName())) {
-            var existingContext = elementContexts.get(elementContext.getName());
+        if(initialized) {
+            throw new IllegalStateException("Element contexts cannot be overridden after the container is initialized.");
+        }
+        try {
+            var existingContext = getElementContext(elementContext.getName());
             log.debug("""
                     Overriding element context with name '{}:
                     - Existing context: {}
                     - Overriding context: {}""", existingContext.getName(), existingContext, elementContext);
-            override = true;
+            elementContexts.remove(existingContext);
+            elementContexts.add(elementContext);
+            return true;
+        } catch (ElementNotFoundException e) {
+            elementContexts.add(elementContext);
+            return false;
         }
-        elementContexts.put(elementContext.getName(), elementContext);
-        return override;
     }
 
     /**
@@ -124,7 +147,7 @@ public class ElementsContainer implements DependencySource {
         if(initialized) {
             throw new IllegalStateException("This container has already been initialized");
         }
-        elementContexts.values().forEach(ElementContext::initialize);
+        elementContexts.forEach(ElementContext::initialize);
     }
 
     /**
@@ -142,19 +165,13 @@ public class ElementsContainer implements DependencySource {
      * Creates an {@link ElementsContainer} that has no elements.
      */
     public static ElementsContainer empty() {
-        return new ElementsContainer(Map.of());
+        return new ElementsContainer(List.of());
     }
 
     /**
      * Creates a new {@link ElementsContainer}, storing the given {@code elementContexts} as well.
      */
     public static ElementsContainer fromElementContexts(@NonNull Collection<ElementContext> elementContexts) {
-        return new ElementsContainer(elementContexts.stream()
-                .collect(
-                        Collectors.toMap(
-                                ElementContext::getName,
-                                elementContext -> elementContext
-                        )
-                ));
+        return new ElementsContainer(elementContexts.stream().toList());
     }
 }

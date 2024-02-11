@@ -4,14 +4,21 @@ package org.tframework.core.elements;
 import org.tframework.core.TFrameworkException;
 
 /**
- * Thrown when an element is requested by name, but it is not found.
+ * Thrown when an element is requested, but it is not found.
  */
 public class ElementNotFoundException extends TFrameworkException {
 
-    private static final String TEMPLATE = "Element not found with name '%s'";
+    static final String HAS_NAME = "has name";
+    static final String ASSIGNABLE_TO_TYPE = "is assignable to type";
+
+    private static final String TEMPLATE = "Element not found which %s: '%s'";
 
     public ElementNotFoundException(String name) {
-        super(String.format(TEMPLATE, name));
+        super(TEMPLATE.formatted(HAS_NAME, name));
+    }
+
+    public ElementNotFoundException(Class<?> elementType) {
+        super(TEMPLATE.formatted(ASSIGNABLE_TO_TYPE, elementType.getName()));
     }
 
     @Override

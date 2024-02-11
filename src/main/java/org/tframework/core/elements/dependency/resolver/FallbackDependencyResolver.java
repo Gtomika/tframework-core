@@ -3,7 +3,6 @@ package org.tframework.core.elements.dependency.resolver;
 
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
@@ -31,17 +30,17 @@ public class FallbackDependencyResolver extends ElementDependencyResolver {
             ElementContext originalElementContext,
             ElementDependencyGraph dependencyGraph
     ) {
-        //we have no '@InjectX' annotations, so the type will be used as dependency name
-        String dependencyName = ElementUtils.getElementNameByType(dependencyDefinition.dependencyType());
+        //we have no '@InjectX' annotations, so the type will be used to resolve
+        log.debug("Attempting to resolve dependency with type '{}' from the elements", dependencyDefinition.dependencyType());
         try {
-            ElementContext dependencyElementContext = elementsContainer.getElementContext(dependencyName);
+            ElementContext dependencyElementContext = elementsContainer.getElementContext(dependencyDefinition.dependencyType());
             // graph will be validated at another place
             dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
             Object resolvedDependency = dependencyElementContext.requestInstance(dependencyGraph);
-            log.debug("Resolved dependency with name '{}' from the elements: {}", dependencyName, resolvedDependency);
+            log.debug("Resolved dependency from the elements: {}", resolvedDependency);
             return Optional.of(resolvedDependency);
         } catch (Exception e) {
-            log.debug("Failed to resolve dependency with name '{}' from the elements", dependencyName, e);
+            log.debug("Failed to resolve dependency from the elements", e);
             return Optional.empty();
         }
     }

@@ -7,7 +7,6 @@ import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.ElementsContainer;
-import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
@@ -39,17 +38,23 @@ public class AnnotatedElementDependencyResolver extends ElementDependencyResolve
         var matchingResult = matchInjectAnnotation(dependencyDefinition.annotationSource());
         if(matchingResult.matches()) {
             InjectElement injectAnnotation = matchingResult.matchedAnnotations().getFirst();
-            String dependencyName = getElementDependencyName(injectAnnotation, dependencyDefinition.dependencyType());
-            log.debug("Attempting to resolve dependency with name '{}' from the elements...", dependencyName);
             try {
-                ElementContext dependencyElementContext = elementsContainer.getElementContext(dependencyName);
-                // graph will be validated at another place
+                ElementContext dependencyElementContext;
+                if(ElementUtils.isNamedElementInjection(injectAnnotation)) {
+                    String dependencyName = injectAnnotation.value();
+                    log.debug("Attempting to resolve dependency with name '{}' from the elements", dependencyName);
+                    dependencyElementContext = elementsContainer.getElementContext(dependencyName);
+                } else {
+                    log.debug("Attempting to resolve dependency with type '{}' from the elements", dependencyDefinition.dependencyType());
+                    dependencyElementContext = elementsContainer.getElementContext(dependencyDefinition.dependencyType());
+                }
+
                 dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
                 Object resolvedDependency = dependencyElementContext.requestInstance(dependencyGraph);
-                log.debug("Resolved dependency with name '{}' from the elements: {}", dependencyName, resolvedDependency);
+                log.debug("Resolved dependency from the elements: {}", resolvedDependency);
                 return Optional.of(resolvedDependency);
             } catch (Exception e) {
-                log.debug("Failed to resolve dependency with name '{}' from the elements", dependencyName, e);
+                log.debug("Failed to resolve dependency from the elements", e);
                 return Optional.empty();
             }
         } else {
@@ -64,14 +69,6 @@ public class AnnotatedElementDependencyResolver extends ElementDependencyResolve
                 .findAny()
                 .map(injectElement -> new AnnotationMatchingResult<>(true, List.of(injectElement)))
                 .orElseGet(() -> new AnnotationMatchingResult<>(false, List.of()));
-    }
-
-    private String getElementDependencyName(InjectElement injectAnnotation, Class<?> dependencyType) {
-        if(Element.NAME_NOT_SPECIFIED.equals(injectAnnotation.value())) {
-            return ElementUtils.getElementNameByType(dependencyType);
-        } else {
-            return injectAnnotation.value();
-        }
     }
 
 }

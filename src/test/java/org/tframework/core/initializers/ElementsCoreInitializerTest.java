@@ -40,7 +40,6 @@ class ElementsCoreInitializerTest {
                 .rootClass(this.getClass())
                 .preConstructedElementData(Set.of())
                 .build();
-        when(elementContext.getName()).thenReturn("testElement");
         var expectedElements = ElementsContainer.fromElementContexts(List.of(elementContext));
         when(elementsInitializationProcess.initialize(input)).thenReturn(expectedElements);
 

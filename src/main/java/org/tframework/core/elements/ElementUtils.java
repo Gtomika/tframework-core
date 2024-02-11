@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.tframework.core.elements.annotations.Element;
+import org.tframework.core.elements.annotations.InjectElement;
 
 /**
  * Utility class for operations on elements.
@@ -28,6 +29,14 @@ public final class ElementUtils {
                 elementAnnotation.name().equals(Element.NAME_NOT_SPECIFIED) ? "<default>" : elementAnnotation.name(),
                 elementAnnotation.scope()
         );
+    }
+
+    /**
+     * Checks if a name was provided for the {@link InjectElement}. That is, anything other
+     * than {@link Element#NAME_NOT_SPECIFIED} is set in {@link InjectElement#value()}.
+     */
+    public static boolean isNamedElementInjection(@NonNull InjectElement elementAnnotation) {
+        return !elementAnnotation.value().equals(Element.NAME_NOT_SPECIFIED);
     }
 
 }

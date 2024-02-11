@@ -61,7 +61,7 @@ class ElementsInitializationProcessTest {
         doReturn(DummyClass.class).when(dummyClassElementContext).getType();
 
         when(dummyStringMethodElementContext.getName()).thenReturn("dummyMethodElement");
-        //doReturn(String.class).when(dummyStringMethodElementContext).getType();
+        doReturn(String.class).when(dummyStringMethodElementContext).getType();
 
         elementsInitializationProcess = ElementsInitializationProcess.builder()
                 .classElementContextAssembler(classElementContextAssembler)

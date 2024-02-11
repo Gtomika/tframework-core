@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
@@ -46,7 +45,7 @@ class FallbackDependencyResolverTest {
         var dependencyGraph = ElementDependencyGraph.empty();
         String expectedDependencyValue = "testDependencyValue";
 
-        when(dependencySource.getElementContext(ElementUtils.getElementNameByType(someField.getType())))
+        when(dependencySource.getElementContext(someField.getType()))
                 .thenReturn(dependencyElementContext);
         when(dependencyElementContext.requestInstance(dependencyGraph))
                 .thenReturn(expectedDependencyValue);
@@ -67,7 +66,7 @@ class FallbackDependencyResolverTest {
 
     @Test
     public void shouldNotResolveDependency_whenNotPresentInDependencySource() {
-        when(dependencySource.getElementContext(ElementUtils.getElementNameByType(someField.getType())))
+        when(dependencySource.getElementContext(someField.getType()))
                 .thenThrow(new RuntimeException("Oof, dependency not found"));
 
         var resolvedDependency = fallbackDependencyResolver.resolveDependency(

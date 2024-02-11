@@ -2,17 +2,20 @@
 package org.tframework.core.elements;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.elements.annotations.Element;
+import org.tframework.core.elements.annotations.InjectElement;
 
 @Slf4j
-class ElementUtilsTest {
+public class ElementUtilsTest {
 
     @Test
-    void shouldGetElementNameByType() {
+    public void shouldGetElementNameByType() {
         String name = ElementUtils.getElementNameByType(String.class);
         assertEquals("java.lang.String", name);
     }
@@ -22,7 +25,7 @@ class ElementUtilsTest {
 
 
     @Test
-    void shouldGetElementNameByType_ifElementHasGenericType_andNameIsDifferentForDifferentTypeParameters() {
+    public void shouldGetElementNameByType_ifElementHasGenericType_andNameIsDifferentForDifferentTypeParameters() {
         String name1 = ElementUtils.getElementNameByType(intList.getClass());
         String name2 = ElementUtils.getElementNameByType(stringList.getClass());
         log.info("Name for int list: '{}' Name for string list: {}", name1, name2);
@@ -34,8 +37,26 @@ class ElementUtilsTest {
     static class DummyElement {}
 
     @Test
-    void shouldCreateStringRepresentationOfElementAnnotation() {
+    public void shouldCreateStringRepresentationOfElementAnnotation() {
         String stringified = ElementUtils.stringifyElementAnnotation(DummyElement.class.getAnnotation(Element.class));
         assertEquals("@Element(name = dummy, scope = SINGLETON)", stringified);
+    }
+
+    @InjectElement("someString")
+    private String someString;
+
+    @Test
+    public void shouldReturnTrue_ifInjectElementIsNamed() throws Exception {
+        var elementAnnotation = this.getClass().getDeclaredField("someString").getAnnotation(InjectElement.class);
+        assertTrue(ElementUtils.isNamedElementInjection(elementAnnotation));
+    }
+
+    @InjectElement
+    private String otherString;
+
+    @Test
+    public void shouldReturnFalse_ifInjectElementIsNotNamed() throws Exception {
+        var elementAnnotation = this.getClass().getDeclaredField("otherString").getAnnotation(InjectElement.class);
+        assertFalse(ElementUtils.isNamedElementInjection(elementAnnotation));
     }
 }

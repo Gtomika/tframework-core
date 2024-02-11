@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.context.ElementContext;
@@ -93,7 +92,7 @@ class AnnotatedElementDependencyResolverTest {
 
         when(injectAnnotationScanner.findInjectAnnotation(otherField, InjectElement.class))
                 .thenReturn(Optional.of(injectElementWithNameNotProvided));
-        when(dependencySource.getElementContext(ElementUtils.getElementNameByType(otherField.getType())))
+        when(dependencySource.getElementContext(otherField.getType()))
                 .thenReturn(dependencyElementContext);
         when(dependencyElementContext.requestInstance(dependencyGraph))
                 .thenReturn(expectedDependencyValue);

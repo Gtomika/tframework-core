@@ -8,22 +8,29 @@ import io.github.classgraph.ClassInfo;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestInstancePostProcessor;
+import org.junit.jupiter.api.extension.TestInstanceFactory;
+import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
+import org.junit.jupiter.api.extension.TestInstantiationException;
 import org.slf4j.MDC;
 import org.tframework.core.Application;
 import org.tframework.core.TFramework;
 import org.tframework.core.TFrameworkRootClass;
-import org.tframework.core.elements.ElementUtils;
-import org.tframework.core.elements.PreConstructedElementData;
+import org.tframework.core.elements.annotations.InjectElement;
+import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.elements.dependency.DependencyDefinition;
+import org.tframework.core.elements.dependency.InjectAnnotationScanner;
+import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
+import org.tframework.core.elements.dependency.resolver.DependencyResolversFactory;
 import org.tframework.core.elements.scanner.ClassesElementClassScanner;
 import org.tframework.core.elements.scanner.InternalElementClassScanner;
 import org.tframework.core.elements.scanner.PackagesElementClassScanner;
@@ -33,7 +40,7 @@ import org.tframework.core.readers.SystemPropertyNotFoundException;
 import org.tframework.core.readers.SystemPropertyReader;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
-import org.tframework.test.annotations.IsolatedTFrameworkTest;
+import org.tframework.test.annotations.InjectInitializationException;
 import org.tframework.test.annotations.SetApplicationName;
 import org.tframework.test.annotations.SetCommandLineArguments;
 import org.tframework.test.annotations.SetElements;
@@ -63,50 +70,87 @@ import org.tframework.test.utils.TestActionsUtils;
  * the other annotations described above.
  *
  * <h3>Using the application</h3>
- * There are some ways to get the launched {@link Application} object.
+ * There are some ways to get the launched {@link Application} object or any other element or property from the
+ * application.
  * <ul>
- *     <li><b>Recommended:</b> it can be field injected into the test class, because the test class is an element.</li>
- *     <li>It can be added as a parameter to JUnit methods such as {@link org.junit.jupiter.api.BeforeEach} and {@link org.junit.jupiter.api.Test}.</li>
+ *     <li>They can be field injected into the test class, because the test class is an element.</li>
+ *     <li>
+ *         They can be added as a parameter to JUnit methods such as {@link org.junit.jupiter.api.BeforeEach} and {@link org.junit.jupiter.api.Test}.
+ *         Parameters need to be annotated with {@code @InjectX} annotations such as {@link InjectElement}.
+ *     </li>
  * </ul>
- * @see IsolatedTFrameworkTest
+ *
+ * <h3>Initialization failure</h3>
+ * There are cases where the test expects the application initialization to fail. In these cases, the
+ * {@link InjectInitializationException} can be used on an {@link Exception} typed test method parameter to inject the
+ * exception that caused the failure, which can be asserted inside the test.
+ * @see org.tframework.test.annotations.IsolatedTFrameworkTest
+ * @see org.tframework.test.annotations.TFrameworkTest
  */
 @Slf4j
-public class TFrameworkExtension implements Extension, TestInstancePostProcessor, AfterAllCallback, ParameterResolver {
+public class TFrameworkExtension implements Extension, BeforeAllCallback, TestInstanceFactory, AfterAllCallback, ParameterResolver {
 
     private static final String SOURCE_ANNOTATION = "sourceAnnotation";
 
     private final AnnotationScanner annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
     private final SystemPropertyReader systemPropertyReader = ReadersFactory.createSystemPropertyReader();
+    private final InjectAnnotationScanner injectAnnotationScanner = new InjectAnnotationScanner(annotationScanner);
+    private DependencyResolverAggregator dependencyResolverAggregator;
 
+    private boolean successfulAppInitialization;
     private Application application;
+    private ElementContext testClassElementContext;
+    private Exception initializationException;
 
     @Override
-    public void postProcessTestInstance(Object testInstance, ExtensionContext context) {
-        var testClass = testInstance.getClass();
+    public void beforeAll(ExtensionContext extensionContext) {
+        var testClass = extensionContext.getRequiredTestClass();
         placeProfilesForApplication(testClass);
         placePropertiesForApplication(testClass);
         placeElementSettingsForApplication(testClass);
 
-        var preConstructedTestClassElement = PreConstructedElementData.builder()
-                .preConstructedInstance(testInstance)
-                .name(ElementUtils.getElementNameByType(testClass))
-                //if the test class is also the root class, then we override it with this pre-constructed element
-                //otherwise it would fail because the element name might not be unique
-                .overrideExistingElement(true)
-                .build();
+        log.debug("Starting TFramework application for test class '{}'...", testClass.getName());
+        try {
+            application = TFramework.start(
+                    findApplicationName(testClass),
+                    findRootClass(testClass),
+                    findCommandLineArguments(testClass)
+            );
 
-        log.debug("Starting TFramework application for test instance '{}'...", testClass.getName());
-        application = TFramework.start(
-                findApplicationName(testClass),
-                findRootClass(testClass),
-                findCommandLineArguments(testClass),
-                Set.of(preConstructedTestClassElement)
-        );
+            //these resolvers will be used to inject parameters into test methods
+            dependencyResolverAggregator = DependencyResolverAggregator.usingResolvers(List.of(
+                    DependencyResolversFactory.createElementDependencyResolver(application.getElementsContainer()),
+                    DependencyResolversFactory.createPropertyDependencyResolver(application.getPropertiesContainer())
+            ));
+
+            successfulAppInitialization = true;
+        } catch (Exception e) {
+            log.warn("TFramework application failed to initialize", e);
+            initializationException = e;
+            successfulAppInitialization = false;
+        }
+    }
+
+    @Override
+    public Object createTestInstance(TestInstanceFactoryContext testInstanceFactoryContext, ExtensionContext extensionContext) throws TestInstantiationException {
+        if(successfulAppInitialization) {
+            testClassElementContext = application.getElementsContainer()
+                    .getElementContext(extensionContext.getRequiredTestClass());
+            log.debug("Found the test class element context '{}', requesting test instance...", testClassElementContext.getName());
+            return testClassElementContext.requestInstance();
+        } else {
+            try {
+                log.debug("Application initialization failed, so instance will be constructed normally");
+                return testInstanceFactoryContext.getTestClass().getDeclaredConstructor().newInstance();
+            } catch (Exception e) {
+                throw new TestInstantiationException("Failed to create test instance", e);
+            }
+        }
     }
 
     @Override
     public void afterAll(ExtensionContext context) {
-        if(application != null) {
+        if(successfulAppInitialization) {
             log.debug("Shutting down the '{}' application after all tests", application.getName());
             TFramework.stop(application);
         }
@@ -119,12 +163,28 @@ public class TFrameworkExtension implements Extension, TestInstancePostProcessor
                     "the application is not yet started.");
             return false;
         }
-        return parameterContext.getParameter().getType().equals(Application.class);
+        if(successfulAppInitialization) {
+            return injectAnnotationScanner.hasAnyInjectAnnotations(parameterContext.getParameter());
+        } else {
+            return annotationScanner.hasAnnotation(parameterContext.getParameter(), InjectInitializationException.class);
+        }
     }
+
+    private static final String DECLARED_AS_TEST_PARAMETER = "JUnit 5 test method parameter";
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return application;
+        if(successfulAppInitialization) {
+            var definition = DependencyDefinition.fromParameter(parameterContext.getParameter());
+            return dependencyResolverAggregator.resolveDependency(
+                    definition,
+                    testClassElementContext,
+                    ElementDependencyGraph.empty(),
+                    DECLARED_AS_TEST_PARAMETER
+            );
+        } else {
+            return initializationException;
+        }
     }
 
     private String findApplicationName(Class<?> testClass) {

@@ -40,17 +40,17 @@ public final class DependencyResolversFactory {
         );
     }
 
-    private static AnnotatedElementDependencyResolver createElementDependencyResolver(ElementsContainer elementsContainer) {
+    public static AnnotatedElementDependencyResolver createElementDependencyResolver(ElementsContainer elementsContainer) {
         var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
         return new AnnotatedElementDependencyResolver(elementsContainer, new InjectAnnotationScanner(annotationScanner));
     }
 
-    private static PropertyDependencyResolver createPropertyDependencyResolver(PropertiesContainer propertiesContainer) {
+    public static PropertyDependencyResolver createPropertyDependencyResolver(PropertiesContainer propertiesContainer) {
         var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
         return new PropertyDependencyResolver(propertiesContainer, new InjectAnnotationScanner(annotationScanner));
     }
 
-    private static FallbackDependencyResolver createFallbackDependencyResolver(ElementsContainer elementsContainer) {
+    public static FallbackDependencyResolver createFallbackDependencyResolver(ElementsContainer elementsContainer) {
         return new FallbackDependencyResolver(elementsContainer);
     }
 

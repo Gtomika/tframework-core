@@ -34,7 +34,6 @@ public class ElementsContainer implements DependencySource {
         this.elementByTypeResolver = new ElementByTypeResolver();
     }
 
-    //this constructor is to be able to provide a mocked resolver for tests
     ElementsContainer(List<ElementContext> elementContexts, ElementByTypeResolver resolver) {
         this.elementContexts = new LinkedList<>(elementContexts);
         this.initialized = false;

@@ -8,8 +8,8 @@ import org.tframework.core.TFrameworkException;
  */
 public class ElementNotFoundException extends TFrameworkException {
 
-    private static final String HAS_NAME = "has name";
-    private static final String ASSIGNABLE_TO_TYPE = "is assignable to type";
+    static final String HAS_NAME = "has name";
+    static final String ASSIGNABLE_TO_TYPE = "is assignable to type";
 
     private static final String TEMPLATE = "Element not found which %s: '%s'";
 

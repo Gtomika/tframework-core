@@ -45,7 +45,7 @@ public class ElementByTypeResolver {
             return exactTypeMatchElement.get();
         } else {
             log.trace("Found no element with exact type '{}', proceeding to assignable matching", requiredType.getName());
-            var assignableTypeMatchElement = selectElementWithAssignableType(elementContexts, requiredType, true);
+            var assignableTypeMatchElement = selectElementWithAssignableType(elementContexts, requiredType);
             if(assignableTypeMatchElement.isPresent()) {
                 log.trace("Found exactly one element which is assignable to type '{}': {}",
                         requiredType.getName(), assignableTypeMatchElement.get());
@@ -64,9 +64,8 @@ public class ElementByTypeResolver {
      * @return True if there is at least one context which has assignable type to {@code requiredType}.
      */
     public boolean hasElementByType(List<ElementContext> elementContexts, Class<?> requiredType) {
-        //unlike 'getElementByType', we can skip straight to finding assignable elements
-        //also, it is not strict: multiple assignable elements are acceptable
-        return selectElementWithAssignableType(elementContexts, requiredType, false).isPresent();
+        var elementsWithAssignableType = filterElementsWithAssignableType(elementContexts, requiredType);
+        return !elementsWithAssignableType.isEmpty();
     }
 
     /**
@@ -74,9 +73,7 @@ public class ElementByTypeResolver {
      * @throws AmbiguousElementTypeException If there are multiple elements with the exact type.
      */
     private Optional<ElementContext> selectElementWithExactType(List<ElementContext> elementContexts, Class<?> requiredType) {
-        var elementsWithExactType = elementContexts.stream()
-                .filter(context -> context.getType().equals(requiredType))
-                .toList();
+        var elementsWithExactType = filterElementsWithExactType(elementContexts, requiredType);
         return switch(elementsWithExactType.size()) {
             case 0 -> Optional.empty();
             case 1 -> Optional.of(elementsWithExactType.getFirst());
@@ -86,28 +83,28 @@ public class ElementByTypeResolver {
 
     /**
      * Select an element which is assignable to the type.
-     * @param strict If this is true, multiple assignable elements will raise {@link AmbiguousElementTypeException}.
-     * @throws AmbiguousElementTypeException If {@code strict} and multiple elements are assignable.
+     * @throws AmbiguousElementTypeException If multiple elements are assignable.
+     * @throws ElementNotFoundException If no elements are assignable.
      */
-    private Optional<ElementContext> selectElementWithAssignableType(
-            List<ElementContext> elementContexts,
-            Class<?> requiredType,
-            boolean strict
-    ) {
-        var elementsWithAssignableType = elementContexts.stream()
-                .filter(context -> requiredType.isAssignableFrom(context.getType()))
-                .toList();
+    private Optional<ElementContext> selectElementWithAssignableType(List<ElementContext> elementContexts, Class<?> requiredType) {
+        var elementsWithAssignableType = filterElementsWithAssignableType(elementContexts, requiredType);
         return switch (elementsWithAssignableType.size()) {
             case 0 -> throw new ElementNotFoundException(requiredType);
             case 1 -> Optional.of(elementsWithAssignableType.getFirst());
-            default -> {
-                if(strict) {
-                    throw new AmbiguousElementTypeException(requiredType, elementsWithAssignableType);
-                } else {
-                    yield Optional.of(elementsWithAssignableType.getFirst());
-                }
-            }
+            default -> throw new AmbiguousElementTypeException(requiredType, elementsWithAssignableType);
         };
+    }
+
+    private List<ElementContext> filterElementsWithExactType(List<ElementContext> contexts, Class<?> requiredType) {
+        return contexts.stream()
+                .filter(context -> context.getType().equals(requiredType))
+                .toList();
+    }
+
+    private List<ElementContext> filterElementsWithAssignableType(List<ElementContext> contexts, Class<?> requiredType) {
+        return contexts.stream()
+                .filter(context -> requiredType.isAssignableFrom(context.getType()))
+                .toList();
     }
 
 }

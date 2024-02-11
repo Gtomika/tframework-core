@@ -6,15 +6,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import java.io.File;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
 import org.tframework.core.elements.context.ElementContext;
 
 @ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
 class ElementsContainerTest {
 
     private static final String ELEMENT_NAME = "test";
@@ -22,60 +25,70 @@ class ElementsContainerTest {
     @Mock
     private ElementContext elementContext;
 
-    public ElementsContainerTest() {
+    @Mock
+    private ElementByTypeResolver elementByTypeResolver;
+
+    @BeforeEach
+    void setUp() {
+        when(elementContext.getName()).thenReturn(ELEMENT_NAME);
     }
 
     @Test
     public void shouldGetElementByName() {
-        when(elementContext.getName()).thenReturn(ELEMENT_NAME);
-        var elementsContainer = ElementsContainer.fromElementContexts(List.of(elementContext));
+        var elementsContainer = new ElementsContainer(List.of(elementContext), elementByTypeResolver);
+
         assertEquals(elementContext, elementsContainer.getElementContext(ELEMENT_NAME));
     }
 
     @Test
     public void shouldThrowException_whenElementByNameDoesNotExist() {
-        var elementsContainer = ElementsContainer.empty();
+        var elementsContainer = new ElementsContainer(List.of(), elementByTypeResolver);
+
         var exception = assertThrows(ElementNotFoundException.class, () -> {
             elementsContainer.getElementContext(ELEMENT_NAME);
         });
+
         assertEquals(
-                exception.getMessageTemplate().formatted(ELEMENT_NAME),
+                exception.getMessageTemplate().formatted(ElementNotFoundException.HAS_NAME, ELEMENT_NAME),
                 exception.getMessage()
         );
     }
 
+    //since getElementContext(Class) delegates to the resolver, detailed test coverage is provided there
     @Test
     public void shouldGetElementByType() {
-        //not specified name will default to the class name
-        when(elementContext.getName()).thenReturn(ElementUtils.getElementNameByType(Integer.class));
-        var elementsContainer = ElementsContainer.fromElementContexts(List.of(elementContext));
+        var elements = List.of(elementContext);
+        when(elementContext.getName()).thenReturn(ELEMENT_NAME);
+        when(elementByTypeResolver.getElementByType(elements, Integer.class)).thenReturn(elementContext);
+
+        var elementsContainer = new ElementsContainer(elements, elementByTypeResolver);
+
         assertEquals(elementContext, elementsContainer.getElementContext(Integer.class));
     }
 
+    //since hasElementContext(Class) delegates to the resolver, detailed test coverage is provided there
     @Test
-    public void shouldThrowException_whenElementByTypeDoesNotExists() {
-        var elementsContainer = ElementsContainer.empty();
-        var exception = assertThrows(ElementNotFoundException.class, () -> {
-            elementsContainer.getElementContext(File.class);
-        });
-        assertEquals(
-                exception.getMessageTemplate().formatted(ElementUtils.getElementNameByType(File.class)),
-                exception.getMessage()
-        );
+    public void shouldCheckIfHasElementByType() {
+        var elements = List.of(elementContext);
+        when(elementByTypeResolver.hasElementByType(elements, Integer.class)).thenReturn(true);
+
+        var elementsContainer = new ElementsContainer(elements, elementByTypeResolver);
+
+        assertTrue(elementsContainer.hasElementContext(Integer.class));
     }
 
     @Test
     public void shouldAddElement_whenElementNameIsUnique() {
-        when(elementContext.getName()).thenReturn(ELEMENT_NAME);
-        var elementsContainer = ElementsContainer.empty();
+        var elementsContainer = new ElementsContainer(List.of(), elementByTypeResolver);
+
         elementsContainer.addElementContext(elementContext);
+
         assertEquals(elementContext, elementsContainer.getElementContext(ELEMENT_NAME));
     }
 
     @Test
     public void shouldThrowException_whenElementNameIsNotUnique() {
-        when(elementContext.getName()).thenReturn(ELEMENT_NAME);
-        var elementsContainer = ElementsContainer.fromElementContexts(List.of(elementContext));
+        var elementsContainer = new ElementsContainer(List.of(elementContext), elementByTypeResolver);
 
         var exception = assertThrows(ElementNameNotUniqueException.class, () -> {
             elementsContainer.addElementContext(elementContext);
@@ -88,8 +101,7 @@ class ElementsContainerTest {
 
     @Test
     public void shouldOverrideElement() {
-        when(elementContext.getName()).thenReturn(ELEMENT_NAME);
-        var elementsContainer = ElementsContainer.fromElementContexts(List.of(elementContext));
+        var elementsContainer = new ElementsContainer(List.of(elementContext), elementByTypeResolver);
 
         //overriding it with itself
         boolean overrideHappened = elementsContainer.overrideElementContext(elementContext);

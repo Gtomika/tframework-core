@@ -1,14 +1,8 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.test;
 
-import static org.tframework.core.profiles.scanners.SystemPropertyProfileScanner.PROFILES_SYSTEM_PROPERTY;
-
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
@@ -49,6 +43,13 @@ import org.tframework.test.annotations.SetProperties;
 import org.tframework.test.annotations.SetRootClass;
 import org.tframework.test.utils.PredicateExecutor;
 import org.tframework.test.utils.TestActionsUtils;
+
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.Executors;
+
+import static org.tframework.core.profiles.scanners.SystemPropertyProfileScanner.PROFILES_SYSTEM_PROPERTY;
 
 /**
  * This is a JUnit 5 extension that allows to easily start TFramework applications. <b>The test instance created by JUnit will
@@ -105,11 +106,13 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
     @Override
     public void beforeAll(ExtensionContext extensionContext) {
         var testClass = extensionContext.getRequiredTestClass();
+        setTestClassForElementScanning(testClass);
+
         placeProfilesForApplication(testClass);
         placePropertiesForApplication(testClass);
         placeElementSettingsForApplication(testClass);
 
-        log.debug("Starting TFramework application for test class '{}'...", testClass.getName());
+        log.debug("Starting TFramework application from test class '{}'...", testClass.getName());
         try {
             application = TFramework.start(
                     findApplicationName(testClass),
@@ -185,6 +188,13 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
         } else {
             return initializationException;
         }
+    }
+
+    private void setTestClassForElementScanning(Class<?> testClass) {
+        TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
+                ClassesElementClassScanner.SCAN_CLASSES_PROPERTY + "-junit-extension-test-class",
+                List.of(testClass.getName())
+        );
     }
 
     private String findApplicationName(Class<?> testClass) {
@@ -320,12 +330,12 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
 
             TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
                     PackagesElementClassScanner.SCAN_PACKAGES_PROPERTY,
-                    setElementsAnnotation.scanAdditionalPackages()
+                    Arrays.asList(setElementsAnnotation.scanAdditionalPackages())
             );
 
             TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
                     ClassesElementClassScanner.SCAN_CLASSES_PROPERTY,
-                    setElementsAnnotation.scanAdditionalClasses()
+                    Arrays.asList(setElementsAnnotation.scanAdditionalClasses())
             );
 
             MDC.remove(SOURCE_ANNOTATION);

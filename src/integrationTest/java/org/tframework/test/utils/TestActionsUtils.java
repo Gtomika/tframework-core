@@ -1,14 +1,15 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.test.utils;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.properties.parsers.PropertyParsingUtils;
 import org.tframework.core.properties.parsers.SeparatedProperty;
 import org.tframework.core.properties.scanners.SystemPropertyScanner;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -38,7 +39,7 @@ public final class TestActionsUtils {
         setFrameworkPropertyIntoSystemProperties(separatedProperty.name(), separatedProperty.value());
     }
 
-    public static void setFrameworkPropertyIntoSystemProperties(String name, String... values) {
+    public static void setFrameworkPropertyIntoSystemProperties(String name, List<String> values) {
         String value = PropertyParsingUtils.LIST_BEGIN_CHARACTER +
                 String.join(PropertyParsingUtils.LIST_ELEMENT_SEPARATOR_CHARACTER, values) +
                 PropertyParsingUtils.LIST_END_CHARACTER;

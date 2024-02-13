@@ -1,10 +1,6 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.scanner;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.ListPropertyValue;
@@ -13,6 +9,11 @@ import org.tframework.core.properties.Property;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.reflection.classes.ClassFiltersFactory;
+
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClassesElementClassScannerTest {
 
@@ -58,6 +59,27 @@ class ClassesElementClassScannerTest {
         var results = scanner.scanElements();
 
         assertTrue(results.isEmpty());
+    }
+
+    @Test
+    public void shouldScanElements_ifAdditionalScanClassesProperties_areAlsoProvided() {
+        PropertiesContainer propertiesContainer = PropertiesContainer.fromProperties(List.of(
+                new Property(
+                        ClassesElementClassScanner.SCAN_CLASSES_PROPERTY + "-test",
+                        new ListPropertyValue(List.of(OuterElementClass.class.getName()))
+                ),
+                new Property(
+                        ClassesElementClassScanner.SCAN_CLASSES_PROPERTY + "-additional",
+                        new ListPropertyValue(List.of(OuterElementClass.InnerElementClass.class.getName()))
+                )
+        ));
+        scanner = buildScanner(propertiesContainer);
+
+        var results = scanner.scanElements();
+
+        assertEquals(2, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(OuterElementClass.class)));
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(OuterElementClass.InnerElementClass.class)));
     }
 
     private void setUpScannerWithMultipleClassesProperty(List<String> classesToScan) {

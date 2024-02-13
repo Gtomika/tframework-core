@@ -1,9 +1,6 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
@@ -11,6 +8,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.dependency.DependencySource;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * A read-only container of the properties, and related methods to access them.
@@ -141,6 +142,15 @@ public final class PropertiesContainer implements DependencySource {
             }
         }
         return PropertiesContainer.fromProperties(mergedProperties);
+    }
+
+    /**
+     * Exposes all the names of the properties in this container.
+     */
+    public List<String> propertyNames() {
+        return properties.stream()
+                .map(Property::name)
+                .toList();
     }
 
     /**

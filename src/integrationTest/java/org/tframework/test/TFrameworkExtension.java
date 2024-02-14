@@ -29,8 +29,8 @@ import org.tframework.core.elements.scanner.ClassesElementClassScanner;
 import org.tframework.core.elements.scanner.InternalElementClassScanner;
 import org.tframework.core.elements.scanner.PackagesElementClassScanner;
 import org.tframework.core.elements.scanner.RootElementClassScanner;
+import org.tframework.core.profiles.scanners.SystemPropertyProfileScanner;
 import org.tframework.core.readers.ReadersFactory;
-import org.tframework.core.readers.SystemPropertyNotFoundException;
 import org.tframework.core.readers.SystemPropertyReader;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
@@ -47,10 +47,11 @@ import org.tframework.test.utils.TestActionsUtils;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executors;
-
-import static org.tframework.core.profiles.scanners.SystemPropertyProfileScanner.PROFILES_SYSTEM_PROPERTY;
 
 /**
  * This is a JUnit 5 extension that allows to easily start TFramework applications. <b>The test instance created by JUnit will
@@ -98,6 +99,7 @@ import static org.tframework.core.profiles.scanners.SystemPropertyProfileScanner
 public class TFrameworkExtension implements Extension, BeforeAllCallback, TestInstanceFactory, AfterAllCallback, ParameterResolver {
 
     private static final String SOURCE_ANNOTATION = "sourceAnnotation";
+    private static final String DECLARED_AS_TEST_PARAMETER = "JUnit 5 test method parameter";
 
     private static final String TOO_MANY_ROOT_CLASSES_ERROR_TEMPLATE = "More than one class was found to annotated with '" +
             TFrameworkRootClass.class.getName() + "' on the classpath: %s";
@@ -111,6 +113,7 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
     private final SystemPropertyReader systemPropertyReader = ReadersFactory.createSystemPropertyReader();
     private final InjectAnnotationScanner injectAnnotationScanner = new InjectAnnotationScanner(annotationScanner);
     private DependencyResolverAggregator dependencyResolverAggregator;
+    private final Set<String> profilesSystemPropertiesInUse = new HashSet<>();
 
     private boolean successfulAppInitialization;
     private Application application;
@@ -173,6 +176,8 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
             log.debug("Shutting down the '{}' application after all tests", application.getName());
             TFramework.stop(application);
         }
+        profilesSystemPropertiesInUse.forEach(p -> System.getProperties().remove(p));
+        profilesSystemPropertiesInUse.clear();
     }
 
     @Override
@@ -188,8 +193,6 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
             return annotationScanner.hasAnnotation(parameterContext.getParameter(), InjectInitializationException.class);
         }
     }
-
-    private static final String DECLARED_AS_TEST_PARAMETER = "JUnit 5 test method parameter";
 
     @Override
     public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
@@ -222,7 +225,7 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
 
     private void setTestClassForElementScanning(Class<?> testClass) {
         TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
-                ClassesElementClassScanner.SCAN_CLASSES_PROPERTY + "-junit-extension-test-class",
+                ClassesElementClassScanner.SCAN_CLASSES_PROPERTY + "-junit5-extension-test-class",
                 List.of(testClass.getName())
         );
     }
@@ -310,15 +313,12 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
             log.debug("The following profiles will be activated by '{}' test annotation: {}", SetProfiles.class.getName(), profiles);
 
             String profilesActivated = String.join(",", profiles);
-            try {
-                String profilesInProperty = systemPropertyReader.readSystemProperty(PROFILES_SYSTEM_PROPERTY);
-                log.debug("System property '{}' already set, appending new values '{}'", PROFILES_SYSTEM_PROPERTY, profilesActivated);
-                profilesInProperty += "," + profilesActivated;
-                System.setProperty(PROFILES_SYSTEM_PROPERTY, profilesInProperty);
-            } catch (SystemPropertyNotFoundException e) {
-                log.debug("System property '{}' not set, adding value '{}'", PROFILES_SYSTEM_PROPERTY, profilesActivated);
-                System.setProperty(PROFILES_SYSTEM_PROPERTY, profilesActivated);
-            }
+
+            String uniqueProfilesSystemPropertyName = SystemPropertyProfileScanner.PROFILES_SYSTEM_PROPERTY +
+                    ".junit5-extension-" + UUID.randomUUID();
+            System.setProperty(uniqueProfilesSystemPropertyName, profilesActivated);
+
+            profilesSystemPropertiesInUse.add(uniqueProfilesSystemPropertyName);
         });
     }
 

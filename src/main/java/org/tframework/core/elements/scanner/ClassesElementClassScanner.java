@@ -13,14 +13,13 @@ import org.tframework.core.utils.LogUtils;
 
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
  * A {@link ElementClassScanner} that scans elements from a set of classes. The classes can be provided
  * with the {@value #SCAN_CLASSES_PROPERTY} property. Additionally, this property name can also be
- * suffixed such as {@value #SCAN_CLASSES_PROPERTY}{@code -important} and these kind of properties will
+ * suffixed such as {@code org.tframework.elements.scan-classes-important} and these kind of properties will
  * also be picked up and checked for classes. It is the responsibility of the user to set the {@value #SCAN_CLASSES_PROPERTY} property
  * with actual valid classes (if a class cannot be loaded, it will be ignored, with an error message logged).
  * <p>
@@ -29,16 +28,11 @@ import java.util.stream.Stream;
  * during testing, it may be useful to pick up only a few classes instead of entire packages.
  * @see PackagesElementClassScanner
  */
-//well this is an obnoxious name...
 @Slf4j
 public class ClassesElementClassScanner extends ElementClassScanner {
 
     public static final String SCAN_CLASSES_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.scan-classes";
     private static final List<String> SCAN_CLASSES_DEFAULT_VALUE = List.of();
-
-    static final Pattern ADDITIONAL_SCAN_CLASSES_PROPERTY_REGEX = Pattern.compile(
-            "org\\.tframework\\.elements\\.scan-classes-.[a-z-]+"
-    );
 
     @Builder
     private ClassesElementClassScanner(
@@ -80,7 +74,7 @@ public class ClassesElementClassScanner extends ElementClassScanner {
 
     private List<String> findAdditionalClassesToScan(PropertiesContainer properties) {
         return properties.propertyNames().stream()
-                .filter(propertyName -> ADDITIONAL_SCAN_CLASSES_PROPERTY_REGEX.matcher(propertyName).matches())
+                .filter(propertyName -> propertyName.startsWith(SCAN_CLASSES_PROPERTY))
                 .peek(propertyName -> log.debug("Found property '{}' that will be used to find classes to scan", propertyName))
                 .map(propertiesContainer::getPropertyValueList)
                 .flatMap(List::stream)

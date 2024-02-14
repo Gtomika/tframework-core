@@ -1,13 +1,16 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.profiles;
 
-import java.util.List;
-import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.profiles.scanners.ProfileScanner;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * The profile merger combines the output of several {@link ProfileScanner}s. Use
@@ -28,13 +31,13 @@ public class ProfileMerger {
                 .stream()
                 .map(s -> s.getClass().getName())
                 .toList());
-        Stream<String> profiles = Stream.empty();
+        Set<String> profiles = new HashSet<>();
 
         for(ProfileScanner scanner: profileScanners) {
-            profiles = Stream.concat(profiles, scanner.scan().stream());
+            profiles.addAll(scanner.scan());
         }
 
-        return profiles;
+        return profiles.stream();
     }
 
     /**

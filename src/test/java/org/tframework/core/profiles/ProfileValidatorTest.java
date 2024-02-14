@@ -1,14 +1,14 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.profiles;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class ProfileValidatorTest {
 
@@ -16,7 +16,7 @@ class ProfileValidatorTest {
 
     @ParameterizedTest
     @NullSource
-    @ValueSource(strings = {"", "ABC", "üö", "123-456"})
+    @ValueSource(strings = {"", "???", "üö"})
     public void shouldValidateProfile_andThrowException_ifInvalid(String profile) {
         var exception = assertThrows(InvalidProfileException.class, () -> profileValidator.validate(profile));
 
@@ -38,7 +38,7 @@ class ProfileValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"dev", "prod-db", "test"})
+    @ValueSource(strings = {"DEV", "prod-db", "123-456", "My_BEST_profile-1"})
     public void shouldValidateProfile_andAcceptIt_ifValid(String profile) {
         assertDoesNotThrow(() -> profileValidator.validate(profile));
     }

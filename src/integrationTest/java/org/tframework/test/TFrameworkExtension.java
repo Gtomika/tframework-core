@@ -34,6 +34,7 @@ import org.tframework.core.readers.SystemPropertyNotFoundException;
 import org.tframework.core.readers.SystemPropertyReader;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
+import org.tframework.test.annotations.ExpectInitializationFailure;
 import org.tframework.test.annotations.InjectInitializationException;
 import org.tframework.test.annotations.SetApplicationName;
 import org.tframework.test.annotations.SetCommandLineArguments;
@@ -82,9 +83,14 @@ import static org.tframework.core.profiles.scanners.SystemPropertyProfileScanner
  * </ul>
  *
  * <h3>Initialization failure</h3>
- * There are cases where the test expects the application initialization to fail. In these cases, the
- * {@link InjectInitializationException} can be used on an {@link Exception} typed test method parameter to inject the
- * exception that caused the failure, which can be asserted inside the test.
+ * There are cases where the test expects the application initialization to fail. In these cases:
+ * <ul>
+ *     <li>Place the {@link ExpectInitializationFailure} annotation.</li>
+ *     <li>
+ *         The {@link InjectInitializationException} can be used on an {@link Exception} typed test method parameter to inject the
+ *         exception that caused the failure, which can be asserted inside the test.
+ *     </li>
+ * </ul>
  * @see org.tframework.test.annotations.IsolatedTFrameworkTest
  * @see org.tframework.test.annotations.TFrameworkTest
  */
@@ -92,6 +98,14 @@ import static org.tframework.core.profiles.scanners.SystemPropertyProfileScanner
 public class TFrameworkExtension implements Extension, BeforeAllCallback, TestInstanceFactory, AfterAllCallback, ParameterResolver {
 
     private static final String SOURCE_ANNOTATION = "sourceAnnotation";
+
+    private static final String TOO_MANY_ROOT_CLASSES_ERROR_TEMPLATE = "More than one class was found to annotated with '" +
+            TFrameworkRootClass.class.getName() + "' on the classpath: %s";
+    private static final String NO_ROOT_CLASS_ERROR = "No root class was found that is annotated with '" +
+            TFrameworkRootClass.class.getName() + "', but exactly one is required.";
+    private static final String UNEXPECTED_START_ERROR = "Application initialization was expected to fail, but it succeeded!";
+
+    private static final int SCAN_THREAD_AMOUNT = 5;
 
     private final AnnotationScanner annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
     private final SystemPropertyReader systemPropertyReader = ReadersFactory.createSystemPropertyReader();
@@ -104,7 +118,7 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
     private Exception initializationException;
 
     @Override
-    public void beforeAll(ExtensionContext extensionContext) {
+    public void beforeAll(ExtensionContext extensionContext) throws Exception {
         var testClass = extensionContext.getRequiredTestClass();
         setTestClassForElementScanning(testClass);
 
@@ -112,7 +126,8 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
         placePropertiesForApplication(testClass);
         placeElementSettingsForApplication(testClass);
 
-        log.debug("Starting TFramework application from test class '{}'...", testClass.getName());
+        boolean expectFailure = detectExpectFailure(testClass);
+        log.debug("Starting TFramework application from test class '{}'. Failure expected: {}", testClass.getName(), expectFailure);
         try {
             application = TFramework.start(
                     findApplicationName(testClass),
@@ -132,6 +147,7 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
             initializationException = e;
             successfulAppInitialization = false;
         }
+        checkUnexpectedApplicationState(expectFailure, successfulAppInitialization);
     }
 
     @Override
@@ -190,6 +206,20 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
         }
     }
 
+    private boolean detectExpectFailure(Class<?> testClass) {
+        return annotationScanner.hasAnnotation(testClass, ExpectInitializationFailure.class);
+    }
+
+    private void checkUnexpectedApplicationState(boolean expectFailure, boolean applicationInitialized) throws Exception {
+        if(applicationInitialized && expectFailure) {
+            throw new IllegalStateException(UNEXPECTED_START_ERROR);
+        }
+        if(!applicationInitialized && !expectFailure) {
+            //if the app expected to start, but did not, transiently rethrow the original exception
+            throw initializationException;
+        }
+    }
+
     private void setTestClassForElementScanning(Class<?> testClass) {
         TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
                 ClassesElementClassScanner.SCAN_CLASSES_PROPERTY + "-junit-extension-test-class",
@@ -237,12 +267,6 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
             return testClass;
         }
     }
-
-    private static final String TOO_MANY_ROOT_CLASSES_ERROR_TEMPLATE = "More than one class was found to annotated with '" +
-            TFrameworkRootClass.class.getName() + "' on the classpath: %s";
-    private static final String NO_ROOT_CLASS_ERROR = "No root class was found that is annotated with '" +
-            TFrameworkRootClass.class.getName() + "', but exactly one is required.";
-    private static final int SCAN_THREAD_AMOUNT = 5;
 
     private Class<?> findRootClassOnClasspath() {
         ClassGraph classGraph = new ClassGraph()

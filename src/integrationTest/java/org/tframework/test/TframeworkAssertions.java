@@ -1,19 +1,18 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.opentest4j.AssertionFailedError;
 import org.tframework.core.initializers.InitializationException;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.profiles.scanners.DefaultProfileScanner;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Utilities for making assertions on TFramework applications.

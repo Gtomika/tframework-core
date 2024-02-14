@@ -1,11 +1,10 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.reflection.annotations;
 
-import org.tframework.core.TFrameworkException;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
+import org.tframework.core.TFrameworkException;
 
 /**
  * This exception is thrown when {@link AnnotationScanner} finds more than one

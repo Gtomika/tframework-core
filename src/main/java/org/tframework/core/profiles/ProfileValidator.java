@@ -1,10 +1,9 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.profiles;
 
+import java.util.regex.Pattern;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-
-import java.util.regex.Pattern;
 
 /**
  * The profile validator ensures all profile names match the framework rules, which are:

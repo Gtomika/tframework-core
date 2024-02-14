@@ -1,6 +1,10 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.scanner;
 
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.properties.PropertiesContainer;
@@ -10,11 +14,6 @@ import org.tframework.core.reflection.classes.ClassScannersFactory;
 import org.tframework.core.utils.ClassLoaderUtils;
 import org.tframework.core.utils.Constants;
 import org.tframework.core.utils.LogUtils;
-
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * A {@link ElementClassScanner} that scans elements from a set of classes. The classes can be provided

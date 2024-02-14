@@ -1,5 +1,7 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.profiles;
 
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.profiles.ProfilesContainer;
@@ -9,8 +11,6 @@ import org.tframework.test.TframeworkAssertions;
 import org.tframework.test.annotations.IsolatedTFrameworkTest;
 import org.tframework.test.annotations.SetCommandLineArguments;
 import org.tframework.test.annotations.SetProfiles;
-
-import java.util.Set;
 
 @SetProfiles({"p1", "p2"})
 @SetCommandLineArguments(ProfilesFromCombinedSourcesTest.PROFILES_SETTER_ARGUMENT)

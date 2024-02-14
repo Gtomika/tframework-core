@@ -1,12 +1,10 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.reflection.classes;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
-import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
@@ -14,11 +12,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
 
 @ExtendWith(MockitoExtension.class)
 class SimpleClassFilterTest {

@@ -1,6 +1,10 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements;
 
+import java.lang.reflect.Method;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +26,6 @@ import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.properties.converters.PropertyConvertersFactory;
 import org.tframework.core.utils.Constants;
-
-import java.lang.reflect.Method;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * This class is responsible for the elements initialization process. This process consists of the following steps:

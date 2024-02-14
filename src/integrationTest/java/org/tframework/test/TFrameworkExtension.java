@@ -3,6 +3,11 @@ package org.tframework.test;
 
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+import java.util.concurrent.Executors;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,12 +55,6 @@ import org.tframework.test.annotations.SetRootClass;
 import org.tframework.test.annotations.TFrameworkTest;
 import org.tframework.test.utils.PredicateExecutor;
 import org.tframework.test.utils.TestActionsUtils;
-
-import java.lang.reflect.Constructor;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.Executors;
 
 /**
  * This is a JUnit 5 extension that allows to easily start TFramework applications. <b>The test class must be marked

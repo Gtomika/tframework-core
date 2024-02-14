@@ -1,13 +1,12 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.test.annotations;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.test.TFrameworkExtension;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 
 /**
  * A composed annotation of {@link TFrameworkExtension} and configurations, that can be used to start a full-fledged

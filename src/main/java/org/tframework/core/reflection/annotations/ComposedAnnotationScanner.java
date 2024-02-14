@@ -1,14 +1,13 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.reflection.annotations;
 
-import lombok.Getter;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import lombok.Getter;
 
 /**
  * The composed annotation scanner implements 'extended annotation detection', which is more elaborate than

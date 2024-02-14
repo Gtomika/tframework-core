@@ -1,15 +1,14 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.profiles.scanners;
 
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.readers.SystemPropertyReader;
-
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.readers.SystemPropertyReader;
 
 /**
  * A {@link ProfileScanner} implementation that scans for profiles in the system properties. The system property

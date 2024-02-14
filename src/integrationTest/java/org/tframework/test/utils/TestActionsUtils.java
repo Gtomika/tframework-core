@@ -1,12 +1,11 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.test.utils;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)

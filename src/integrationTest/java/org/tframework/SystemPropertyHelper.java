@@ -1,12 +1,12 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework;
-
-import org.tframework.core.properties.parsers.PropertyParsingUtils;
-import org.tframework.core.properties.parsers.SeparatedProperty;
-import org.tframework.core.properties.scanners.SystemPropertyScanner;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.tframework.core.properties.parsers.PropertyParsingUtils;
+import org.tframework.core.properties.parsers.SeparatedProperty;
+import org.tframework.core.properties.scanners.SystemPropertyScanner;
 
 /**
  * Utility class for setting system properties and marking them

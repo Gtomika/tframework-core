@@ -1,6 +1,9 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.tframework.core.Application;
@@ -11,9 +14,6 @@ import org.tframework.test.annotations.SetElements;
 import org.tframework.test.annotations.SetProfiles;
 import org.tframework.test.annotations.SetProperties;
 import org.tframework.test.annotations.SetRootClass;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SetProfiles("test")
 @SetProperties("cool.prop=123")

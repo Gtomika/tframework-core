@@ -1,13 +1,14 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.reflection.annotations;
 
+import lombok.Getter;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import lombok.Getter;
 
 /**
  * The composed annotation scanner implements 'extended annotation detection', which is more elaborate than
@@ -98,7 +99,7 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
         if(scannedAnnotations.size() == 1) {
             return Optional.of(scannedAnnotations.getFirst());
         } else if(scannedAnnotations.size() > 1) {
-            throw new MultipleAnnotationsScannedException(scannedAnnotations);
+            throw new MultipleAnnotationsScannedException(annotatedElement, scannedAnnotations);
         } else {
             return Optional.empty();
         }

@@ -4,8 +4,11 @@ package org.tframework.test;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.AfterAllCallback;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.Extension;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
@@ -15,9 +18,11 @@ import org.junit.jupiter.api.extension.TestInstanceFactory;
 import org.junit.jupiter.api.extension.TestInstanceFactoryContext;
 import org.junit.jupiter.api.extension.TestInstantiationException;
 import org.slf4j.MDC;
+import org.tframework.SystemPropertyHelper;
 import org.tframework.core.Application;
 import org.tframework.core.TFramework;
 import org.tframework.core.TFrameworkRootClass;
+import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
@@ -30,33 +35,33 @@ import org.tframework.core.elements.scanner.InternalElementClassScanner;
 import org.tframework.core.elements.scanner.PackagesElementClassScanner;
 import org.tframework.core.elements.scanner.RootElementClassScanner;
 import org.tframework.core.profiles.scanners.SystemPropertyProfileScanner;
-import org.tframework.core.readers.ReadersFactory;
-import org.tframework.core.readers.SystemPropertyReader;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
+import org.tframework.core.reflection.annotations.ComposedAnnotationScanner;
 import org.tframework.test.annotations.ExpectInitializationFailure;
 import org.tframework.test.annotations.InjectInitializationException;
+import org.tframework.test.annotations.IsolatedTFrameworkTest;
 import org.tframework.test.annotations.SetApplicationName;
 import org.tframework.test.annotations.SetCommandLineArguments;
 import org.tframework.test.annotations.SetElements;
 import org.tframework.test.annotations.SetProfiles;
 import org.tframework.test.annotations.SetProperties;
 import org.tframework.test.annotations.SetRootClass;
+import org.tframework.test.annotations.TFrameworkTest;
 import org.tframework.test.utils.PredicateExecutor;
 import org.tframework.test.utils.TestActionsUtils;
 
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 
 /**
- * This is a JUnit 5 extension that allows to easily start TFramework applications. <b>The test instance created by JUnit will
- * be added as an element, allowing to field inject dependencies</b>. The application will be started before the tests, once.
- * It will be stopped after all tests are completed.
+ * This is a JUnit 5 extension that allows to easily start TFramework applications. <b>The test class must be marked
+ * with {@link Element}, so that it will be scanned, allowing to field inject dependencies</b>. The application will
+ * be started before the tests, once. It will be stopped after all tests are completed. It is recommended to use the
+ * composed annotations {@link TFrameworkTest} or {@link IsolatedTFrameworkTest} which come with some useful configurations.
  *
  * <h3>Configuring the application</h3>
  * Additional annotations can be used on the test class to specify the details of the started application:
@@ -68,8 +73,8 @@ import java.util.concurrent.Executors;
  *     <li>{@link SetProperties} can be used to control general properties.</li>
  *     <li>{@link SetElements} can be used to control element related settings, such as what to scan.</li>
  * </ul>
- * A {@link org.tframework.core.reflection.annotations.ComposedAnnotationScanner} will be used to pick up these annotations,
- * so it is possible to use composed meta annotations that combine {@link org.junit.jupiter.api.extension.ExtendWith} and
+ * A {@link ComposedAnnotationScanner} will be used to pick up these annotations,
+ * so it is possible to use composed meta annotations that combine {@link ExtendWith} and
  * the other annotations described above.
  *
  * <h3>Using the application</h3>
@@ -78,7 +83,7 @@ import java.util.concurrent.Executors;
  * <ul>
  *     <li>They can be field injected into the test class, because the test class is an element.</li>
  *     <li>
- *         They can be added as a parameter to JUnit methods such as {@link org.junit.jupiter.api.BeforeEach} and {@link org.junit.jupiter.api.Test}.
+ *         They can be added as a parameter to JUnit methods such as {@link BeforeEach} and {@link Test}.
  *         Parameters need to be annotated with {@code @InjectX} annotations such as {@link InjectElement}.
  *     </li>
  * </ul>
@@ -92,8 +97,8 @@ import java.util.concurrent.Executors;
  *         exception that caused the failure, which can be asserted inside the test.
  *     </li>
  * </ul>
- * @see org.tframework.test.annotations.IsolatedTFrameworkTest
- * @see org.tframework.test.annotations.TFrameworkTest
+ * @see IsolatedTFrameworkTest
+ * @see TFrameworkTest
  */
 @Slf4j
 public class TFrameworkExtension implements Extension, BeforeAllCallback, TestInstanceFactory, AfterAllCallback, ParameterResolver {
@@ -105,16 +110,17 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
             TFrameworkRootClass.class.getName() + "' on the classpath: %s";
     private static final String NO_ROOT_CLASS_ERROR = "No root class was found that is annotated with '" +
             TFrameworkRootClass.class.getName() + "', but exactly one is required.";
+    private static final String TEST_CLASS_NOT_ELEMENT_ERROR = "The test class '%s' should be marked with '" +
+            Element.class.getName() + "'";
     private static final String UNEXPECTED_START_ERROR = "Application initialization was expected to fail, but it succeeded!";
 
     private static final int SCAN_THREAD_AMOUNT = 5;
 
     private final AnnotationScanner annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
-    private final SystemPropertyReader systemPropertyReader = ReadersFactory.createSystemPropertyReader();
     private final InjectAnnotationScanner injectAnnotationScanner = new InjectAnnotationScanner(annotationScanner);
-    private DependencyResolverAggregator dependencyResolverAggregator;
-    private final Set<String> profilesSystemPropertiesInUse = new HashSet<>();
+    private final SystemPropertyHelper systemPropertyHelper = new SystemPropertyHelper();
 
+    private DependencyResolverAggregator dependencyResolverAggregator;
     private boolean successfulAppInitialization;
     private Application application;
     private ElementContext testClassElementContext;
@@ -123,6 +129,7 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
     @Override
     public void beforeAll(ExtensionContext extensionContext) throws Exception {
         var testClass = extensionContext.getRequiredTestClass();
+        checkIfTestClassIsElement(testClass);
         setTestClassForElementScanning(testClass);
 
         placeProfilesForApplication(testClass);
@@ -176,8 +183,7 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
             log.debug("Shutting down the '{}' application after all tests", application.getName());
             TFramework.stop(application);
         }
-        profilesSystemPropertiesInUse.forEach(p -> System.getProperties().remove(p));
-        profilesSystemPropertiesInUse.clear();
+        systemPropertyHelper.cleanUp();
     }
 
     @Override
@@ -223,9 +229,16 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
         }
     }
 
+    private void checkIfTestClassIsElement(Class<?> testClass) {
+        if(!annotationScanner.hasAnnotation(testClass, Element.class)) {
+            throw new IllegalStateException(TEST_CLASS_NOT_ELEMENT_ERROR.formatted(testClass.getName()));
+        }
+    }
+
     private void setTestClassForElementScanning(Class<?> testClass) {
-        TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
-                ClassesElementClassScanner.SCAN_CLASSES_PROPERTY + "-junit5-extension-test-class",
+        String scanTestClassProperty = ClassesElementClassScanner.SCAN_CLASSES_PROPERTY + "-junit5-extension-test-class";
+        systemPropertyHelper.setFrameworkPropertyIntoSystemProperties(
+                scanTestClassProperty,
                 List.of(testClass.getName())
         );
     }
@@ -316,9 +329,7 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
 
             String uniqueProfilesSystemPropertyName = SystemPropertyProfileScanner.PROFILES_SYSTEM_PROPERTY +
                     ".junit5-extension-" + UUID.randomUUID();
-            System.setProperty(uniqueProfilesSystemPropertyName, profilesActivated);
-
-            profilesSystemPropertiesInUse.add(uniqueProfilesSystemPropertyName);
+            systemPropertyHelper.setIntoSystemProperties(uniqueProfilesSystemPropertyName, profilesActivated);
         });
     }
 
@@ -328,7 +339,7 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
             if(properties.isEmpty()) return;
 
             MDC.put(SOURCE_ANNOTATION, SetProperties.class.getName());
-            properties.forEach(TestActionsUtils::setRawFrameworkPropertyIntoSystemProperties);
+            properties.forEach(systemPropertyHelper::setRawFrameworkPropertyIntoSystemProperties);
             MDC.remove(SOURCE_ANNOTATION);
         });
     }
@@ -337,27 +348,27 @@ public class TFrameworkExtension implements Extension, BeforeAllCallback, TestIn
         annotationScanner.scanOneStrict(testClass, SetElements.class).ifPresent(setElementsAnnotation -> {
             MDC.put(SOURCE_ANNOTATION, SetElements.class.getName());
 
-            TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
+            systemPropertyHelper.setFrameworkPropertyIntoSystemProperties(
                     RootElementClassScanner.ROOT_SCANNING_ENABLED_PROPERTY,
                     String.valueOf(setElementsAnnotation.rootScanningEnabled())
             );
 
-            TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
+            systemPropertyHelper.setFrameworkPropertyIntoSystemProperties(
                     RootElementClassScanner.ROOT_HIERARCHY_SCANNING_ENABLED_PROPERTY,
                     String.valueOf(setElementsAnnotation.rootHierarchyScanningEnabled())
             );
 
-            TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
+            systemPropertyHelper.setFrameworkPropertyIntoSystemProperties(
                     InternalElementClassScanner.TFRAMEWORK_INTERNAL_SCAN_ENABLED_PROPERTY,
                     String.valueOf(setElementsAnnotation.internalScanningEnabled())
             );
 
-            TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
+            systemPropertyHelper.setFrameworkPropertyIntoSystemProperties(
                     PackagesElementClassScanner.SCAN_PACKAGES_PROPERTY,
                     Arrays.asList(setElementsAnnotation.scanAdditionalPackages())
             );
 
-            TestActionsUtils.setFrameworkPropertyIntoSystemProperties(
+            systemPropertyHelper.setFrameworkPropertyIntoSystemProperties(
                     ClassesElementClassScanner.SCAN_CLASSES_PROPERTY,
                     Arrays.asList(setElementsAnnotation.scanAdditionalClasses())
             );

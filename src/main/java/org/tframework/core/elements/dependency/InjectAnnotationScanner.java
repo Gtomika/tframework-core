@@ -1,18 +1,19 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.AnnotatedElement;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.annotations.InjectProperty;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * This class is a specialized {@link AnnotationScanner} that has useful methods for finding '@InjectX' annotations.
@@ -46,7 +47,7 @@ public class InjectAnnotationScanner {
         var injectAnnotations = findAllInjectAnnotationsPresent(annotatedElement);
 
         if(injectAnnotations.size() > 1) {
-            throw new MultipleAnnotationsScannedException(injectAnnotations);
+            throw new MultipleAnnotationsScannedException(annotatedElement, injectAnnotations);
         }
 
         return injectAnnotations.stream()
@@ -71,7 +72,7 @@ public class InjectAnnotationScanner {
         var injectAnnotations = findAllInjectAnnotationsPresent(annotatedElement);
 
         if(injectAnnotations.size() > 1) {
-            throw new MultipleAnnotationsScannedException(injectAnnotations);
+            throw new MultipleAnnotationsScannedException(annotatedElement, injectAnnotations);
         }
 
         return !injectAnnotations.isEmpty();

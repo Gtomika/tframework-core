@@ -13,7 +13,7 @@ import org.tframework.test.TFrameworkExtension;
  * For example, to set the {@code cool.prop} and {@code test.prop} properties to {@code cool} and {@code test},
  * respectively, use:
  * <pre>
- * {@literal @Properties({"cool.prop=cool", "test.prop=test"})}
+ * {@literal @SetProperties({"cool.prop=cool", "test.prop=test"})}
  * </pre>
  */
 @Documented

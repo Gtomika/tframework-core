@@ -16,7 +16,7 @@ class ProfileValidatorTest {
 
     @ParameterizedTest
     @NullSource
-    @ValueSource(strings = {"", "ABC", "üö", "123-456"})
+    @ValueSource(strings = {"", "???", "üö"})
     public void shouldValidateProfile_andThrowException_ifInvalid(String profile) {
         var exception = assertThrows(InvalidProfileException.class, () -> profileValidator.validate(profile));
 
@@ -38,7 +38,7 @@ class ProfileValidatorTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"dev", "prod-db", "test"})
+    @ValueSource(strings = {"DEV", "prod-db", "123-456", "My_BEST_profile-1"})
     public void shouldValidateProfile_andAcceptIt_ifValid(String profile) {
         assertDoesNotThrow(() -> profileValidator.validate(profile));
     }

@@ -49,7 +49,7 @@ class SimpleClassFilterTest {
 
         var testAnnotations = Arrays.asList(TestFilterClass3.class.getAnnotationsByType(TestAnnotation.class));
         when(annotationScanner.scanOneStrict(TestFilterClass3.class, TestAnnotation.class))
-                .thenThrow(new MultipleAnnotationsScannedException(testAnnotations));
+                .thenThrow(new MultipleAnnotationsScannedException(TestFilterClass3.class, testAnnotations));
 
         var classes = List.of(TestFilterClass1.class, TestFilterClass3.class);
 

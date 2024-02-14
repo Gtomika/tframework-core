@@ -2,6 +2,7 @@
 package org.tframework.core.reflection.annotations;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import org.tframework.core.TFrameworkException;
 
@@ -11,10 +12,13 @@ import org.tframework.core.TFrameworkException;
  */
 public class MultipleAnnotationsScannedException extends TFrameworkException {
 
-    private static final String TEMPLATE = "At most 1 annotation was allowed, but found %d: %s";
+    private static final String TEMPLATE = "At most 1 annotation was allowed on component '%s', but found %d: %s";
 
-    public MultipleAnnotationsScannedException(List<? extends Annotation> scannedAnnotations) {
-        super(TEMPLATE.formatted(scannedAnnotations.size(), scannedAnnotations));
+    public MultipleAnnotationsScannedException(
+            AnnotatedElement annotatedElement,
+            List<? extends Annotation> scannedAnnotations
+    ) {
+        super(TEMPLATE.formatted(annotatedElement, scannedAnnotations.size(), scannedAnnotations));
     }
 
     @Override

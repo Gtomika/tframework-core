@@ -98,7 +98,7 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
         if(scannedAnnotations.size() == 1) {
             return Optional.of(scannedAnnotations.getFirst());
         } else if(scannedAnnotations.size() > 1) {
-            throw new MultipleAnnotationsScannedException(scannedAnnotations);
+            throw new MultipleAnnotationsScannedException(annotatedElement, scannedAnnotations);
         } else {
             return Optional.empty();
         }

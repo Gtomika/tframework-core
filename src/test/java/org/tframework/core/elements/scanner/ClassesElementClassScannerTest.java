@@ -60,6 +60,27 @@ class ClassesElementClassScannerTest {
         assertTrue(results.isEmpty());
     }
 
+    @Test
+    public void shouldScanElements_ifAdditionalScanClassesProperties_areAlsoProvided() {
+        PropertiesContainer propertiesContainer = PropertiesContainer.fromProperties(List.of(
+                new Property(
+                        ClassesElementClassScanner.SCAN_CLASSES_PROPERTY + "-test",
+                        new ListPropertyValue(List.of(OuterElementClass.class.getName()))
+                ),
+                new Property(
+                        ClassesElementClassScanner.SCAN_CLASSES_PROPERTY + "-additional",
+                        new ListPropertyValue(List.of(OuterElementClass.InnerElementClass.class.getName()))
+                )
+        ));
+        scanner = buildScanner(propertiesContainer);
+
+        var results = scanner.scanElements();
+
+        assertEquals(2, results.size());
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(OuterElementClass.class)));
+        assertTrue(results.stream().anyMatch(r -> r.annotationSource().equals(OuterElementClass.InnerElementClass.class)));
+    }
+
     private void setUpScannerWithMultipleClassesProperty(List<String> classesToScan) {
         var propertiesContainer = PropertiesContainer.fromProperties(List.of(new Property(
                 ClassesElementClassScanner.SCAN_CLASSES_PROPERTY,

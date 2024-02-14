@@ -11,7 +11,7 @@ import org.tframework.test.TFrameworkExtension;
  * applications {@link org.tframework.core.profiles.ProfilesContainer}. For example, to set
  * the {@code test} and {@code dev} profiles for the given tests, use:
  * <pre>
- * {@literal @Profiles({"test", "dev"})}
+ * {@literal @SetProfiles({"test", "dev"})}
  * </pre>
  */
 @Documented

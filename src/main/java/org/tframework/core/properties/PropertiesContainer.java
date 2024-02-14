@@ -144,6 +144,15 @@ public final class PropertiesContainer implements DependencySource {
     }
 
     /**
+     * Exposes all the names of the properties in this container.
+     */
+    public List<String> propertyNames() {
+        return properties.stream()
+                .map(Property::name)
+                .toList();
+    }
+
+    /**
      * Creates a new {@link PropertiesContainer} with the original ones merged with the ones found in
      * the other container. Properties in the other container will override the current ones.
      * @param otherContainer Non-null container to merge into this one.

@@ -6,9 +6,6 @@ import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.properties.parsers.PropertyParsingUtils;
-import org.tframework.core.properties.parsers.SeparatedProperty;
-import org.tframework.core.properties.scanners.SystemPropertyScanner;
 
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -31,24 +28,6 @@ public final class TestActionsUtils {
                 .findFirst()
                 .orElseThrow();
         return executor.action().get();
-    }
-
-    public static void setRawFrameworkPropertyIntoSystemProperties(String rawProperty) {
-        SeparatedProperty separatedProperty = PropertyParsingUtils.separateNameValue(rawProperty);
-        setFrameworkPropertyIntoSystemProperties(separatedProperty.name(), separatedProperty.value());
-    }
-
-    public static void setFrameworkPropertyIntoSystemProperties(String name, String... values) {
-        String value = PropertyParsingUtils.LIST_BEGIN_CHARACTER +
-                String.join(PropertyParsingUtils.LIST_ELEMENT_SEPARATOR_CHARACTER, values) +
-                PropertyParsingUtils.LIST_END_CHARACTER;
-        setFrameworkPropertyIntoSystemProperties(name, value);
-    }
-
-    public static void setFrameworkPropertyIntoSystemProperties(String name, String value) {
-        log.debug("The following framework property will be set into the system properties: {} = {}", name, value);
-        //if it exists, it will simply be overridden
-        System.setProperty(SystemPropertyScanner.PROPERTY_PREFIX + name, value);
     }
 
 }

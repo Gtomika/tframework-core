@@ -22,6 +22,10 @@ import org.tframework.core.elements.scanner.ElementScanner;
 import org.tframework.core.elements.scanner.ElementScannersBundle;
 import org.tframework.core.elements.scanner.ElementScannersFactory;
 import org.tframework.core.elements.scanner.ElementScanningResult;
+import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.SinglePropertyValue;
+import org.tframework.core.properties.converters.PropertyConvertersFactory;
+import org.tframework.core.utils.Constants;
 
 /**
  * This class is responsible for the elements initialization process. This process consists of the following steps:
@@ -31,11 +35,19 @@ import org.tframework.core.elements.scanner.ElementScanningResult;
  *     <li>Initializes each element context (see {@link ElementContext#initialize()}).</li>
  * </ul>
  * The result of the process will be an {@link ElementsContainer} with unique {@link ElementContext}s.
+ * <p><br>
+ * The {@value ELEMENTS_INITIALIZATION_ENABLED_PROPERTY} can be set to {@code false}, which will
+ * disable element initialization all together. By default, this property is treated as {@code true}, so
+ * elements are initialized.
  */
 @Slf4j
 @Builder
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ElementsInitializationProcess {
+
+    public static final String ELEMENTS_INITIALIZATION_ENABLED_PROPERTY =
+            Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.enabled";
+    private static final SinglePropertyValue ELEMENTS_INITIALIZATION_PROPERTY_DEFAULT = new SinglePropertyValue("true");
 
     private final ClassElementContextAssembler classElementContextAssembler;
     private final MethodElementContextAssembler methodElementContextAssembler;
@@ -58,6 +70,11 @@ public class ElementsInitializationProcess {
     //this should be used by the other 'initialize' method and during tests
     //here we can provide the components instead of creating a default one
     ElementsContainer initialize(ElementsInitializationInput input, ElementScannersBundle scannersBundle) {
+        if(isElementInitializationDisabled(input.application().getPropertiesContainer())) {
+            log.info("The element initialization is disabled. No elements will be scanned, dependency injection is disabled.");
+            return ElementsContainer.empty();
+        }
+
         var elementsContainer = ElementsContainer.empty();
         DependencyResolutionInput dependencyResolutionInput = DependencyResolutionInput.builder()
                 .elementsContainer(elementsContainer)
@@ -72,6 +89,14 @@ public class ElementsInitializationProcess {
         log.info("Successfully initialized {} element contexts", elementsContainer.elementCount());
 
         return elementsContainer;
+    }
+
+    private boolean isElementInitializationDisabled(PropertiesContainer properties) {
+        var booleanPropertyConverter = PropertyConvertersFactory.getConverter(Boolean.class);
+        var elementInitializationEnabled = properties.getPropertyValueObject(
+                ELEMENTS_INITIALIZATION_ENABLED_PROPERTY, ELEMENTS_INITIALIZATION_PROPERTY_DEFAULT
+        );
+        return !booleanPropertyConverter.convert(elementInitializationEnabled);
     }
 
     /**

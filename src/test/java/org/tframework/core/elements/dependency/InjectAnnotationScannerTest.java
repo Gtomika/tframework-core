@@ -69,7 +69,7 @@ class InjectAnnotationScannerTest {
         });
 
         assertEquals(
-                exception.getMessageTemplate().formatted(multipleInjectAnnotations.size(), multipleInjectAnnotations),
+                exception.getMessageTemplate().formatted(testField, multipleInjectAnnotations.size(), multipleInjectAnnotations),
                 exception.getMessage()
         );
     }

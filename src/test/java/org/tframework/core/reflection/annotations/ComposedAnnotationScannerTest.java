@@ -118,7 +118,7 @@ class ComposedAnnotationScannerTest {
 
         var repeatedAnnotationContainer = DirectlyPresentRepeated.class.getAnnotation(RepeatedTestAnnotationA.class);
         assertEquals(
-                exception.getMessageTemplate().formatted(2, Arrays.asList(repeatedAnnotationContainer.value())),
+                exception.getMessageTemplate().formatted(testClass, 2, Arrays.asList(repeatedAnnotationContainer.value())),
                 exception.getMessage()
         );
     }
@@ -182,7 +182,7 @@ class ComposedAnnotationScannerTest {
 
         List<TestAnnotationA> composedAnnotationsExpectedInMessage = scanner.scan(ComposedPresentTwoLayers.class, TestAnnotationA.class);
         assertEquals(
-                exception.getMessageTemplate().formatted(2, composedAnnotationsExpectedInMessage),
+                exception.getMessageTemplate().formatted(ComposedPresentTwoLayers.class, 2, composedAnnotationsExpectedInMessage),
                 exception.getMessage()
         );
     }

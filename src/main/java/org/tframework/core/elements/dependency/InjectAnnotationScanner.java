@@ -43,16 +43,10 @@ public class InjectAnnotationScanner {
             @NonNull AnnotatedElement annotatedElement,
             @NonNull Class<A> injectAnnotationType
     ) {
-        List<Annotation> injectAnnotations = new ArrayList<>();
-
-        for(Class<? extends Annotation> injectAnnotation : INJECT_ANNOTATIONS) {
-            //strict scanning will make sure that a one type of '@InjectX' annotation is not found multiple times
-            annotationScanner.scanOneStrict(annotatedElement, injectAnnotation)
-                    .ifPresent(injectAnnotations::add);
-        }
+        var injectAnnotations = findAllInjectAnnotationsPresent(annotatedElement);
 
         if(injectAnnotations.size() > 1) {
-            throw new MultipleAnnotationsScannedException(injectAnnotations);
+            throw new MultipleAnnotationsScannedException(annotatedElement, injectAnnotations);
         }
 
         return injectAnnotations.stream()
@@ -65,5 +59,33 @@ public class InjectAnnotationScanner {
                     }
                 })
                 .findFirst();
+    }
+
+    /**
+     * Checks if the {@link AnnotatedElement} has an of the {@code @InjectX} annotations.
+     * @param annotatedElement Non null annotated element.
+     * @return True if there was at least one inject annotation.
+     * @throws MultipleAnnotationsScannedException If more than one '@InjectX' annotation was found.
+     */
+    public boolean hasAnyInjectAnnotations(@NonNull AnnotatedElement annotatedElement) {
+        var injectAnnotations = findAllInjectAnnotationsPresent(annotatedElement);
+
+        if(injectAnnotations.size() > 1) {
+            throw new MultipleAnnotationsScannedException(annotatedElement, injectAnnotations);
+        }
+
+        return !injectAnnotations.isEmpty();
+    }
+
+    private List<Annotation> findAllInjectAnnotationsPresent(AnnotatedElement annotatedElement) {
+        List<Annotation> injectAnnotations = new ArrayList<>();
+
+        for(Class<? extends Annotation> injectAnnotation : INJECT_ANNOTATIONS) {
+            //strict scanning will make sure that a one type of '@InjectX' annotation is not found multiple times
+            annotationScanner.scanOneStrict(annotatedElement, injectAnnotation)
+                    .ifPresent(injectAnnotations::add);
+        }
+
+        return injectAnnotations;
     }
 }

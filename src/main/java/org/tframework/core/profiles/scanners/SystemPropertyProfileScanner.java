@@ -1,16 +1,19 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.profiles.scanners;
 
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.readers.SystemPropertyNotFoundException;
 import org.tframework.core.readers.SystemPropertyReader;
 
 /**
  * A {@link ProfileScanner} implementation that scans for profiles in the system properties. The system property
- * to use is {@value #PROFILES_SYSTEM_PROPERTY}. Multiple profiles can be provided, separated by comma.
+ * to use is {@value #PROFILES_SYSTEM_PROPERTY} (other system properties where the name starts with this prefix
+ * will also be picked up). Multiple profiles can be provided in a single property, separated by comma.
  */
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
@@ -23,19 +26,17 @@ public class SystemPropertyProfileScanner implements ProfileScanner {
 
     @Override
     public Set<String> scan() {
-        try {
-            String profilesRaw = systemPropertyReader.readSystemProperty(PROFILES_SYSTEM_PROPERTY);
-            log.debug("Found '{}' system property with value '{}'.", PROFILES_SYSTEM_PROPERTY, profilesRaw);
+        return systemPropertyReader.getAllSystemPropertyNames().stream()
+                .filter(systemPropertyName -> systemPropertyName.startsWith(PROFILES_SYSTEM_PROPERTY))
+                .flatMap(this::extractProfilesFromSystemProperty)
+                .collect(Collectors.toSet());
+    }
 
-            var profiles = Set.of(profilesRaw.split(","));
-            log.debug("The '{}' profile scanner will attempt to activate the following profiles: {}",
-                    SystemPropertyProfileScanner.class.getName(), profiles);
-            return profiles;
-        } catch (SystemPropertyNotFoundException e) {
-            log.debug("System property with name '{}' was not found." +
-                    " The '{}' profile scanner will not active any profiles.",
-                    PROFILES_SYSTEM_PROPERTY, SystemPropertyProfileScanner.class.getName());
-            return Set.of();
-        }
+    private Stream<String> extractProfilesFromSystemProperty(String systemPropertyName) {
+        String profilesRaw = systemPropertyReader.readSystemProperty(systemPropertyName);
+        return Arrays.stream(profilesRaw.split(","))
+                    .map(String::strip)
+                    .peek(profile -> log.debug("The system property '{}' will attempt to activate the following profile: {}",
+                                systemPropertyName, profile));
     }
 }

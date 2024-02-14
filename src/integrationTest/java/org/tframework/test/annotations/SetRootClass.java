@@ -11,9 +11,6 @@ import org.tframework.test.TFrameworkExtension;
  * one attribute of this annotation can be used to specify the root class. For example if {@link #useTestClassAsRoot()}
  * is set to true, then {@link #findRootClassOnClasspath()} should be false, and {@link #rootClass()} should be
  * left unspecified.
- * <p><br>
- * If you specify {@link #findRootClassOnClasspath()}, then also provide a {@link BasePackage} annotation together
- * with this one.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

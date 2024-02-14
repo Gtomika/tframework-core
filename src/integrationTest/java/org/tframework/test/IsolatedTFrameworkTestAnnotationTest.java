@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.Application;
 import org.tframework.core.elements.annotations.Element;
+import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.test.annotations.IsolatedTFrameworkTest;
 import org.tframework.test.annotations.SetApplicationName;
 
@@ -15,7 +16,7 @@ import org.tframework.test.annotations.SetApplicationName;
 public class IsolatedTFrameworkTestAnnotationTest {
 
     @Test
-    public void shouldLaunchSingleClassTFrameworkApplication(Application application) {
+    public void shouldLaunchSingleClassTFrameworkApplication(@InjectElement Application application) {
         assertEquals("isolatedApp", application.getName());
         assertEquals(IsolatedTFrameworkTestAnnotationTest.class, application.getRootClass());
 

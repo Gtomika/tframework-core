@@ -5,7 +5,7 @@
  *     <li>YAML property files placed in the resources.</li>
  *     <li>Directly specified properties (through environmental variables, CLI arguments, etc).</li>
  * </ul>
- * <h3>Property files</h3>
+ * <strong>Property files</strong><br><br><br><br>
  * Property files are in the YAML format. Reading properties from files follows this process:
  * <ul>
  *     <li>The files are found by {@link org.tframework.core.properties.filescanners.PropertyFileScanner}s.</li>
@@ -13,7 +13,7 @@
  *     <li>The parsed contents are turned into properties by {@link org.tframework.core.properties.extractors.PropertiesExtractor}s.</li>
  * </ul>
  * Finally, the extracted properties are placed into the {@link org.tframework.core.properties.PropertiesContainer}.
- * <h3>Directly specified properties.</h3>
+ * <strong>Directly specified properties.</strong><br><br><br><br>
  * Directly specified properties are processed after the ones from files and can override those.
  * <ul>
  *     <li>{@link org.tframework.core.properties.scanners.PropertyScanner}s find the raw properties.</li>

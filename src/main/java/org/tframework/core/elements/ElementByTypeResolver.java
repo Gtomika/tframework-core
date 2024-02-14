@@ -16,14 +16,14 @@ public class ElementByTypeResolver {
 
     /**
      * Selects an {@link ElementContext} from the provided ones, based on the required type. The rules are as follows:
-     * <h3>Exact matching</h3>
+     * <strong>Exact matching</strong><br><br>
      * At first, elements that have exactly {@code requiredType} are checked.
      * <ul>
      *     <li>If there is only one such context, it is returned.</li>
      *     <li>If there are multiple ones, an {@link AmbiguousElementTypeException} is raised.</li>
      *     <li>If there is no such context, proceeding to assignable matching.</li>
      * </ul>
-     * <h3>Assignable matching</h3>
+     * <strong>Assignable matching</strong><br><br>
      * Since there was no element with exactly the required type, an attempt will be made to find elements
      * where the type is <b>assignable</b> to {@code requiredType}.
      * <ul>

@@ -62,7 +62,7 @@ import org.tframework.test.utils.TestActionsUtils;
  * be started before the tests, once. It will be stopped after all tests are completed. It is recommended to use the
  * composed annotations {@link TFrameworkTest} or {@link IsolatedTFrameworkTest} which come with some useful configurations.
  *
- * <h3>Configuring the application</h3>
+ * <strong>Configuring the application</strong><br><br>
  * Additional annotations can be used on the test class to specify the details of the started application:
  * <ul>
  *     <li>{@link SetApplicationName} can be used to set a custom application name. By default, the name will be deduced from the test class.</li>
@@ -76,7 +76,7 @@ import org.tframework.test.utils.TestActionsUtils;
  * so it is possible to use composed meta annotations that combine {@link ExtendWith} and
  * the other annotations described above.
  *
- * <h3>Using the application</h3>
+ * <strong>Using the application</strong><br><br>
  * There are some ways to get the launched {@link Application} object or any other element or property from the
  * application.
  * <ul>
@@ -87,7 +87,7 @@ import org.tframework.test.utils.TestActionsUtils;
  *     </li>
  * </ul>
  *
- * <h3>Initialization failure</h3>
+ * <strong>Initialization failure</strong><br><br>
  * There are cases where the test expects the application initialization to fail. In these cases:
  * <ul>
  *     <li>Place the {@link ExpectInitializationFailure} annotation.</li>

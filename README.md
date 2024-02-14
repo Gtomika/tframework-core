@@ -3,6 +3,19 @@
 This is the repository of the TFramework, which is an application development framework for Java.
 **It is a hobby project, and a work in progress**.
 
+```gradle
+repositories {
+     ...
+     maven {
+        url "https://jitpack.io"
+     }
+}
+
+dependencies {
+    implementation "org.tframework:tframework-core:${tframeworkVersion}"
+}
+```
+
 ## Features
 
 New features are added from time to time.
@@ -114,13 +127,7 @@ If you have multiple public constructors, the `@ElementConstructor` annotation m
 
 ### How to run
 
-Include the framework in your dependencies. For example, assuming you use Gradle:
-
-```
-TODO: public repo is not yet available
-```
-
-Then, the framework should be started from the `main` method:
+The framework should be started from the `main` method:
 
 ```java
 @TFrameworkRootClass

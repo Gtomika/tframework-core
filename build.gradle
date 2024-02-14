@@ -2,12 +2,13 @@ plugins {
     id 'java-library'
     id 'jacoco'
     id 'jvm-test-suite'
+    id 'maven-publish'
     id "com.diffplug.spotless" version "6.23.3"
     id "io.freefair.lombok" version "8.4"
 }
 
-group 'org.tframework'
-version '0.0.1'
+group 'com.github.tframework'
+version '0.0.1-SNAPSHOT'
 
 ext {
     slf4jVersion = "1.7.25"
@@ -21,6 +22,22 @@ ext {
 
 repositories {
     mavenCentral()
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+        }
+    }
 }
 
 dependencies {

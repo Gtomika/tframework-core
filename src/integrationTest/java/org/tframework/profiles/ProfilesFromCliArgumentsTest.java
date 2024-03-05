@@ -7,9 +7,9 @@ import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.profiles.scanners.CLIProfileScanner;
 import org.tframework.core.utils.CliUtils;
-import org.tframework.test.TframeworkAssertions;
-import org.tframework.test.annotations.IsolatedTFrameworkTest;
-import org.tframework.test.annotations.SetCommandLineArguments;
+import org.tframework.test.commons.annotations.SetCommandLineArguments;
+import org.tframework.test.commons.utils.TframeworkAssertions;
+import org.tframework.test.junit5.IsolatedTFrameworkTest;
 
 @SetCommandLineArguments({
         ProfilesFromCliArgumentsTest.PROFILES_SETTER_ARGUMENT,
@@ -23,6 +23,6 @@ public class ProfilesFromCliArgumentsTest {
 
     @Test
     public void shouldDetectProfilesFromCliArguments(@InjectElement ProfilesContainer profilesContainer) {
-        TframeworkAssertions.assertHasNonDefaultProfilesExactly(profilesContainer, Set.of("integration-test", "dev"));
+        TframeworkAssertions.assertHasNonDefaultProfiles(profilesContainer, Set.of("integration-test", "dev"));
     }
 }

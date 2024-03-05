@@ -7,7 +7,7 @@ plugins {
     id "io.freefair.lombok" version "8.4"
 }
 
-group 'com.github.gtomika'
+group 'com.github.Gtomika'
 version '0.0.1-SNAPSHOT'
 
 ext {
@@ -18,6 +18,12 @@ ext {
     junitJupiterVersion = "5.8.2"
     mockitoVersion = "5.8.0"
     log4jVersion = "2.17.2"
+    tframeworkTestVersion = "master-SNAPSHOT" //TODO: use fixed version
+}
+
+//TODO: remove when version is fixed
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
 }
 
 repositories {
@@ -87,6 +93,7 @@ testing {
         integrationTest(JvmTestSuite) {
             testType = TestSuiteType.INTEGRATION_TEST
             dependencies {
+                implementation "com.github.Gtomika:tframework-test:${tframeworkTestVersion}"
                 implementation "io.github.classgraph:classgraph:${classGraphVersion}"
             }
         }
@@ -130,8 +137,6 @@ jacocoTestCoverageVerification {
             limit {
                 minimum = 0.75
             }
-            //these packages have tests in several test suites, so coverage is not easy to measure
-            excludes = ["org.tframework.core.properties.parsers"]
         }
     }
 }

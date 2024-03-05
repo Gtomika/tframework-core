@@ -7,10 +7,10 @@ import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.profiles.scanners.CLIProfileScanner;
 import org.tframework.core.utils.CliUtils;
-import org.tframework.test.TframeworkAssertions;
-import org.tframework.test.annotations.IsolatedTFrameworkTest;
-import org.tframework.test.annotations.SetCommandLineArguments;
-import org.tframework.test.annotations.SetProfiles;
+import org.tframework.test.commons.annotations.SetCommandLineArguments;
+import org.tframework.test.commons.annotations.SetProfiles;
+import org.tframework.test.commons.utils.TframeworkAssertions;
+import org.tframework.test.junit5.IsolatedTFrameworkTest;
 
 @SetProfiles({"p1", "p2"})
 @SetCommandLineArguments(ProfilesFromCombinedSourcesTest.PROFILES_SETTER_ARGUMENT)
@@ -22,6 +22,6 @@ public class ProfilesFromCombinedSourcesTest {
 
     @Test
     public void shouldDetectProfilesFromCombinedSources(@InjectElement ProfilesContainer profilesContainer) {
-        TframeworkAssertions.assertHasNonDefaultProfilesExactly(profilesContainer, Set.of("p1", "p2", "p3"));
+        TframeworkAssertions.assertHasNonDefaultProfiles(profilesContainer, Set.of("p1", "p2", "p3"));
     }
 }

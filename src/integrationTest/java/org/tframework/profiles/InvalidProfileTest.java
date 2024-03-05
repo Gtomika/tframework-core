@@ -3,11 +3,11 @@ package org.tframework.profiles;
 
 import org.junit.jupiter.api.Test;
 import org.tframework.core.profiles.InvalidProfileException;
-import org.tframework.test.TframeworkAssertions;
-import org.tframework.test.annotations.ExpectInitializationFailure;
-import org.tframework.test.annotations.InjectInitializationException;
-import org.tframework.test.annotations.IsolatedTFrameworkTest;
-import org.tframework.test.annotations.SetProfiles;
+import org.tframework.test.commons.annotations.ExpectInitializationFailure;
+import org.tframework.test.commons.annotations.InjectInitializationException;
+import org.tframework.test.commons.annotations.SetProfiles;
+import org.tframework.test.commons.utils.TframeworkAssertions;
+import org.tframework.test.junit5.IsolatedTFrameworkTest;
 
 @ExpectInitializationFailure
 @SetProfiles(InvalidProfileTest.INVALID_PROFILE)

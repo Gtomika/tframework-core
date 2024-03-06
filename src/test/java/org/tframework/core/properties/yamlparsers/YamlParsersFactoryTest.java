@@ -12,7 +12,7 @@ class YamlParsersFactoryTest {
     @Test
     public void shouldCreateYamlParser() {
         var parser = YamlParsersFactory.createDefaultYamlParser();
-        assertEquals(JacksonYamlParser.class, parser.getClass());
+        assertEquals(SnakeYamlParser.class, parser.getClass());
     }
 
 }

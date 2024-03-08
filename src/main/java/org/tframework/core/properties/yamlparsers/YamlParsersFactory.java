@@ -1,11 +1,10 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.yamlparsers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * Creates {@link YamlParser}s.
@@ -18,16 +17,16 @@ public final class YamlParsersFactory {
      * Creates a {@link YamlParser} that can be used to parse properties files.
      */
     public static YamlParser createDefaultYamlParser() {
-        log.debug("Using Jackson YAML parser...");
-        return createJacksonYamlParser();
+        log.debug("Using SNAKE YAML parser...");
+        return createSnakeYamlParser();
     }
 
     /**
-     * Creates a {@link JacksonYamlParser}.
+     * Creates a {@link SnakeYamlParser}.
      */
-    static JacksonYamlParser createJacksonYamlParser() {
-        ObjectMapper objectMapper = new ObjectMapper(new YAMLFactory());
-        return new JacksonYamlParser(objectMapper);
+    static SnakeYamlParser createSnakeYamlParser() {
+        Yaml snakeYaml = new Yaml();
+        return new SnakeYamlParser(snakeYaml);
     }
 
 }

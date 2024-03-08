@@ -1,0 +1,6 @@
+integration-test:
+  custom:
+    property: value
+    list-property:
+      - value1
+      - value2

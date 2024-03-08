@@ -14,7 +14,7 @@ ext {
     slf4jVersion = "1.7.25"
     classGraphVersion = "4.8.165"
     jgraphtVersion = "1.5.2"
-    jacksonVersion = "2.16.1"
+    snakeYamlVersion = "2.2"
     junitJupiterVersion = "5.8.2"
     mockitoVersion = "5.8.0"
     log4jVersion = "2.17.2"
@@ -50,7 +50,7 @@ dependencies {
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation "io.github.classgraph:classgraph:${classGraphVersion}"
     implementation "org.jgrapht:jgrapht-core:${jgraphtVersion}"
-    implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:${jacksonVersion}"
+    implementation "org.yaml:snakeyaml:${snakeYamlVersion}"
 }
 
 testing {

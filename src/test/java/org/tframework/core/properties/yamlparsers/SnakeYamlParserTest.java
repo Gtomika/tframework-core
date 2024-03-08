@@ -4,9 +4,7 @@ package org.tframework.core.properties.yamlparsers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.JsonMappingException;
 import java.util.List;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
@@ -15,9 +13,9 @@ import org.tframework.core.readers.ReadersFactory;
 import org.tframework.core.readers.ResourceFileReader;
 
 @Slf4j
-class JacksonYamlParserTest {
+class SnakeYamlParserTest {
 
-    private final JacksonYamlParser parser = YamlParsersFactory.createJacksonYamlParser();
+    private final SnakeYamlParser parser = YamlParsersFactory.createSnakeYamlParser();
 
     private final ResourceFileReader reader = ReadersFactory.createResourceFileReader();
 
@@ -54,12 +52,6 @@ class JacksonYamlParserTest {
                 exception.getMessageTemplate().formatted(invalidYaml),
                 exception.getMessage()
         );
-
-        var cause = exception.getCause();
-        assertTrue(JsonMappingException.class.isAssignableFrom(cause.getClass()));
-
-        log.info(exception.getMessage());
-        log.info(cause.getMessage());
     }
 
 }

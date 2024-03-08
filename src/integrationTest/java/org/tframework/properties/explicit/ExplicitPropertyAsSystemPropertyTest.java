@@ -1,20 +1,18 @@
 /* Licensed under Apache-2.0 2024. */
-package org.tframework.profiles;
+package org.tframework.properties.explicit;
 
-import java.util.Set;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.elements.annotations.InjectElement;
-import org.tframework.core.profiles.ProfilesContainer;
-import org.tframework.core.profiles.scanners.SystemPropertyProfileScanner;
+import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.test.commons.annotations.BeforeFrameworkInitialization;
 import org.tframework.test.commons.utils.SystemPropertyHelper;
 import org.tframework.test.commons.utils.TframeworkAssertions;
 import org.tframework.test.junit5.IsolatedTFrameworkTest;
 
-@BeforeFrameworkInitialization(callback = ProfilesFromSystemPropertiesTest.SystemPropertySetter.class)
+@BeforeFrameworkInitialization(callback = ExplicitPropertyAsSystemPropertyTest.SystemPropertySetter.class)
 @IsolatedTFrameworkTest
-public class ProfilesFromSystemPropertiesTest {
+public class ExplicitPropertyAsSystemPropertyTest {
 
     private static final SystemPropertyHelper systemPropertyHelper = new SystemPropertyHelper();
 
@@ -22,20 +20,25 @@ public class ProfilesFromSystemPropertiesTest {
 
         @Override
         public void run() {
-            systemPropertyHelper.setIntoSystemProperties(
-                    SystemPropertyProfileScanner.PROFILES_SYSTEM_PROPERTY,
-                    "integration-test,dev"
+            systemPropertyHelper.setFrameworkPropertyIntoSystemProperties(
+                    "integration-test.custom.property",
+                    "value"
             );
         }
     }
 
     @Test
-    public void shouldDetectProfilesFromSystemProperties(@InjectElement ProfilesContainer profilesContainer) {
-        TframeworkAssertions.assertHasNonDefaultProfiles(profilesContainer, Set.of("integration-test", "dev"));
+    public void shouldPickUpExplicitProperty_fromSystemProperties(@InjectElement PropertiesContainer propertiesContainer) {
+        TframeworkAssertions.assertHasPropertyWithValue(
+                propertiesContainer,
+                "integration-test.custom.property",
+                "value"
+        );
     }
 
     @AfterAll
-    public static void afterAll() {
+    public static void tearDownClass() {
         systemPropertyHelper.cleanUp();
     }
+
 }

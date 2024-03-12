@@ -9,22 +9,22 @@ import org.junit.jupiter.api.Test;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.SinglePropertyValue;
 
-class ListPropertyConverterTest {
+class StringListPropertyConverterTest {
 
-    private final ListPropertyConverter listPropertyConverter = new ListPropertyConverter();
+    private final StringListPropertyConverter stringListPropertyConverter = new StringListPropertyConverter();
 
     @Test
     public void shouldConvertSinglePropertyValue() {
         String expectedString = "test";
         var spv = new SinglePropertyValue(expectedString);
-        List<String> convertedValue = listPropertyConverter.convert(spv);
+        List<String> convertedValue = stringListPropertyConverter.convert(spv);
         assertEquals(List.of(expectedString), convertedValue);
     }
 
     @Test
     public void shouldConvertSinglePropertyValue_whenSingleValueIsNull() {
         var spv = new SinglePropertyValue(null);
-        List<String> convertedValue = listPropertyConverter.convert(spv);
+        List<String> convertedValue = stringListPropertyConverter.convert(spv);
         assertNull(convertedValue.getFirst());
     }
 
@@ -32,7 +32,7 @@ class ListPropertyConverterTest {
     public void shouldConvertListPropertyValue() {
         var expectedList = List.of("test1", "test2");
         var lpv = new ListPropertyValue(expectedList);
-        List<String> convertedValue = listPropertyConverter.convert(lpv);
+        List<String> convertedValue = stringListPropertyConverter.convert(lpv);
         assertEquals(expectedList, convertedValue);
     }
 

@@ -12,10 +12,10 @@ import org.tframework.core.properties.SinglePropertyValue;
  * by the rules of {@link Boolean#valueOf(String)}.
  */
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class BooleanPropertyConverter extends PropertyConverter<Boolean> {
+public class BooleanPropertyConverter implements PropertyConverter<Boolean> {
 
     @Override
-    protected Boolean convertInternal(PropertyValue propertyValue) {
+    public Boolean convert(PropertyValue propertyValue) {
         return switch(propertyValue) {
             case SinglePropertyValue(var value) -> Boolean.valueOf(value);
             case ListPropertyValue lpv -> throw PropertyConversionException.builder()

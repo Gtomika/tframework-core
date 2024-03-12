@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.dependency.DependencySource;
+import org.tframework.core.properties.converters.PropertyConversionException;
+import org.tframework.core.properties.converters.PropertyConverterAggregator;
 
 /**
  * A read-only container of the properties, and related methods to access them.
@@ -18,14 +20,14 @@ import org.tframework.core.elements.dependency.DependencySource;
 @Slf4j
 @EqualsAndHashCode
 @PreConstructedElement
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class PropertiesContainer implements DependencySource {
 
     private final List<Property> properties;
+    private final PropertyConverterAggregator propertyConverterAggregator;
 
     /**
-     * Gets the {@link PropertyValue} of a property. If interested only in the raw underlying value,
-     * it's possible to use {@link #getPropertyValue(String)} or {@link #getPropertyValueList(String)} instead.
+     * Gets the {@link PropertyValue} of a property.
      * @return The {@link PropertyValue} for the given property name.
      * @throws PropertyNotFoundException If the property does not exist.
      */
@@ -34,8 +36,7 @@ public final class PropertiesContainer implements DependencySource {
     }
 
     /**
-     * Gets the {@link PropertyValue} of a property, or the provided default one. If interested only in the raw underlying value,
-     * it's possible to use {@link #getPropertyValue(String)} or {@link #getPropertyValueList(String)} instead.
+     * Gets the {@link PropertyValue} of a property, or the provided default one.
      * @param propertyName The property to get.
      * @param defaultValue A default value to return if the property does not exist.
      */
@@ -49,24 +50,24 @@ public final class PropertiesContainer implements DependencySource {
     }
 
     /**
-     * Convenience method that gets a property as a string. If the property is a list,
-     * it will be converted to a string using {@code List#toString()}.
+     * Gets a property by name, and converts it to the desired type.
+     * @param propertyName The property to get.
+     * @param requiredType The type to convert this property to.
      * @throws PropertyNotFoundException If the property does not exist.
+     * @throws PropertyConversionException If the conversion failed to the required type.
      */
-    public String getPropertyValue(String propertyName) {
-        return switch (getPropertyValueObject(propertyName)) {
-            case SinglePropertyValue(var value) -> value;
-            case ListPropertyValue(var values) -> values.toString();
-        };
+    public <T> T getPropertyValue(String propertyName, Class<T> requiredType) {
+        var propertyValueObject = getPropertyValueObject(propertyName);
+        return propertyConverterAggregator.convert(propertyValueObject, requiredType);
     }
 
     /**
-     * A version of {@link #getPropertyValue(String)} that returns a default value instead of throwing
+     * A version of {@link #getPropertyValue(String, Class)} that returns a default value instead of throwing
      * {@link PropertyNotFoundException} when the given property does not exist.
      */
-    public String getPropertyValue(String propertyName, String defaultValue) {
+    public <T> T getPropertyValue(String propertyName, Class<T> requiredType, T defaultValue) {
         try {
-            return getPropertyValue(propertyName);
+            return getPropertyValue(propertyName, requiredType);
         } catch (PropertyNotFoundException e) {
             log.debug("Property '{}' not found. Returning default value '{}'", propertyName, defaultValue);
             return defaultValue;
@@ -140,7 +141,7 @@ public final class PropertiesContainer implements DependencySource {
                 mergedProperties.add(property);
             }
         }
-        return PropertiesContainer.fromProperties(mergedProperties);
+        return PropertiesContainerFactory.fromProperties(mergedProperties, propertyConverterAggregator);
     }
 
     /**
@@ -175,20 +176,4 @@ public final class PropertiesContainer implements DependencySource {
                 .collect(Collectors.joining("\n"));
         return containerString;
     }
-
-    /**
-     * Creates a {@link PropertiesContainer} from the given list of properties.
-     * @param properties Properties list to create the container from, cannot be null.
-     */
-    public static PropertiesContainer fromProperties(@NonNull List<Property> properties) {
-        return new PropertiesContainer(properties);
-    }
-
-    /**
-     * Creates an empty {@link PropertiesContainer}.
-     */
-    public static PropertiesContainer empty() {
-        return fromProperties(List.of());
-    }
-
 }

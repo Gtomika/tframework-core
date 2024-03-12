@@ -30,9 +30,9 @@ public class TFrameworkTest {
         assertTrue(application.getProfilesContainer().isProfileSet("unit-test"));
         assertTrue(application.getProfilesContainer().isProfileSet("demo"));
 
-        assertEquals("test", application.getPropertiesContainer().getPropertyValue("custom.string-prop"));
-        assertEquals("1", application.getPropertiesContainer().getPropertyValue("custom.int-prop"));
-        assertEquals("true", application.getPropertiesContainer().getPropertyValue("custom.boolean-prop"));
+        assertEquals("test", application.getPropertiesContainer().getPropertyValue("custom.string-prop", String.class));
+        assertEquals(1, application.getPropertiesContainer().getPropertyValue("custom.int-prop", Integer.class));
+        assertEquals(true, application.getPropertiesContainer().getPropertyValue("custom.boolean-prop", Boolean.class));
         assertEquals(
                 List.of("test1", "test2", "test3"),
                 application.getPropertiesContainer().getPropertyValueList("custom.list-prop")

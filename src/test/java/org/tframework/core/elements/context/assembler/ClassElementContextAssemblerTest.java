@@ -21,7 +21,7 @@ import org.tframework.core.elements.annotations.ElementConstructor;
 import org.tframework.core.elements.context.source.ClassElementSource;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.scanner.ElementScanningResult;
-import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.PropertiesContainerFactory;
 import org.tframework.core.reflection.AnnotationFilteringResult;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.constructor.ConstructorFilter;
@@ -31,7 +31,7 @@ import org.tframework.core.reflection.constructor.ConstructorScanner;
 class ClassElementContextAssemblerTest {
 
     private final DependencyResolutionInput dependencyResolutionInput = new DependencyResolutionInput(
-            ElementsContainer.empty(), PropertiesContainer.empty()
+            ElementsContainer.empty(), PropertiesContainerFactory.empty()
     );
 
     @Mock

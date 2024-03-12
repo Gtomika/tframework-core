@@ -1,13 +1,13 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.properties.converters;
 
+import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.tframework.core.properties.PropertyValue;
 import org.tframework.core.utils.PrimitivesUtils;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Combines several {@link PropertyConverter}s to find which one to use and apply

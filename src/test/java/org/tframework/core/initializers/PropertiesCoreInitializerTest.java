@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.PropertiesContainerFactory;
 import org.tframework.core.properties.PropertiesInitializationInput;
 import org.tframework.core.properties.PropertiesInitializationProcess;
 import org.tframework.core.properties.Property;
@@ -32,7 +33,7 @@ class PropertiesCoreInitializerTest {
 
     @Test
     void shouldInitializeProperties() {
-        PropertiesContainer expectedProperties = PropertiesContainer.fromProperties(List.of(
+        PropertiesContainer expectedProperties = PropertiesContainerFactory.fromProperties(List.of(
                 new Property("property1", new SinglePropertyValue("value1")),
                 new Property("property2", new SinglePropertyValue("value2")),
                 new Property("property3", new SinglePropertyValue("value3"))

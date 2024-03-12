@@ -49,7 +49,7 @@ public class InternalElementClassScanner extends ElementClassScanner {
         this.classScanner.setPackageNames(Set.of(TFRAMEWORK_INTERNAL_PACKAGE));
         log.debug("The internal element scanner will scan the package '{}' and all its sub-packages", TFRAMEWORK_INTERNAL_PACKAGE);
 
-        this.propertyConverter = PropertyConvertersFactory.getConverter(Boolean.class);
+        this.propertyConverter = PropertyConvertersFactory.getConverterByType(Boolean.class);
     }
 
     @Override

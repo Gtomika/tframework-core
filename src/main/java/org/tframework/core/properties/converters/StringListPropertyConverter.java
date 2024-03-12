@@ -1,14 +1,13 @@
 /* Licensed under Apache-2.0 2023. */
 package org.tframework.core.properties.converters;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.PropertyValue;
 import org.tframework.core.properties.SinglePropertyValue;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A {@link PropertyConverter} which can convert any {@link PropertyValue} into a {@link List} of strings.

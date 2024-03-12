@@ -1,8 +1,9 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.core.utils;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import org.junit.jupiter.api.Test;
 
 public class PrimitivesUtilsTest {
 

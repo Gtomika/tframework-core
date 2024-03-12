@@ -18,7 +18,7 @@ import org.tframework.core.TFrameworkRootClass;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.profiles.InvalidProfileException;
 import org.tframework.core.profiles.ProfilesContainer;
-import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.PropertiesContainerFactory;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 
 @TFrameworkRootClass
@@ -55,7 +55,7 @@ class CoreInitializationProcessTest {
                 .name("testApp")
                 .rootClass(CoreInitializationProcessTest.class)
                 .profilesContainer(ProfilesContainer.fromProfiles(Set.of("a, b")))
-                .propertiesContainer(PropertiesContainer.empty())
+                .propertiesContainer(PropertiesContainerFactory.empty())
                 .elementsContainer(ElementsContainer.empty())
                 .build();
         expectedApp.finalizeApplication();

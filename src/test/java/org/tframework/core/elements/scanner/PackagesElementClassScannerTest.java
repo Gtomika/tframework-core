@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.PropertiesContainerFactory;
 import org.tframework.core.properties.Property;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
@@ -74,7 +75,7 @@ class PackagesElementClassScannerTest {
     }
 
     private void setUpScannerWithMultiplePackagesProperty(List<String> packagesToScan) {
-        var propertiesContainer = PropertiesContainer.fromProperties(List.of(new Property(
+        var propertiesContainer = PropertiesContainerFactory.fromProperties(List.of(new Property(
                 PackagesElementClassScanner.SCAN_PACKAGES_PROPERTY,
                 new ListPropertyValue(packagesToScan)
         )));
@@ -82,7 +83,7 @@ class PackagesElementClassScannerTest {
     }
 
     private void setUpScannerWithOnePackageProperty(String packageToScan) {
-        var propertiesContainer = PropertiesContainer.fromProperties(List.of(new Property(
+        var propertiesContainer = PropertiesContainerFactory.fromProperties(List.of(new Property(
                 PackagesElementClassScanner.SCAN_PACKAGES_PROPERTY,
                 new SinglePropertyValue(packageToScan)
         )));
@@ -90,7 +91,7 @@ class PackagesElementClassScannerTest {
     }
 
     private void setUpScannerWithScannerWithNoPackagesToScan() {
-        var propertiesContainer = PropertiesContainer.empty();
+        var propertiesContainer = PropertiesContainerFactory.empty();
         packagesElementClassScanner = buildScanner(propertiesContainer);
     }
 

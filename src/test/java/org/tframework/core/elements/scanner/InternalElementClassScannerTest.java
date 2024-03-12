@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.PropertiesContainerFactory;
 import org.tframework.core.properties.Property;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
@@ -63,13 +64,13 @@ class InternalElementClassScannerTest {
     private void setUpScannerWithScanEnabledProperty(Boolean enabled) {
         PropertiesContainer properties;
         if(enabled == null) {
-            properties = PropertiesContainer.empty();
+            properties = PropertiesContainerFactory.empty();
         } else if(enabled) {
-            properties = PropertiesContainer.fromProperties(List.of(new Property(
+            properties = PropertiesContainerFactory.fromProperties(List.of(new Property(
                     TFRAMEWORK_INTERNAL_SCAN_ENABLED_PROPERTY, new SinglePropertyValue("true")
             )));
         } else {
-            properties = PropertiesContainer.fromProperties(List.of(new Property(
+            properties = PropertiesContainerFactory.fromProperties(List.of(new Property(
                     TFRAMEWORK_INTERNAL_SCAN_ENABLED_PROPERTY, new SinglePropertyValue("false")
             )));
         }

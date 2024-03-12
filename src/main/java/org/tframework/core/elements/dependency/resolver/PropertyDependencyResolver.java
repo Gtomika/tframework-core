@@ -1,16 +1,15 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.dependency.resolver;
 
+import java.lang.reflect.AnnotatedElement;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.InjectProperty;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
-
-import java.lang.reflect.AnnotatedElement;
-import java.util.List;
-import java.util.Optional;
 
 /**
  * This {@link BasicDependencyResolver} is responsible for resolving dependencies that are annotated with

@@ -1,12 +1,11 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.properties.converters;
 
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The factory to {@link PropertyConverter}s by type.
@@ -23,6 +22,7 @@ public final class PropertyConvertersFactory {
     private static List<PropertyConverter<?>> createDefaultPropertyConverters() {
         return List.of(
                 new BooleanPropertyConverter(),
+                new IntegerPropertyConverter(),
                 new StringPropertyConverter(),
                 new StringListPropertyConverter()
         );
@@ -35,11 +35,18 @@ public final class PropertyConvertersFactory {
      * @throws PropertyConverterNotFoundException If no converter for the given type was found.
      */
     @SuppressWarnings("unchecked")
-    public static <T> PropertyConverter<T> getConverter(@NonNull Class<T> type) {
+    public static <T> PropertyConverter<T> getConverterByType(@NonNull Class<T> type) {
         return (PropertyConverter<T>) propertyConverters.stream()
                 .filter(propertyConverter -> propertyConverter.getType().equals(type))
                 .findAny()
                 .orElseThrow(() -> new PropertyConverterNotFoundException(type));
+    }
+
+    /**
+     * Gets a list of all available {@link PropertyConverter}s.
+     */
+    public static List<PropertyConverter<?>> getAvailableConverters() {
+        return propertyConverters;
     }
 
 }

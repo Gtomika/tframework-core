@@ -19,7 +19,8 @@ public interface PropertyConverter<T> {
     T convert(PropertyValue propertyValue);
 
     /**
-     * @return The type this converter produces.
+     * @return The type this converter produces. If this converter should support primitive types as well,
+     * the <b>wrapper</b> class should be returned here.
      */
     Class<T> getType();
 

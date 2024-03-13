@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.tframework.core.AmbiguousElementTypeException;
 import org.tframework.core.elements.context.ElementContext;
 
 @ExtendWith(MockitoExtension.class)

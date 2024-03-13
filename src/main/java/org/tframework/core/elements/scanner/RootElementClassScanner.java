@@ -59,7 +59,7 @@ public class RootElementClassScanner extends ElementClassScanner {
         super(classFilter, annotationScanner, propertiesContainer);
         this.packageClassScanner = packageClassScanner;
         this.rootClassScanner = rootClassScanner;
-        this.propertyConverter = PropertyConvertersFactory.getConverter(Boolean.class);
+        this.propertyConverter = PropertyConvertersFactory.getConverterByType(Boolean.class);
         this.rootClass = rootClass;
     }
 

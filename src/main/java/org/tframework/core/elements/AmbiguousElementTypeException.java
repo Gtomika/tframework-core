@@ -1,8 +1,9 @@
 /* Licensed under Apache-2.0 2024. */
-package org.tframework.core;
+package org.tframework.core.elements;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.tframework.core.TFrameworkException;
 import org.tframework.core.elements.context.ElementContext;
 
 /**

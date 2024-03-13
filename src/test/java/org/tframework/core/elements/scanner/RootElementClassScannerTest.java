@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.PropertiesContainerFactory;
 import org.tframework.core.properties.Property;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.reflection.AnnotationFilteringResult;
@@ -123,13 +124,13 @@ class RootElementClassScannerTest {
 
     private PropertiesContainer setUpBooleanPropertyProperty(String propertyName, BoolPropertyState boolPropertyState) {
         return switch (boolPropertyState) {
-            case BoolPropertyState.ENABLED -> PropertiesContainer.fromProperties(List.of(new Property(
+            case BoolPropertyState.ENABLED -> PropertiesContainerFactory.fromProperties(List.of(new Property(
                     propertyName, new SinglePropertyValue("true")
             )));
-            case BoolPropertyState.DISABLED -> PropertiesContainer.fromProperties(List.of(new Property(
+            case BoolPropertyState.DISABLED -> PropertiesContainerFactory.fromProperties(List.of(new Property(
                     propertyName, new SinglePropertyValue("false")
             )));
-            case BoolPropertyState.NOT_SET ->  PropertiesContainer.empty();
+            case BoolPropertyState.NOT_SET ->  PropertiesContainerFactory.empty();
         };
     }
 

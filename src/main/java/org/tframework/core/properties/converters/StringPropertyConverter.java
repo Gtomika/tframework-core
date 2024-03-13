@@ -12,10 +12,10 @@ import org.tframework.core.properties.SinglePropertyValue;
  * using {@link String#valueOf(Object)}: any property can be converted to a string.
  */
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class StringPropertyConverter extends PropertyConverter<String> {
+public class StringPropertyConverter implements PropertyConverter<String> {
 
     @Override
-    protected String convertInternal(PropertyValue propertyValue) {
+    public String convert(PropertyValue propertyValue) {
         return switch(propertyValue) {
             case SinglePropertyValue spv -> spv.value();
             case ListPropertyValue cpv -> String.valueOf(cpv.values());

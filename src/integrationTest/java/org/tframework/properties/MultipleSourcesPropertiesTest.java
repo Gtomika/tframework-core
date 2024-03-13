@@ -24,10 +24,10 @@ public class MultipleSourcesPropertiesTest {
     @Test
     public void shouldFindPropertiesFromMultipleSources(@InjectElement PropertiesContainer propertiesContainer) {
         //from the default properties file
-        TframeworkAssertions.assertHasPropertyWithValue(propertiesContainer, "integration-test.default.property", "value");
+        TframeworkAssertions.assertHasPropertyWithValue(propertiesContainer, "integration-test.default.property", "1");
 
         //from the properties file activated by profile
-        TframeworkAssertions.assertHasPropertyWithValue(propertiesContainer, "integration-test.custom-profile.property", "value");
+        TframeworkAssertions.assertHasPropertyWithValue(propertiesContainer, "integration-test.custom-profile.property", List.of("value1", "value2"));
 
         //from the custom properties file
         TframeworkAssertions.assertHasPropertyWithValue(propertiesContainer, "integration-test.custom.property", "value");

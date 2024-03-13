@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.PropertiesContainerFactory;
 import org.tframework.core.properties.Property;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
@@ -62,7 +63,7 @@ class ClassesElementClassScannerTest {
 
     @Test
     public void shouldScanElements_ifAdditionalScanClassesProperties_areAlsoProvided() {
-        PropertiesContainer propertiesContainer = PropertiesContainer.fromProperties(List.of(
+        PropertiesContainer propertiesContainer = PropertiesContainerFactory.fromProperties(List.of(
                 new Property(
                         ClassesElementClassScanner.SCAN_CLASSES_PROPERTY + "-test",
                         new ListPropertyValue(List.of(OuterElementClass.class.getName()))
@@ -82,7 +83,7 @@ class ClassesElementClassScannerTest {
     }
 
     private void setUpScannerWithMultipleClassesProperty(List<String> classesToScan) {
-        var propertiesContainer = PropertiesContainer.fromProperties(List.of(new Property(
+        var propertiesContainer = PropertiesContainerFactory.fromProperties(List.of(new Property(
                 ClassesElementClassScanner.SCAN_CLASSES_PROPERTY,
                 new ListPropertyValue(classesToScan)
         )));
@@ -90,7 +91,7 @@ class ClassesElementClassScannerTest {
     }
 
     private void setUpScannerWithOneClassProperty(String classToScan) {
-        var propertiesContainer = PropertiesContainer.fromProperties(List.of(new Property(
+        var propertiesContainer = PropertiesContainerFactory.fromProperties(List.of(new Property(
                 ClassesElementClassScanner.SCAN_CLASSES_PROPERTY,
                 new SinglePropertyValue(classToScan)
         )));
@@ -98,7 +99,7 @@ class ClassesElementClassScannerTest {
     }
 
     private void setUpScannerWithScannerWithNoClassToScan() {
-        var propertiesContainer = PropertiesContainer.empty();
+        var propertiesContainer = PropertiesContainerFactory.empty();
         scanner = buildScanner(propertiesContainer);
     }
 

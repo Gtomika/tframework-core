@@ -72,13 +72,13 @@ public class PropertiesInitializationProcess {
             List<PropertyFileScanner> propertyFileScanners,
             List<PropertyScanner> propertyScanners
     ) {
-        return PropertiesContainer.empty()
+        return PropertiesContainerFactory.empty()
                 .merge(readPropertiesFromFiles(propertyFileScanners))
                 .merge(readDirectlySpecifiedProperties(propertyScanners));
     }
 
     private PropertiesContainer readPropertiesFromFiles(List<PropertyFileScanner> propertyFileScanners) {
-        PropertiesContainer propertiesContainer = PropertiesContainer.empty();
+        PropertiesContainer propertiesContainer = PropertiesContainerFactory.empty();
 
         for(PropertyFileScanner propertyFileScanner: propertyFileScanners) {
             List<String> propertyFiles = propertyFileScanner.scan();
@@ -115,7 +115,7 @@ public class PropertiesInitializationProcess {
     }
 
     private PropertiesContainer readDirectlySpecifiedProperties(List<PropertyScanner> propertyScanners) {
-        PropertiesContainer propertiesContainer = PropertiesContainer.empty();
+        PropertiesContainer propertiesContainer = PropertiesContainerFactory.empty();
 
         for(PropertyScanner propertyScanner: propertyScanners) {
             var properties = propertyScanner.scanProperties().stream()

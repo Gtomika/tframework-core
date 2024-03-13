@@ -7,11 +7,9 @@ import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.AmbiguousElementTypeException;
 import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.elements.context.ElementContext;
-import org.tframework.core.elements.dependency.DependencySource;
 
 /**
  * Stores all elements of the application, and provides ways to access them by name or by type.
@@ -19,7 +17,7 @@ import org.tframework.core.elements.dependency.DependencySource;
 @Slf4j
 @EqualsAndHashCode
 @PreConstructedElement
-public class ElementsContainer implements DependencySource {
+public class ElementsContainer {
 
     /**
      * All elements of the application, wrapped in {@link ElementContext}s.
@@ -147,17 +145,6 @@ public class ElementsContainer implements DependencySource {
             throw new IllegalStateException("This container has already been initialized");
         }
         elementContexts.forEach(ElementContext::initialize);
-    }
-
-    /**
-     * Requests an element dependency from this container.
-     * @param dependencyName The name of the dependency to request.
-     * @return The dependency value, which is an instance of the element with name {@code dependencyName}.
-     * @throws ElementNotFoundException If no element with the given name is found.
-     */
-    @Override
-    public Object requestDependency(String dependencyName) {
-        return getElementContext(dependencyName).requestInstance();
     }
 
     /**

@@ -20,7 +20,7 @@ import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.source.MethodElementSource;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.scanner.ElementScanningResult;
-import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.PropertiesContainerFactory;
 import org.tframework.core.reflection.methods.MethodFilter;
 
 @Element
@@ -28,7 +28,7 @@ import org.tframework.core.reflection.methods.MethodFilter;
 class MethodElementContextAssemblerTest {
 
     private final DependencyResolutionInput dependencyResolutionInput = new DependencyResolutionInput(
-            ElementsContainer.empty(), PropertiesContainer.empty()
+            ElementsContainer.empty(), PropertiesContainerFactory.empty()
     );
 
     @Mock

@@ -22,7 +22,7 @@ import org.tframework.core.properties.PropertiesContainer;
 class PropertyDependencyResolverTest {
 
     @Mock
-    private PropertiesContainer dependencySource;
+    private PropertiesContainer propertiesContainer;
 
     @Mock
     private InjectAnnotationScanner injectAnnotationScanner;
@@ -35,7 +35,7 @@ class PropertyDependencyResolverTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        propertyDependencyResolver = new PropertyDependencyResolver(dependencySource, injectAnnotationScanner);
+        propertyDependencyResolver = new PropertyDependencyResolver(propertiesContainer, injectAnnotationScanner);
 
         someField = this.getClass().getDeclaredField("someString");
         injectPropertyAnnotation = someField.getAnnotation(InjectProperty.class);
@@ -47,7 +47,7 @@ class PropertyDependencyResolverTest {
         String dependencyValue = "test";
         when(injectAnnotationScanner.findInjectAnnotation(someField, InjectProperty.class))
                 .thenReturn(Optional.of(injectPropertyAnnotation));
-        when(dependencySource.requestDependency(injectPropertyAnnotation.value()))
+        when(propertiesContainer.getPropertyValue(injectPropertyAnnotation.value(), String.class))
                 .thenReturn(dependencyValue);
 
         var resolvedDependency = propertyDependencyResolver.resolveDependency(dependencyDefinition);
@@ -64,7 +64,7 @@ class PropertyDependencyResolverTest {
     public void shouldNotResolveDependency_whenNotPresentInProperties() {
         when(injectAnnotationScanner.findInjectAnnotation(someField, InjectProperty.class))
                 .thenReturn(Optional.of(injectPropertyAnnotation));
-        when(dependencySource.requestDependency(injectPropertyAnnotation.value()))
+        when(propertiesContainer.getPropertyValue(injectPropertyAnnotation.value(), String.class))
                 .thenThrow(new RuntimeException("Dependency not found"));
 
         var resolvedDependency = propertyDependencyResolver.resolveDependency(dependencyDefinition);

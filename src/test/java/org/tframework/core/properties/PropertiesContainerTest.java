@@ -4,21 +4,32 @@ package org.tframework.core.properties;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.tframework.core.properties.converters.PropertyConverterAggregator;
 
+@ExtendWith(MockitoExtension.class)
 class PropertiesContainerTest {
+
+    @Mock
+    private PropertyConverterAggregator aggregator;
 
     private PropertiesContainer container;
 
     @BeforeEach
     public void setUp() {
-        container = PropertiesContainer.fromProperties(List.of(
+        container = PropertiesContainerFactory.fromProperties(List.of(
                 new Property("p1", new SinglePropertyValue("v1")),
                 new Property("p2", new ListPropertyValue(List.of("v2-1", "v2-2"))
-        )));
+        )), aggregator);
     }
 
     @Test
@@ -55,14 +66,14 @@ class PropertiesContainerTest {
 
     @Test
     public void shouldGetPropertyValue_whenExists() {
-        assertEquals("v1", container.getPropertyValue("p1"));
-        assertEquals("[v2-1, v2-2]", container.getPropertyValue("p2"));
+        when(aggregator.convert(any(PropertyValue.class), eq(String.class))).thenReturn("v1");
+        assertEquals("v1", container.getPropertyValue("p1", String.class));
     }
 
     @Test
     public void shouldThrowException_getPropertyValue_whenPropertyDoesNotExist() {
         var exception = assertThrows(PropertyNotFoundException.class, () -> {
-            container.getPropertyValue("p3");
+            container.getPropertyValue("p3", String.class);
         });
 
         assertEquals(
@@ -73,13 +84,14 @@ class PropertiesContainerTest {
 
     @Test
     public void shouldGetPropertyValue_whenExists_withDefaultValue() {
-        assertEquals("v1", container.getPropertyValue("p1", "default"));
-        assertEquals("[v2-1, v2-2]", container.getPropertyValue("p2", "default"));
+        when(aggregator.convert(any(PropertyValue.class), eq(String.class))).thenReturn("v1");
+
+        assertEquals("v1", container.getPropertyValue("p1", String.class, "default"));
     }
 
     @Test
     public void shouldGetDefaultValue_getPropertyValue_whenPropertyDoesNotExist() {
-        assertEquals("default", container.getPropertyValue("p3", "default"));
+        assertEquals("default", container.getPropertyValue("p3", String.class, "default"));
     }
 
     @Test

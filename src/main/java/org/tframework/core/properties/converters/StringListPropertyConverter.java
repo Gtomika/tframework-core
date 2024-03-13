@@ -15,12 +15,12 @@ import org.tframework.core.properties.SinglePropertyValue;
  * by create a collection with a single element. The returned list is mutable.
  */
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class ListPropertyConverter extends PropertyConverter<List<String>> {
+public class StringListPropertyConverter implements PropertyConverter<List<String>> {
 
     private static final List<String> STRING_LIST = List.of();
 
     @Override
-    protected List<String> convertInternal(PropertyValue propertyValue) {
+    public List<String> convert(PropertyValue propertyValue) {
         return switch (propertyValue) {
             case SinglePropertyValue(var value) -> {
                 var list = new ArrayList<String>();

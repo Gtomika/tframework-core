@@ -4,7 +4,6 @@ package org.tframework.core.elements;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.tframework.core.AmbiguousElementTypeException;
 import org.tframework.core.elements.context.ElementContext;
 
 /**

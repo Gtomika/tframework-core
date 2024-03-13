@@ -2,6 +2,8 @@
 package org.tframework.core.elements.dependency.resolver;
 
 import java.util.Optional;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.context.ElementContext;
@@ -18,11 +20,10 @@ import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
  * is ordered, and this resolver is the last one in the chain.
  */
 @Slf4j
-public class FallbackDependencyResolver extends ElementDependencyResolver {
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+public class FallbackDependencyResolver implements ElementDependencyResolver {
 
-    FallbackDependencyResolver(ElementsContainer dependencySource) {
-        super(dependencySource);
-    }
+    private final ElementsContainer elementsContainer;
 
     @Override
     public Optional<Object> resolveDependency(

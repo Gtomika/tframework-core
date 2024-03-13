@@ -32,6 +32,7 @@ import org.tframework.core.elements.scanner.ElementScannersBundle;
 import org.tframework.core.elements.scanner.ElementScanningResult;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.properties.PropertiesContainerFactory;
 import org.tframework.core.properties.Property;
 import org.tframework.core.properties.SinglePropertyValue;
 
@@ -102,7 +103,7 @@ class ElementsInitializationProcessTest {
                 .overrideExistingElement(false)
                 .build());
 
-        var input = createDependencyInjectionInput(PropertiesContainer.empty(), preConstructedElementsData);
+        var input = createDependencyInjectionInput(PropertiesContainerFactory.empty(), preConstructedElementsData);
         var elementsContainer = elementsInitializationProcess.initialize(input, elementScannersBundle);
 
         assertTrue(elementsContainer.hasElementContext("dummyClassElement")); //from element class
@@ -116,7 +117,7 @@ class ElementsInitializationProcessTest {
 
     @Test
     public void shouldNotInitializeElementsProcess_whenDisabledWithProperty() {
-        var properties = PropertiesContainer.fromProperties(List.of(
+        var properties = PropertiesContainerFactory.fromProperties(List.of(
                 new Property(ElementsInitializationProcess.ELEMENTS_INITIALIZATION_ENABLED_PROPERTY, new SinglePropertyValue("false"))
         ));
         var input = createDependencyInjectionInput(properties, Set.of());

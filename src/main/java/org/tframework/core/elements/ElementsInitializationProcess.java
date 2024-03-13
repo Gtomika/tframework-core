@@ -92,7 +92,7 @@ public class ElementsInitializationProcess {
     }
 
     private boolean isElementInitializationDisabled(PropertiesContainer properties) {
-        var booleanPropertyConverter = PropertyConvertersFactory.getConverter(Boolean.class);
+        var booleanPropertyConverter = PropertyConvertersFactory.getConverterByType(Boolean.class);
         var elementInitializationEnabled = properties.getPropertyValueObject(
                 ELEMENTS_INITIALIZATION_ENABLED_PROPERTY, ELEMENTS_INITIALIZATION_PROPERTY_DEFAULT
         );

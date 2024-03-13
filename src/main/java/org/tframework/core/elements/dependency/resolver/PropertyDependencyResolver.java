@@ -4,6 +4,8 @@ package org.tframework.core.elements.dependency.resolver;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Optional;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.InjectProperty;
 import org.tframework.core.elements.dependency.DependencyDefinition;
@@ -17,14 +19,11 @@ import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
  * resolver will ignore it.
  */
 @Slf4j
-public class PropertyDependencyResolver extends BasicDependencyResolver {
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+public class PropertyDependencyResolver implements BasicDependencyResolver {
 
+    private final PropertiesContainer propertiesContainer;
     private final InjectAnnotationScanner injectAnnotationScanner;
-
-    PropertyDependencyResolver(PropertiesContainer dependencySource, InjectAnnotationScanner injectAnnotationScanner) {
-        super(dependencySource);
-        this.injectAnnotationScanner = injectAnnotationScanner;
-    }
 
     @Override
     public Optional<Object> resolveDependency(DependencyDefinition dependencyDefinition) {
@@ -34,7 +33,7 @@ public class PropertyDependencyResolver extends BasicDependencyResolver {
             String dependencyName = injectAnnotation.value();
             log.debug("Attempting to resolve dependency with name '{}' from the properties...", dependencyName);
             try {
-                Object resolvedDependency = dependencySource.requestDependency(dependencyName);
+                Object resolvedDependency = propertiesContainer.getPropertyValue(dependencyName, dependencyDefinition.dependencyType());
                 log.debug("Resolved dependency with name '{}' from the properties: {}", dependencyName, resolvedDependency);
                 return Optional.of(resolvedDependency);
             } catch (Exception e) {

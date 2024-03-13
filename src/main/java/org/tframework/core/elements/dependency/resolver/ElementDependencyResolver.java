@@ -2,9 +2,6 @@
 package org.tframework.core.elements.dependency.resolver;
 
 import java.util.Optional;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
@@ -14,10 +11,7 @@ import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
  * than the {@link BasicDependencyResolver}s, because each dependency resolution can trigger additional resolutions,
  * and we have to avoid getting into infinite loops (such as circular dependencies).
  */
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public abstract non-sealed class ElementDependencyResolver implements DependencyResolver {
-
-    protected final ElementsContainer elementsContainer;
+public non-sealed interface ElementDependencyResolver extends DependencyResolver {
 
     /**
      * Resolves the given definition into an element instance.

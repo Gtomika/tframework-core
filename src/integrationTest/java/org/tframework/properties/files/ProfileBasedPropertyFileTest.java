@@ -1,11 +1,12 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.properties.files;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.tframework.core.elements.annotations.InjectElement;
-import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.elements.annotations.InjectProperty;
 import org.tframework.test.commons.annotations.SetProfiles;
-import org.tframework.test.commons.utils.TframeworkAssertions;
 import org.tframework.test.junit5.IsolatedTFrameworkTest;
 
 /*
@@ -17,12 +18,10 @@ from the resources folder.
 public class ProfileBasedPropertyFileTest {
 
     @Test
-    public void shouldReadPropertiesFromProfileBasedPropertyFile(@InjectElement PropertiesContainer propertiesContainer) {
-        TframeworkAssertions.assertHasPropertyWithValue(
-                propertiesContainer,
-                "integration-test.custom-profile.property",
-                "value"
-        );
+    public void shouldReadPropertiesFromProfileBasedPropertyFile(
+            @InjectProperty("integration-test.custom-profile.property") List<String> customProfileProperty
+    ) {
+        assertEquals(List.of("value1", "value2"), customProfileProperty);
     }
 
 }

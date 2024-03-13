@@ -4,6 +4,8 @@ package org.tframework.core.elements.dependency.resolver;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Optional;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementUtils;
 import org.tframework.core.elements.ElementsContainer;
@@ -20,14 +22,11 @@ import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
  * resolver will ignore it.
  */
 @Slf4j
-public class AnnotatedElementDependencyResolver extends ElementDependencyResolver {
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+public class AnnotatedElementDependencyResolver implements ElementDependencyResolver {
 
+    private final ElementsContainer elementsContainer;
     private final InjectAnnotationScanner injectAnnotationScanner;
-
-    AnnotatedElementDependencyResolver(ElementsContainer dependencySource, InjectAnnotationScanner injectAnnotationScanner) {
-        super(dependencySource);
-        this.injectAnnotationScanner = injectAnnotationScanner;
-    }
 
     @Override
     public Optional<Object> resolveDependency(

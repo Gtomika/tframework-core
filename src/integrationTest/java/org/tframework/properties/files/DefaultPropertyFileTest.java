@@ -1,10 +1,10 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.properties.files;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import org.junit.jupiter.api.Test;
-import org.tframework.core.elements.annotations.InjectElement;
-import org.tframework.core.properties.PropertiesContainer;
-import org.tframework.test.commons.utils.TframeworkAssertions;
+import org.tframework.core.elements.annotations.InjectProperty;
 import org.tframework.test.junit5.IsolatedTFrameworkTest;
 
 /*
@@ -15,11 +15,9 @@ resources folder.
 public class DefaultPropertyFileTest {
 
     @Test
-    public void shouldReadPropertiesFromDefaultPropertyFile(@InjectElement PropertiesContainer propertiesContainer) {
-        TframeworkAssertions.assertHasPropertyWithValue(
-                propertiesContainer,
-                "integration-test.default.property",
-                "value" //value is specified in 'properties.yaml'
-        );
+    public void shouldReadPropertiesFromDefaultPropertyFile(
+            @InjectProperty("integration-test.default.property") Integer defaultProperty
+    ) {
+        assertEquals(1, defaultProperty);
     }
 }

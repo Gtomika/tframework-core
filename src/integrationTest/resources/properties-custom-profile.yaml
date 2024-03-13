@@ -1,3 +1,5 @@
 integration-test:
   custom-profile:
-    property: value
+    property:
+      - value1
+      - value2

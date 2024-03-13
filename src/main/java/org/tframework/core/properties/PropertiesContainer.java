@@ -10,7 +10,6 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.PreConstructedElement;
-import org.tframework.core.elements.dependency.DependencySource;
 import org.tframework.core.properties.converters.PropertyConversionException;
 import org.tframework.core.properties.converters.PropertyConverterAggregator;
 
@@ -21,7 +20,7 @@ import org.tframework.core.properties.converters.PropertyConverterAggregator;
 @EqualsAndHashCode
 @PreConstructedElement
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public final class PropertiesContainer implements DependencySource {
+public final class PropertiesContainer {
 
     private final List<Property> properties;
     private final PropertyConverterAggregator propertyConverterAggregator;
@@ -110,17 +109,6 @@ public final class PropertiesContainer implements DependencySource {
      */
     public int size() {
         return properties.size();
-    }
-
-    /**
-     * Requests a property dependency from this container.
-     * @param dependencyName The name of the dependency to request.
-     * @return A {@link PropertyValue} with the requested property.
-     * @throws PropertyNotFoundException If no property with the given name is found.
-     */
-    @Override
-    public Object requestDependency(String dependencyName) {
-        return getPropertyValueObject(dependencyName);
     }
 
     /**

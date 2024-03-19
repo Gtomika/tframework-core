@@ -3,12 +3,15 @@ package org.tframework.core.elements.dependency.resolver;
 
 import java.util.List;
 import lombok.Builder;
+import lombok.Getter;
 import org.tframework.core.TFrameworkException;
 import org.tframework.core.utils.LogUtils;
 
 /**
- * Thrown when no available {@link BasicDependencyResolver} is able to resolve a dependency.
+ * Thrown when no available {@link DependencyResolver} is able to resolve a dependency. The exception message
+ * will have the details about the resolution process.
  */
+@Getter
 @Builder
 public class DependencyResolutionException extends TFrameworkException {
 

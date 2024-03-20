@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation "org.tframework:tframework-core:${tframeworkVersion}"
+    implementation "com.github.Gtomika:tframework-core:${tframeworkVersion}"
 }
 ```
 
@@ -135,8 +135,6 @@ public class MyApplication {
 
     public static void main(String[] args) {
         Application app = TFramework.start("My cool app", MyApplication.class, args);
-        //profiles, properties and elements are available from the 'app' object
-        //however, they should be injected instead
     }
 }
 ```

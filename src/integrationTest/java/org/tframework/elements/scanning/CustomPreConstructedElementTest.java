@@ -1,5 +1,5 @@
 /* Licensed under Apache-2.0 2024. */
-package org.tframework.elements;
+package org.tframework.elements.scanning;
 
 import static org.junit.jupiter.api.Assertions.assertSame;
 

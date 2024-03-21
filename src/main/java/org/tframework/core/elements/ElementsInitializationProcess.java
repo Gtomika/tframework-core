@@ -3,10 +3,10 @@ package org.tframework.core.elements;
 
 import java.lang.reflect.Method;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.Application;
@@ -15,12 +15,12 @@ import org.tframework.core.elements.context.PreConstructedElementContext;
 import org.tframework.core.elements.context.assembler.ClassElementContextAssembler;
 import org.tframework.core.elements.context.assembler.ElementContextAssembler;
 import org.tframework.core.elements.context.assembler.MethodElementContextAssembler;
+import org.tframework.core.elements.context.filter.ElementContextFilterAggregator;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.scanner.ElementClassScanner;
+import org.tframework.core.elements.scanner.ElementContextBundle;
 import org.tframework.core.elements.scanner.ElementMethodScanner;
 import org.tframework.core.elements.scanner.ElementScanner;
-import org.tframework.core.elements.scanner.ElementScannersBundle;
-import org.tframework.core.elements.scanner.ElementScannersFactory;
 import org.tframework.core.elements.scanner.ElementScanningResult;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;
@@ -41,7 +41,6 @@ import org.tframework.core.utils.Constants;
  * elements are initialized.
  */
 @Slf4j
-@Builder
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ElementsInitializationProcess {
 
@@ -49,27 +48,14 @@ public class ElementsInitializationProcess {
             Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.enabled";
     private static final SinglePropertyValue ELEMENTS_INITIALIZATION_PROPERTY_DEFAULT = new SinglePropertyValue("true");
 
-    private final ClassElementContextAssembler classElementContextAssembler;
-    private final MethodElementContextAssembler methodElementContextAssembler;
-
     /**
-     * Initializes the dependency injection process.
+     * Initializes the elements.
      * @param input The {@link ElementsInitializationInput} containing the input data for the process.
+     * @param contextBundle An {@link ElementContextBundle} which describes how to find and process {@link ElementContext}s.
+     *                      (see {@link ElementsInitializationProcessFactory#createDefaultElementContextBundle(ElementsInitializationInput)}.
      * @return the {@link ElementsContainer} containing the assembled {@link ElementContext}s
      */
-    public ElementsContainer initialize(ElementsInitializationInput input) {
-        var classElementScanners = ElementScannersFactory.createDefaultElementClassScanners(input);
-        var methodElementScanners = ElementScannersFactory.createDefaultElementMethodScanners(input);
-        var bundle = ElementScannersBundle.builder()
-                .elementClassScanners(classElementScanners)
-                .elementMethodScanners(methodElementScanners)
-                .build();
-        return initialize(input, bundle);
-    }
-
-    //this should be used by the other 'initialize' method and during tests
-    //here we can provide the components instead of creating a default one
-    ElementsContainer initialize(ElementsInitializationInput input, ElementScannersBundle scannersBundle) {
+    public ElementsContainer initialize(ElementsInitializationInput input, ElementContextBundle contextBundle) {
         if(isElementInitializationDisabled(input.application().getPropertiesContainer())) {
             log.info("The element initialization is disabled. No elements will be scanned, dependency injection is disabled.");
             return ElementsContainer.empty();
@@ -81,9 +67,12 @@ public class ElementsInitializationProcess {
                 .propertiesContainer(input.application().getPropertiesContainer())
                 .build();
 
-        assembleElementContexts(elementsContainer, scannersBundle, dependencyResolutionInput);
+        assembleElementContexts(elementsContainer, contextBundle, dependencyResolutionInput);
         addPreConstructedElementContexts(elementsContainer, input.application(), input.preConstructedElementData());
-        log.debug("Successfully assembled a total of {} element contexts", elementsContainer.elementCount());
+        log.info("Successfully assembled a total of {} element contexts", elementsContainer.elementCount());
+
+        filterElementContext(elementsContainer, contextBundle.elementContextFilterAggregator());
+        log.info("A total of {} element contexts survived after filtering", elementsContainer.elementCount());
 
         elementsContainer.initializeElementContexts();
         log.info("Successfully initialized {} element contexts", elementsContainer.elementCount());
@@ -100,7 +89,7 @@ public class ElementsInitializationProcess {
     }
 
     /**
-     * Uses the scanners in the {@link ElementScannersBundle} to find elements,
+     * Uses the scanners in the {@link ElementContextBundle} to find elements,
      * then assembles {@link ElementContext}s from them. These will be added to the {@link ElementsContainer}.
      * <ul>
      *     <li>
@@ -110,50 +99,50 @@ public class ElementsInitializationProcess {
      *     <li>
      *         Then, each {@link ElementMethodScanner} in the scanner bundle will find element methods.
      *         These will be assembled into {@link ElementContext}s using the {@link MethodElementContextAssembler}.
-     *         See {@link #assembleMethodElementContexts(ElementsContainer, List, List, DependencyResolutionInput)}.
+     *         See {@link #assembleMethodElementContexts(ElementsContainer, List, ElementContextBundle, DependencyResolutionInput)}.
      *     </li>
      * </ul>
      */
     private void assembleElementContexts(
             ElementsContainer elementsContainer,
-            ElementScannersBundle scannersBundle,
+            ElementContextBundle contextBundle,
             DependencyResolutionInput dependencyResolutionInput
     ) {
         Set<ElementScanningResult<Class<?>>> allScannedClassElements = new HashSet<>();
-        for(ElementClassScanner elementClassScanner : scannersBundle.elementClassScanners()) {
+        for(ElementClassScanner elementClassScanner : contextBundle.elementClassScanners()) {
             var scannedElements = elementClassScanner.scanElements();
             allScannedClassElements.addAll(scannedElements);
             log.debug("Scanned {} elements from class scanner '{}'", scannedElements, elementClassScanner.getClass().getName());
         }
 
         List<ElementContext> elementContexts = allScannedClassElements.stream()
-                .map(scanResult -> classElementContextAssembler.assemble(scanResult, dependencyResolutionInput))
+                .map(scanResult -> contextBundle.classElementContextAssembler().assemble(scanResult, dependencyResolutionInput))
                 .peek(elementsContainer::addElementContext)
                 .toList();
 
         assembleMethodElementContexts(
                 elementsContainer,
                 elementContexts,
-                scannersBundle.elementMethodScanners(),
+                contextBundle,
                 dependencyResolutionInput
         );
     }
 
     /**
-     * Uses the {@link ElementMethodScanner}s from the {@link ElementScannersBundle} to find element methods.
+     * Uses the {@link ElementMethodScanner}s from the {@link ElementContextBundle} to find element methods.
      * These will be assembled into {@link ElementContext}s using the {@link MethodElementContextAssembler}s.
      */
     private void assembleMethodElementContexts(
             ElementsContainer elementsContainer,
             List<ElementContext> parentElementContexts,
-            List<ElementMethodScanner> elementMethodScanners,
+            ElementContextBundle contextBundle,
             DependencyResolutionInput dependencyResolutionInput
     ) {
         for(ElementContext parentElementContext : parentElementContexts) {
-            methodElementContextAssembler.setParentElementContext(parentElementContext);
+            contextBundle.methodElementContextAssembler().setParentElementContext(parentElementContext);
 
             Set<ElementScanningResult<Method>> allScannedMethodElements = new HashSet<>();
-            for(var elementMethodScanner : elementMethodScanners) {
+            for(var elementMethodScanner : contextBundle.elementMethodScanners()) {
                 elementMethodScanner.setClassToScan(parentElementContext.getType());
                 var scannedMethodElements = elementMethodScanner.scanElements();
                 allScannedMethodElements.addAll(scannedMethodElements);
@@ -165,7 +154,7 @@ public class ElementsInitializationProcess {
             }
 
             allScannedMethodElements.stream()
-                    .map(scanResult -> methodElementContextAssembler.assemble(scanResult, dependencyResolutionInput))
+                    .map(scanResult -> contextBundle.methodElementContextAssembler().assemble(scanResult, dependencyResolutionInput))
                     .forEach(elementsContainer::addElementContext);
         }
     }
@@ -191,6 +180,22 @@ public class ElementsInitializationProcess {
                 elementsContainer.addElementContext(preConstructedContext);
             }
         });
+    }
+
+    private void filterElementContext(ElementsContainer elementsContainer, ElementContextFilterAggregator filterAggregator) {
+        List<ElementContext> discardedContexts = new LinkedList<>();
+
+        elementsContainer.forEach(elementContext -> {
+            if(filterAggregator.discardElementContext(elementContext)) {
+                discardedContexts.add(elementContext);
+                log.debug("The element context '{}' is filtered out, and marked for discarding", elementContext.getName());
+            } else {
+                log.debug("The element context '{}' survived filtering and will be kept", elementContext.getName());
+            }
+        });
+
+        log.debug("A total of {} element contexts have been filtered out, and will be discarded", discardedContexts.size());
+        discardedContexts.forEach(elementsContainer::removeElementContext);
     }
 
 }

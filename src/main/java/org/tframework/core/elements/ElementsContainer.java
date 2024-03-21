@@ -2,6 +2,7 @@
 package org.tframework.core.elements;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.EqualsAndHashCode;
@@ -17,7 +18,7 @@ import org.tframework.core.elements.context.ElementContext;
 @Slf4j
 @EqualsAndHashCode
 @PreConstructedElement
-public class ElementsContainer {
+public class ElementsContainer implements Iterable<ElementContext> {
 
     /**
      * All elements of the application, wrapped in {@link ElementContext}s.
@@ -129,6 +130,19 @@ public class ElementsContainer {
     }
 
     /**
+     * Removes the given {@link ElementContext} from the container.
+     * @param elementContext The element context to remove, must not be null.
+     * @throws IllegalStateException If the container is already initialized.
+     */
+    @TFrameworkInternal
+    public void removeElementContext(@NonNull ElementContext elementContext) {
+        if(initialized) {
+            throw new IllegalStateException("Element contexts cannot be removed after the container is initialized.");
+        }
+        elementContexts.remove(elementContext);
+    }
+
+    /**
      * @return How many elements are stored in this container.
      */
     public int elementCount() {
@@ -159,5 +173,10 @@ public class ElementsContainer {
      */
     public static ElementsContainer fromElementContexts(@NonNull Collection<ElementContext> elementContexts) {
         return new ElementsContainer(elementContexts.stream().toList());
+    }
+
+    @Override
+    public Iterator<ElementContext> iterator() {
+        return elementContexts.iterator();
     }
 }

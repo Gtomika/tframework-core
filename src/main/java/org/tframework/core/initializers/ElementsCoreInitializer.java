@@ -8,6 +8,7 @@ import org.tframework.core.TFrameworkInternal;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.ElementsInitializationInput;
 import org.tframework.core.elements.ElementsInitializationProcess;
+import org.tframework.core.elements.ElementsInitializationProcessFactory;
 import org.tframework.core.utils.TimerUtils;
 
 /**
@@ -26,7 +27,8 @@ public class ElementsCoreInitializer implements CoreInitializer<ElementsInitiali
         log.debug("Starting elements core initialization...");
         Instant start = Instant.now();
 
-        ElementsContainer elementsContainer = elementsInitializationProcess.initialize(elementsInitializationInput);
+        var elementContextBundle = ElementsInitializationProcessFactory.createDefaultElementContextBundle(elementsInitializationInput);
+        ElementsContainer elementsContainer = elementsInitializationProcess.initialize(elementsInitializationInput, elementContextBundle);
 
         log.info("The elements core initialization completed in {} ms, and found {} elements.",
                 TimerUtils.msBetween(start, Instant.now()), elementsContainer.elementCount());

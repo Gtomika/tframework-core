@@ -2,6 +2,7 @@
 package org.tframework.core.elements;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -25,10 +26,11 @@ import org.tframework.core.elements.annotations.ElementConstructor;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.assembler.ClassElementContextAssembler;
 import org.tframework.core.elements.context.assembler.MethodElementContextAssembler;
+import org.tframework.core.elements.context.filter.ElementContextFilterAggregator;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.scanner.ElementClassScanner;
+import org.tframework.core.elements.scanner.ElementContextBundle;
 import org.tframework.core.elements.scanner.ElementMethodScanner;
-import org.tframework.core.elements.scanner.ElementScannersBundle;
 import org.tframework.core.elements.scanner.ElementScanningResult;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
@@ -53,13 +55,16 @@ class ElementsInitializationProcessTest {
     private ElementMethodScanner elementMethodScanner;
 
     @Mock
+    private ElementContextFilterAggregator elementContextFilterAggregator;
+
+    @Mock
     private ElementContext dummyClassElementContext;
 
     @Mock
     private ElementContext dummyStringMethodElementContext;
 
     private ElementsInitializationProcess elementsInitializationProcess;
-    private ElementScannersBundle elementScannersBundle;
+    private ElementContextBundle elementContextBundle;
     private Method dummyStringMethod;
 
     @BeforeEach
@@ -70,13 +75,13 @@ class ElementsInitializationProcessTest {
         when(dummyStringMethodElementContext.getName()).thenReturn("dummyMethodElement");
         doReturn(String.class).when(dummyStringMethodElementContext).getType();
 
-        elementsInitializationProcess = ElementsInitializationProcess.builder()
-                .classElementContextAssembler(classElementContextAssembler)
-                .methodElementContextAssembler(methodElementContextAssembler)
-                .build();
-        elementScannersBundle = ElementScannersBundle.builder()
+        elementsInitializationProcess = new ElementsInitializationProcess();
+        elementContextBundle = ElementContextBundle.builder()
                 .elementClassScanners(List.of(elementClassScanner))
                 .elementMethodScanners(List.of(elementMethodScanner))
+                .classElementContextAssembler(classElementContextAssembler)
+                .methodElementContextAssembler(methodElementContextAssembler)
+                .elementContextFilterAggregator(elementContextFilterAggregator)
                 .build();
         dummyStringMethod = DummyClass.class.getDeclaredMethod("dummyStringCreator");
     }
@@ -97,6 +102,10 @@ class ElementsInitializationProcessTest {
         when(methodElementContextAssembler.assemble(eq(methodScanningResult), any(DependencyResolutionInput.class)))
                 .thenReturn(dummyStringMethodElementContext);
 
+        //mock that the 'dummyMethodElement' element is filtered out
+        when(elementContextFilterAggregator.discardElementContext(dummyStringMethodElementContext))
+                .thenReturn(true);
+
         var preConstructedElementsData = Set.of(PreConstructedElementData.builder()
                 .preConstructedInstance(new File("."))
                 .name("importantFile")
@@ -104,10 +113,10 @@ class ElementsInitializationProcessTest {
                 .build());
 
         var input = createDependencyInjectionInput(PropertiesContainerFactory.empty(), preConstructedElementsData);
-        var elementsContainer = elementsInitializationProcess.initialize(input, elementScannersBundle);
+        var elementsContainer = elementsInitializationProcess.initialize(input, elementContextBundle);
 
         assertTrue(elementsContainer.hasElementContext("dummyClassElement")); //from element class
-        assertTrue(elementsContainer.hasElementContext("dummyMethodElement")); //from element method
+        assertFalse(elementsContainer.hasElementContext("dummyMethodElement")); //from element method, but it was filtered out
         assertTrue(elementsContainer.hasElementContext(Application.class)); //from DEFAULT pre-constructed elements
         assertTrue(elementsContainer.hasElementContext(ProfilesContainer.class));
         assertTrue(elementsContainer.hasElementContext(PropertiesContainer.class));
@@ -122,7 +131,7 @@ class ElementsInitializationProcessTest {
         ));
         var input = createDependencyInjectionInput(properties, Set.of());
 
-        var elementsContainer = elementsInitializationProcess.initialize(input, elementScannersBundle);
+        var elementsContainer = elementsInitializationProcess.initialize(input, elementContextBundle);
 
         assertEquals(0, elementsContainer.elementCount());
     }
@@ -142,7 +151,7 @@ class ElementsInitializationProcessTest {
     }
 
     /*
-    This single element class and its method elements are used for testing the dependency injection process.
+    This single element class and its method elements are used for testing the elements process.
      */
     @Element(name = "dummyClassElement")
     public static class DummyClass {

@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.context.source;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
@@ -20,6 +21,11 @@ public record MethodElementSource(
         @NonNull Method method,
         @NonNull ElementContext parentElementContext
 ) implements ElementSource {
+
+    @Override
+    public AnnotatedElement annotatedSource() {
+        return method;
+    }
 
     @Override
     public List<Parameter> elementConstructionParameters() {

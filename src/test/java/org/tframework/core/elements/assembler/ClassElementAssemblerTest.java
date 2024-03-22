@@ -36,7 +36,7 @@ class ClassElementAssemblerTest {
     @BeforeEach
     void setUp() throws Exception {
         var constructor = DummyElement.class.getConstructor(String.class);
-        var classElementSource = new ClassElementSource(constructor);
+        var classElementSource = new ClassElementSource(DummyElement.class, constructor);
 
         when(elementContext.getName()).thenReturn("dummyElement");
         doReturn(DummyElement.class).when(elementContext).getType();

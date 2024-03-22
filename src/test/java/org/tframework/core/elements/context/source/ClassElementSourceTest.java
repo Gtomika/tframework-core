@@ -14,7 +14,7 @@ class ClassElementSourceTest {
     @Test
     void shouldReturnElementConstructionParameters() {
         var testConstructor = TestClass.class.getConstructors()[0];
-        var source = new ClassElementSource(testConstructor);
+        var source = new ClassElementSource(TestClass.class, testConstructor);
 
         var parameters = source.elementConstructionParameters();
         assertEquals(2, parameters.size());

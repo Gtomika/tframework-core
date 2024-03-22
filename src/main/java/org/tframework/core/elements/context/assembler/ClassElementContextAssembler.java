@@ -53,7 +53,7 @@ public class ClassElementContextAssembler implements ElementContextAssembler<Cla
     ) throws ElementContextAssemblingException {
         var elementClass = scanningResult.annotationSource();
         validateElementType(elementClass);
-        var elementSource = new ClassElementSource(findAppropriateConstructor(elementClass));
+        var elementSource = new ClassElementSource(elementClass, findAppropriateConstructor(elementClass));
         log.trace("Created element source for element class '{}': {}", elementClass.getName(), elementSource);
 
         Element elementAnnotation = scanningResult.elementAnnotation();

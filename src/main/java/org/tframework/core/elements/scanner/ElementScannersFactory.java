@@ -20,11 +20,11 @@ import org.tframework.core.reflection.methods.MethodScannersFactory;
 public final class ElementScannersFactory {
 
     /**
-     * Creates an {@link ElementScannersBundle} with default {@link ElementScanner}s.
+     * Creates an {@link ElementContextBundle} with default {@link ElementScanner}s.
      * @param input {@link ElementsInitializationInput}, not null.
      */
-    public static ElementScannersBundle createDefaultElementScannersBundle(@NonNull ElementsInitializationInput input) {
-        return ElementScannersBundle.builder()
+    public static ElementContextBundle createDefaultElementScannersBundle(@NonNull ElementsInitializationInput input) {
+        return ElementContextBundle.builder()
                 .elementClassScanners(createDefaultElementClassScanners(input))
                 .elementMethodScanners(createDefaultElementMethodScanners(input))
                 .build();

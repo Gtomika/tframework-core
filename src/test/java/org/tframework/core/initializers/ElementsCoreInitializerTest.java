@@ -2,6 +2,8 @@
 package org.tframework.core.initializers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -16,6 +18,9 @@ import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.ElementsInitializationInput;
 import org.tframework.core.elements.ElementsInitializationProcess;
 import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.elements.scanner.ElementContextBundle;
+import org.tframework.core.profiles.ProfilesContainer;
+import org.tframework.core.properties.PropertiesContainerFactory;
 
 @ExtendWith(MockitoExtension.class)
 class ElementsCoreInitializerTest {
@@ -35,13 +40,20 @@ class ElementsCoreInitializerTest {
 
     @Test
     public void shouldPerformElementsCoreInitialization() {
+        var application = Application.builder()
+                .propertiesContainer(PropertiesContainerFactory.empty())
+                .profilesContainer(ProfilesContainer.empty())
+                .build();
+
         var input = ElementsInitializationInput.builder()
-                .application(Application.empty())
+                .application(application)
                 .rootClass(this.getClass())
                 .preConstructedElementData(Set.of())
                 .build();
+
         var expectedElements = ElementsContainer.fromElementContexts(List.of(elementContext));
-        when(elementsInitializationProcess.initialize(input)).thenReturn(expectedElements);
+        when(elementsInitializationProcess.initialize(eq(input), any(ElementContextBundle.class)))
+                .thenReturn(expectedElements);
 
         var actualElements = elementsCoreInitializer.initialize(input);
         assertEquals(expectedElements, actualElements);

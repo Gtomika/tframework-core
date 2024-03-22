@@ -5,6 +5,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.annotations.Element;
+import org.tframework.core.elements.context.source.PreConstructedElementSource;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 
 /**
@@ -22,7 +23,7 @@ public class PreConstructedElementContext extends ElementContext {
                 name,
                 preConstructedInstance.getClass(),
                 ElementScope.SINGLETON,
-                null, //no real source for pre-constructed elements
+                new PreConstructedElementSource(preConstructedInstance),
                 null //no real dependency resolution input for pre-constructed elements
         );
         this.preConstructedInstance = preConstructedInstance;

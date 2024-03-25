@@ -36,7 +36,7 @@ public final class SingletonElementContext extends ElementContext {
     private void initialize(ElementDependencyGraph dependencyGraph) {
         log.debug("Starting initialization of singleton element '{}'", name);
         if(instance == null) {
-            instance = elementAssembler.assemble(dependencyGraph);
+            instance = requestInstance(dependencyGraph);
             log.debug("Initialized singleton element context: {}. The instance was created: {}", name, instance);
         } else {
             log.debug("Singleton element '{}' was already eagerly initialized, skipping.", name);
@@ -44,14 +44,13 @@ public final class SingletonElementContext extends ElementContext {
     }
 
     @Override
-    public Object requestInstance(ElementDependencyGraph dependencyGraph) {
+    protected InstanceRequest requestInstanceInternal(ElementDependencyGraph dependencyGraph) {
         if(instance == null) {
-            //this can happen when singleton elements depend on each other
-            log.debug("Singleton element '{}' instance was requested before initialization. " +
-                    "Performing eager initialization now.", name);
-            initialize(dependencyGraph);
+            instance = elementAssembler.assemble(dependencyGraph);
+            return InstanceRequest.ofNewlyCreated(instance);
+        } else {
+            return InstanceRequest.ofReused(instance);
         }
-        return instance;
     }
 
     @Override

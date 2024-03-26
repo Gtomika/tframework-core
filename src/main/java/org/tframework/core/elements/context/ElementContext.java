@@ -12,6 +12,9 @@ import org.tframework.core.elements.assembler.ElementAssemblersFactory;
 import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
+import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorAggregator;
+import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorFactory;
+import org.tframework.core.elements.postprocessing.PostProcessingInput;
 
 /**
  * A wrapper for an element, that keeps track of all the data of this element, and
@@ -26,6 +29,7 @@ public abstract class ElementContext {
     protected final ElementScope scope;
     protected final ElementSource source;
     protected final ElementAssembler elementAssembler;
+    private final ElementInstancePostProcessorAggregator postProcessor;
 
     /**
      * Creates a new element context. To activate this context, {@link #initialize()} must also be called.
@@ -47,13 +51,29 @@ public abstract class ElementContext {
         this.type = type;
         this.scope = scope;
         this.source = source;
-        if(source != null && dependencyResolutionInput != null) {
-            this.elementAssembler = ElementAssemblersFactory.createElementAssembler(this, dependencyResolutionInput);
+        this.elementAssembler = initializeElementAssembler(this.name, source, dependencyResolutionInput);
+        this.postProcessor = initializePostProcessor(dependencyResolutionInput);
+    }
+
+    private ElementAssembler initializeElementAssembler(
+            String name,
+            ElementSource elementSource,
+            DependencyResolutionInput dependencyResolutionInput
+    ) {
+        if(elementSource != null && dependencyResolutionInput != null) {
+            return ElementAssemblersFactory.createElementAssembler(this, dependencyResolutionInput);
         } else {
             log.debug("Will not create assembler for element '{}', because the required " +
-                    "input was not provided", this.name);
-            this.elementAssembler = null;
+                    "input was not provided", name);
+            return null;
         }
+    }
+
+    private ElementInstancePostProcessorAggregator initializePostProcessor(DependencyResolutionInput dependencyResolutionInput) {
+        var postProcessingInput = PostProcessingInput.builder()
+                .dependencyResolutionInput(dependencyResolutionInput)
+                .build();
+        return ElementInstancePostProcessorFactory.createDefaultAggregator(postProcessingInput);
     }
 
     /**
@@ -62,7 +82,8 @@ public abstract class ElementContext {
     public abstract void initialize();
 
     /**
-     * Requests this element context to return with an instance of the element.
+     * Requests this element context to return with an instance of the element. The instance will
+     * be post-processed and initialized.
      * Depending on the implementation, this might reuse an existing instance, or create a new one.
      */
     public Object requestInstance() {
@@ -71,10 +92,30 @@ public abstract class ElementContext {
 
     /**
      * Requests this element context to return with an instance of the element, continuing the
-     * dependency resolution process with the given {@link ElementDependencyGraph}.
+     * dependency resolution process with the given {@link ElementDependencyGraph}. The instance will
+     * be post-processed and initialized.
      * @param dependencyGraph The {@link ElementDependencyGraph} to use for dependency resolution.
      */
-    public abstract Object requestInstance(ElementDependencyGraph dependencyGraph);
+    public Object requestInstance(ElementDependencyGraph dependencyGraph) {
+        var instanceRequest = requestInstanceInternal(dependencyGraph);
+        if(!instanceRequest.reused()) {
+            postProcessInstance(instanceRequest.instance());
+        }
+        return instanceRequest.instance();
+    }
+
+    /**
+     * Request an instance of this element. Depending on the implementation, this may create a new one, or
+     * re-use an exiting one. It is not the responsibility of this method to perform and post-processing
+     * or initialization on the instance.
+     * @param dependencyGraph The {@link ElementDependencyGraph} to use for dependency resolution.
+     * @return An {@link InstanceRequest} with details about the returned instance.
+     */
+    protected abstract InstanceRequest requestInstanceInternal(ElementDependencyGraph dependencyGraph);
+
+    protected void postProcessInstance(Object instance) {
+        postProcessor.postProcessInstance(this, instance);
+    }
 
     @Override
     public int hashCode() {

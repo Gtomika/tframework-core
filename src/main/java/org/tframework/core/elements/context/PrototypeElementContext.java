@@ -39,12 +39,12 @@ public final class PrototypeElementContext extends ElementContext {
     }
 
     @Override
-    public Object requestInstance(ElementDependencyGraph dependencyGraph) {
+    protected InstanceRequest requestInstanceInternal(ElementDependencyGraph dependencyGraph) {
         Object instance = elementAssembler.assemble(dependencyGraph);
 
         instances.add(instance);
         log.debug("Created new instance of prototype element: {}", name);
-        return instance;
+        return InstanceRequest.ofNewlyCreated(instance);
     }
 
     @Override

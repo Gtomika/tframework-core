@@ -35,8 +35,8 @@ public class PreConstructedElementContext extends ElementContext {
     }
 
     @Override
-    public Object requestInstance(ElementDependencyGraph dependencyGraph) {
-        return preConstructedInstance;
+    protected InstanceRequest requestInstanceInternal(ElementDependencyGraph dependencyGraph) {
+        return InstanceRequest.ofReused(preConstructedInstance);
     }
 
     @Override

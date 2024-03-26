@@ -12,6 +12,9 @@ import org.tframework.core.elements.assembler.ElementAssemblersFactory;
 import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
+import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorAggregator;
+import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorFactory;
+import org.tframework.core.elements.postprocessing.PostProcessingInput;
 
 /**
  * A wrapper for an element, that keeps track of all the data of this element, and
@@ -26,6 +29,7 @@ public abstract class ElementContext {
     protected final ElementScope scope;
     protected final ElementSource source;
     protected final ElementAssembler elementAssembler;
+    private final ElementInstancePostProcessorAggregator postProcessor;
 
     /**
      * Creates a new element context. To activate this context, {@link #initialize()} must also be called.
@@ -48,6 +52,7 @@ public abstract class ElementContext {
         this.scope = scope;
         this.source = source;
         this.elementAssembler = initializeElementAssembler(this.name, source, dependencyResolutionInput);
+        this.postProcessor = initializePostProcessor(dependencyResolutionInput);
     }
 
     private ElementAssembler initializeElementAssembler(
@@ -62,6 +67,13 @@ public abstract class ElementContext {
                     "input was not provided", name);
             return null;
         }
+    }
+
+    private ElementInstancePostProcessorAggregator initializePostProcessor(DependencyResolutionInput dependencyResolutionInput) {
+        var postProcessingInput = PostProcessingInput.builder()
+                .dependencyResolutionInput(dependencyResolutionInput)
+                .build();
+        return ElementInstancePostProcessorFactory.createDefaultAggregator(postProcessingInput);
     }
 
     /**
@@ -102,7 +114,7 @@ public abstract class ElementContext {
     protected abstract InstanceRequest requestInstanceInternal(ElementDependencyGraph dependencyGraph);
 
     protected void postProcessInstance(Object instance) {
-        log.debug("Post processing instance is not yet implemented");
+        postProcessor.postProcessInstance(this, instance);
     }
 
     @Override

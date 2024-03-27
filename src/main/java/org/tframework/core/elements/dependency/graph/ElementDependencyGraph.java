@@ -2,6 +2,7 @@
 package org.tframework.core.elements.dependency.graph;
 
 import java.util.stream.Collectors;
+import lombok.EqualsAndHashCode;
 import org.jgrapht.alg.cycle.CycleDetector;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
@@ -42,6 +43,7 @@ import org.tframework.core.elements.context.ElementContext;
  *
  * In case of cyclic dependencies, the framework will throw a {@link CircularDependencyException}.
  */
+@EqualsAndHashCode
 public class ElementDependencyGraph {
 
     private final DirectedAcyclicGraph<ElementContext, DefaultEdge> graph;

@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
@@ -17,7 +18,14 @@ import org.tframework.core.reflection.field.FieldSetter;
 
 /**
  * This {@link ElementInstancePostProcessor} is responsible for injecting the dependencies
- * into the appropriately annotated fields of the element instance.
+ * into the appropriately annotated fields of the element instance. The fields
+ * are candidates for injection, if all conditions are met:
+ * <ul>
+ *     <li>The field is not static.</li>
+ *     <li>The field is not final.</li>
+ *     <li>The field is annotated with some {@code InjectX} annotation, such as {@link InjectElement}.</li>
+ * </ul>
+ * visibility is not relevant, fields can be private as well.
  */
 @Slf4j
 @Builder
@@ -36,16 +44,33 @@ public class FieldInjectionPostProcessor implements ElementInstancePostProcessor
     public void postProcessInstance(ElementContext elementContext, Object instance) {
         var dependencyFields = fieldScanner.getAllFields(elementContext.getType())
                 .stream()
-                .filter(this::isCandidateForDependencyInjection)
-                .peek(field -> log.debug("Element context '{}' has field '{}' which is a candidate for dependency injection",
+                .filter(field -> isCandidateForFieldInjection(elementContext, field))
+                .peek(field -> log.debug("Element context '{}', field '{}': candidate for field injection",
                         elementContext.getName(), field.getName()))
                 .toList();
 
         dependencyFields.forEach(field -> setDependencyField(elementContext, instance, field));
     }
 
-    private boolean isCandidateForDependencyInjection(Field field) {
-        return !fieldFilter.isStatic(field) && injectAnnotationScanner.hasAnyInjectAnnotations(field);
+    private boolean isCandidateForFieldInjection(ElementContext elementContext, Field field) {
+        if(!injectAnnotationScanner.hasAnyInjectAnnotations(field)) {
+            log.debug("Element context '{}', field '{}': not a candidate for field injection, because it is not '@InjectX' annotated",
+                    elementContext.getName(), field.getName());
+            return false;
+        }
+        //field is @InjectX annotated, but that is not enough to be a candidate
+
+        if(fieldFilter.isStatic(field)) {
+            log.warn("Element context '{}', field '{}' is STATIC, so it will be ignored by field injection",
+                    elementContext.getName(), field.getName());
+            return false;
+        }
+        if(fieldFilter.isFinal(field)) {
+            log.warn("Element context '{}', field '{}' is FINAL, so it will be ignored by field injection",
+                    elementContext.getName(), field.getName());
+            return false;
+        }
+        return true;
     }
 
     private void setDependencyField(ElementContext elementContext, Object instance, Field field) {
@@ -57,6 +82,8 @@ public class FieldInjectionPostProcessor implements ElementInstancePostProcessor
                 DEPENDENCY_DECLARED_AS_FIELD
         );
         fieldSetter.setFieldValue(instance, field, resolvedDependency);
+        log.debug("Element context '{}', field '{}': injected a dependency: {}",
+                elementContext.getName(), field.getName(), resolvedDependency);
     }
 
 }

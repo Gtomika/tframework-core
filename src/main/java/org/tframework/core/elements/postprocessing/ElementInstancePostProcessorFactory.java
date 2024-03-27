@@ -12,6 +12,9 @@ import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.reflection.field.FieldFiltersFactory;
 import org.tframework.core.reflection.field.FieldScannersFactory;
 import org.tframework.core.reflection.field.FieldSettersFactory;
+import org.tframework.core.reflection.methods.MethodFiltersFactory;
+import org.tframework.core.reflection.methods.MethodInvokerFactory;
+import org.tframework.core.reflection.methods.MethodScannersFactory;
 
 /**
  * Creates {@link ElementInstancePostProcessor}s and {@link ElementInstancePostProcessorAggregator}s.
@@ -25,7 +28,9 @@ public final class ElementInstancePostProcessorFactory {
      */
     public static ElementInstancePostProcessorAggregator createDefaultAggregator(PostProcessingInput postProcessingInput) {
         List<ElementInstancePostProcessor> processors = List.of(
-                createFieldInjectionPostProcessor(postProcessingInput.dependencyResolutionInput())
+                //ordering of the post-processors is important
+                createFieldInjectionPostProcessor(postProcessingInput.dependencyResolutionInput()),
+                createPostInitializationMethodInvokerProcessor() //this must be the last one
         );
         return ElementInstancePostProcessorAggregator.usingPostProcessors(processors);
     }
@@ -42,6 +47,16 @@ public final class ElementInstancePostProcessorFactory {
                 .fieldScanner(FieldScannersFactory.createDefaultFieldScanner())
                 .fieldFilter(FieldFiltersFactory.createDefaultFieldFilter())
                 .fieldSetter(FieldSettersFactory.createDefaultFieldSetter())
+                .build();
+    }
+
+    private static PostInitializationMethodPostProcessor createPostInitializationMethodInvokerProcessor() {
+        var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
+        return PostInitializationMethodPostProcessor.builder()
+                .annotationScanner(annotationScanner)
+                .methodScanner(MethodScannersFactory.createDefaultMethodScanner())
+                .methodFilter(MethodFiltersFactory.createDefaultMethodFilter())
+                .methodInvoker(MethodInvokerFactory.createDefaultMethodInvoker())
                 .build();
     }
 

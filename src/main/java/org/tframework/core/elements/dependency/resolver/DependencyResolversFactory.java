@@ -42,12 +42,18 @@ public final class DependencyResolversFactory {
 
     public static AnnotatedElementDependencyResolver createElementDependencyResolver(ElementsContainer elementsContainer) {
         var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
-        return new AnnotatedElementDependencyResolver(elementsContainer, new InjectAnnotationScanner(annotationScanner));
+        return new AnnotatedElementDependencyResolver(
+                elementsContainer,
+                InjectAnnotationScanner.wrappingScanner(annotationScanner)
+        );
     }
 
     public static PropertyDependencyResolver createPropertyDependencyResolver(PropertiesContainer propertiesContainer) {
         var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
-        return new PropertyDependencyResolver(propertiesContainer, new InjectAnnotationScanner(annotationScanner));
+        return new PropertyDependencyResolver(
+                propertiesContainer,
+                InjectAnnotationScanner.wrappingScanner(annotationScanner)
+        );
     }
 
     public static FallbackDependencyResolver createFallbackDependencyResolver(ElementsContainer elementsContainer) {

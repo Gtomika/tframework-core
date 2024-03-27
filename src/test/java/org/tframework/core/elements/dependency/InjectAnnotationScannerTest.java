@@ -37,7 +37,7 @@ class InjectAnnotationScannerTest {
 
     @BeforeEach
     void setUp() throws NoSuchFieldException {
-        injectAnnotationScanner = new InjectAnnotationScanner(annotationScanner);
+        injectAnnotationScanner = InjectAnnotationScanner.wrappingScanner(annotationScanner);
         testField = this.getClass().getDeclaredField("testFieldActual");
     }
 

@@ -7,6 +7,7 @@ import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.context.source.PreConstructedElementSource;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 
 /**
  * A special {@link ElementContext} for {@link org.tframework.core.elements.annotations.PreConstructedElement}s.
@@ -24,7 +25,7 @@ public class PreConstructedElementContext extends ElementContext {
                 preConstructedInstance.getClass(),
                 ElementScope.SINGLETON,
                 new PreConstructedElementSource(preConstructedInstance),
-                null //no real dependency resolution input for pre-constructed elements
+                DependencyResolutionInput.builder().build() //dependency resolution is not used by pre-constructed elements
         );
         this.preConstructedInstance = preConstructedInstance;
     }

@@ -1,7 +1,7 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.postprocessing;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 
 import org.junit.jupiter.api.Test;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
@@ -15,6 +15,6 @@ public class ElementInstancePostProcessorFactoryTest {
                 .build();
         var aggregator = ElementInstancePostProcessorFactory.createDefaultAggregator(input);
 
-        assertTrue(aggregator.getProcessors().isEmpty());
+        assertInstanceOf(FieldInjectionPostProcessor.class, aggregator.getProcessors().getFirst());
     }
 }

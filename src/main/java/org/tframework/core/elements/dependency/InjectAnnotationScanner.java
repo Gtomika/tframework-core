@@ -88,4 +88,11 @@ public class InjectAnnotationScanner {
 
         return injectAnnotations;
     }
+
+    /**
+     * Creates a new {@link InjectAnnotationScanner} wrapping an {@link AnnotationScanner}.
+     */
+    public static InjectAnnotationScanner wrappingScanner(AnnotationScanner annotationScanner) {
+        return new InjectAnnotationScanner(annotationScanner);
+    }
 }

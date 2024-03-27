@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.source.ClassElementSource;
 import org.tframework.core.elements.context.source.MethodElementSource;
+import org.tframework.core.elements.context.source.PreConstructedElementSource;
 import org.tframework.core.elements.dependency.resolver.BasicDependencyResolver;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
@@ -32,6 +33,7 @@ public final class ElementAssemblersFactory {
         return switch (elementContext.getSource()) {
             case ClassElementSource ces -> createClassElementAssembler(elementContext, aggregator);
             case MethodElementSource mes -> createMethodElementAssembler(elementContext, aggregator);
+            case PreConstructedElementSource pes -> createNoOpElementAssembler(elementContext);
             default -> throw new IllegalArgumentException("Unexpected element source: " + elementContext.getSource());
         };
     }
@@ -53,6 +55,10 @@ public final class ElementAssemblersFactory {
                 .elementContext(elementContext)
                 .dependencyResolverAggregator(aggregator)
                 .build();
+    }
+
+    private static NoOpElementAssembler createNoOpElementAssembler(ElementContext elementContext) {
+        return new NoOpElementAssembler(elementContext.getName(), elementContext.getType());
     }
 
 }

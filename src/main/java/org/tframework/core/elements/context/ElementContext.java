@@ -51,22 +51,12 @@ public abstract class ElementContext {
         this.type = type;
         this.scope = scope;
         this.source = source;
-        this.elementAssembler = initializeElementAssembler(this.name, source, dependencyResolutionInput);
+        this.elementAssembler = initializeElementAssembler(dependencyResolutionInput);
         this.postProcessor = initializePostProcessor(dependencyResolutionInput);
     }
 
-    private ElementAssembler initializeElementAssembler(
-            String name,
-            ElementSource elementSource,
-            DependencyResolutionInput dependencyResolutionInput
-    ) {
-        if(elementSource != null && dependencyResolutionInput != null) {
-            return ElementAssemblersFactory.createElementAssembler(this, dependencyResolutionInput);
-        } else {
-            log.debug("Will not create assembler for element '{}', because the required " +
-                    "input was not provided", name);
-            return null;
-        }
+    private ElementAssembler initializeElementAssembler(DependencyResolutionInput dependencyResolutionInput) {
+        return ElementAssemblersFactory.createElementAssembler(this, dependencyResolutionInput);
     }
 
     private ElementInstancePostProcessorAggregator initializePostProcessor(DependencyResolutionInput dependencyResolutionInput) {

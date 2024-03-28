@@ -15,6 +15,7 @@ import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.reflection.methods.MethodInvoker;
 import org.tframework.core.reflection.methods.MethodScanner;
+import org.tframework.core.utils.LogUtils;
 
 /**
  * This {@link ElementInstancePostProcessor} is responsible for finding methods of
@@ -23,7 +24,7 @@ import org.tframework.core.reflection.methods.MethodScanner;
  */
 @Slf4j
 @Builder(access = AccessLevel.PACKAGE)
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class PostInitializationMethodPostProcessor implements ElementInstancePostProcessor {
 
     private final AnnotationScanner annotationScanner;
@@ -42,25 +43,27 @@ public class PostInitializationMethodPostProcessor implements ElementInstancePos
                 false
         ).stream()
                 .map(AnnotationFilteringResult::annotationSource)
-                .filter(method -> isValidPostConstructMethod(elementContext, method))
-                .peek(method -> log.debug("Element context '{}', method '{}': valid post-initialization method",
-                        elementContext.getName(), method.getName()))
-                .forEach(method -> methodInvoker.invokeMethodWithNoParametersAndIgnoreResult(instance, method));
+                .peek(method -> {
+                    checkValidPostInitializationMethod(elementContext, method);
+                    log.debug("Element context '{}', method '{}': valid post-initialization method",
+                            elementContext.getName(), LogUtils.niceExecutableName(method));
+                })
+                .forEach(method -> invokePostInitializationMethod(elementContext, method, instance));
     }
 
-    private boolean isValidPostConstructMethod(ElementContext elementContext, Method method) {
+    private void checkValidPostInitializationMethod(ElementContext elementContext, Method method) {
         List<String> problems = new LinkedList<>();
 
         if(!methodFilter.isPublic(method)) {
             problems.add("method is not public");
         }
-        if(!methodFilter.isStatic(method)) {
+        if(methodFilter.isStatic(method)) {
             problems.add("method is static");
         }
-        if(!methodFilter.isPublic(method)) {
+        if(methodFilter.isAbstract(method)) {
             problems.add("method abstract");
         }
-        if(!methodFilter.isPublic(method)) {
+        if(methodFilter.hasParameters(method)) {
             problems.add("method has parameters");
         }
 
@@ -68,13 +71,18 @@ public class PostInitializationMethodPostProcessor implements ElementInstancePos
             //having a return value is not a problem, but it is pointless
             if(!methodFilter.hasVoidReturnType(method)) {
                 log.warn("Element context '{}', post-initialization method '{}': has return value, which will be ignored",
-                        elementContext.getName(), method.getName());
+                        elementContext.getName(), LogUtils.niceExecutableName(method));
             }
-            return true;
         } else {
-            log.warn("Element context '{}', post-initialization method '{}': problems found, this method will not be invoked: {}",
-                    elementContext.getName(), method.getName(), problems);
-            return false;
+            throw new PostInitializationMethodException(method, elementContext, problems);
+        }
+    }
+
+    private void invokePostInitializationMethod(ElementContext elementContext, Method method, Object instance) {
+        try {
+            methodInvoker.invokeMethodWithNoParametersAndIgnoreResult(instance, method);
+        } catch (Exception e) {
+            throw new PostInitializationMethodException(method, elementContext, e);
         }
     }
 }

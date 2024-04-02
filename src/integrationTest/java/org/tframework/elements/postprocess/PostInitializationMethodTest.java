@@ -1,37 +1,54 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.elements.postprocess;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
-import java.util.LinkedList;
-import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import org.tframework.core.Application;
+import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.postprocessing.annotations.PostInitialization;
 import org.tframework.test.junit5.IsolatedTFrameworkTest;
 
+@Slf4j
 @IsolatedTFrameworkTest
 public class PostInitializationMethodTest {
 
-    private final List<String> data;
+    private final DummyClass mock;
 
     public PostInitializationMethodTest() {
-        data = new LinkedList<>();
+        //field is not injected yet
+        assertNull(application);
+        mock = Mockito.mock(DummyClass.class);
+    }
+
+    @InjectElement
+    private Application application;
+
+    @PostInitialization
+    public void postInit1() {
+        //field must be injected at this point
+        assertNotNull(application);
+        mock.dummyMethod();
     }
 
     @PostInitialization
-    public void addData1() {
-        data.add("data1");
-    }
-
-    @PostInitialization
-    public boolean addData2() { //return value will be ignored
-        return data.add("data2");
+    public void postInit2() {
+        assertNotNull(application);
+        mock.dummyMethod();
     }
 
     @Test
-    public void shouldExecutePostInitializationMethods() {
-        assertTrue(data.contains("data1"));
-        assertTrue(data.contains("data2"));
+    public void shouldExecutePostInitializationMethod() {
+        verify(mock, times(2)).dummyMethod();
+    }
+
+    static class DummyClass {
+        public void dummyMethod() {}
     }
 
 }

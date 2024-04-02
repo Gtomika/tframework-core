@@ -3,6 +3,7 @@ package org.tframework.core.elements.postprocessing;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
@@ -41,11 +42,10 @@ public class FieldInjectionPostProcessorTest {
     @BeforeEach
     public void setUp() throws Exception {
         when(elementContext.getName()).thenReturn("test-element");
-        doReturn(TestClass.class).when(elementContext).getType();
 
-        dependencyField = TestClass.class.getDeclaredField("string1");
-        nonDependencyField = TestClass.class.getDeclaredField("string2");
-        invalidDependencyField = TestClass.class.getDeclaredField("string3");
+        dependencyField = ValidElement.class.getDeclaredField("string1");
+        nonDependencyField = ValidElement.class.getDeclaredField("string2");
+        invalidDependencyField = InvalidElement.class.getDeclaredField("string1");
 
         fieldInjectionPostProcessor = FieldInjectionPostProcessor.builder()
                 .injectAnnotationScanner(injectAnnotationScanner)
@@ -58,10 +58,10 @@ public class FieldInjectionPostProcessorTest {
     }
 
     @Test
-    public void shouldInjectFieldDependencies() throws Exception {
+    public void shouldInjectFieldDependencies() {
+        doReturn(ValidElement.class).when(elementContext).getType();
         when(injectAnnotationScanner.hasAnyInjectAnnotations(dependencyField)).thenReturn(true);
         when(injectAnnotationScanner.hasAnyInjectAnnotations(nonDependencyField)).thenReturn(false);
-        when(injectAnnotationScanner.hasAnyInjectAnnotations(invalidDependencyField)).thenReturn(true);
 
         when(dependencyResolver.resolveDependency(
                 DependencyDefinition.fromField(dependencyField),
@@ -70,24 +70,54 @@ public class FieldInjectionPostProcessorTest {
                 FieldInjectionPostProcessor.DEPENDENCY_DECLARED_AS_FIELD
         )).thenReturn(RESOLVED_DEPENDENCY);
 
-        TestClass instance = new TestClass();
+        ValidElement instance = new ValidElement();
 
         fieldInjectionPostProcessor.postProcessInstance(elementContext, instance);
 
         assertEquals(RESOLVED_DEPENDENCY, instance.string1);
         assertNull(instance.string2);
-        assertNull(TestClass.string3);
     }
 
-    static class TestClass {
+    @Test
+    public void shouldThrowFieldInjectionException_whenAnnotatedFieldIsInvalid() {
+        doReturn(InvalidElement.class).when(elementContext).getType();
+        when(injectAnnotationScanner.hasAnyInjectAnnotations(invalidDependencyField)).thenReturn(true);
+
+        InvalidElement instance = new InvalidElement();
+
+        assertThrows(FieldInjectionException.class, () -> fieldInjectionPostProcessor.postProcessInstance(elementContext, instance));
+    }
+
+    @Test
+    public void shouldThrowFieldInjectionException_whenDependencyResolutionFails() {
+        doReturn(ValidElement.class).when(elementContext).getType();
+        when(injectAnnotationScanner.hasAnyInjectAnnotations(dependencyField)).thenReturn(true);
+
+        when(dependencyResolver.resolveDependency(
+                DependencyDefinition.fromField(dependencyField),
+                elementContext,
+                ElementDependencyGraph.empty(),
+                FieldInjectionPostProcessor.DEPENDENCY_DECLARED_AS_FIELD
+        )).thenReturn(1); //the field is a String, but an int is resolved
+
+        ValidElement instance = new ValidElement();
+
+        assertThrows(FieldInjectionException.class, () -> fieldInjectionPostProcessor.postProcessInstance(elementContext, instance));
+    }
+
+    static class ValidElement {
 
         @InjectElement
         private String string1;
 
         private String string2;
 
+    }
+
+    static class InvalidElement {
+
         @InjectElement
-        private static String string3;
+        private static String string1;
 
     }
 

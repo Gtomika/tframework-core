@@ -19,8 +19,8 @@ import org.tframework.core.utils.LogUtils;
 
 /**
  * This {@link ElementInstancePostProcessor} is responsible for finding methods of
- * elements that are annotated with {@link PostInitialization}, and invoke them.
- * @see PostInitialization
+ * elements that are annotated with {@link PostInitialization}, and invoke them. For the
+ * rules of what methods can be annotated, see {@link PostInitialization}.
  */
 @Slf4j
 @Builder(access = AccessLevel.PACKAGE)

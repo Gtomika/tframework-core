@@ -148,7 +148,7 @@ class SimpleMethodFilterTest {
 
     public static Stream<Arguments> getHasParamsTestMethods() throws Exception {
         return Stream.of(
-                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("methodWithParams"), true),
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("methodWithParams", String.class, String.class), true),
                 Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("methodWithNoParams"), false)
         );
     }

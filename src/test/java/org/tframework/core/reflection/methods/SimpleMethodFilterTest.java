@@ -61,6 +61,12 @@ class SimpleMethodFilterTest {
         assertEquals(isVoid, simpleMethodFilter.hasVoidReturnType(method));
     }
 
+    @ParameterizedTest
+    @MethodSource("getHasParamsTestMethods")
+    public void shouldFilterByHasParams(Method method, boolean hasParams) {
+        assertEquals(hasParams, simpleMethodFilter.hasParameters(method));
+    }
+
 
     // ---------------------------------- filter by annotation ----------------------------------
 
@@ -131,6 +137,19 @@ class SimpleMethodFilterTest {
                 Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("primitiveVoidMethod"), true),
                 Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("wrapperVoidMethod"), true),
                 Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("nonVoidMethod"), false)
+        );
+    }
+
+    // ----------------------------- has params -----------------------------
+
+    public void methodWithParams(String s1, String s2) {}
+
+    public void methodWithNoParams() {}
+
+    public static Stream<Arguments> getHasParamsTestMethods() throws Exception {
+        return Stream.of(
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("methodWithParams", String.class, String.class), true),
+                Arguments.of(SimpleMethodFilterTest.class.getDeclaredMethod("methodWithNoParams"), false)
         );
     }
 }

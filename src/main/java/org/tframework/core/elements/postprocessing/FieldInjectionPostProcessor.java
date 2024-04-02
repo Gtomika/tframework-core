@@ -2,6 +2,8 @@
 package org.tframework.core.elements.postprocessing;
 
 import java.lang.reflect.Field;
+import java.util.LinkedList;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
@@ -42,48 +44,47 @@ public class FieldInjectionPostProcessor implements ElementInstancePostProcessor
 
     @Override
     public void postProcessInstance(ElementContext elementContext, Object instance) {
-        var dependencyFields = fieldScanner.getAllFields(elementContext.getType())
+        fieldScanner.getAllFields(elementContext.getType())
                 .stream()
-                .filter(field -> isCandidateForFieldInjection(elementContext, field))
-                .peek(field -> log.debug("Element context '{}', field '{}': candidate for field injection",
-                        elementContext.getName(), field.getName()))
-                .toList();
-
-        dependencyFields.forEach(field -> setDependencyField(elementContext, instance, field));
+                .filter(injectAnnotationScanner::hasAnyInjectAnnotations)
+                .peek(field -> {
+                    isValidFieldForInjection(elementContext, field);
+                    log.debug("Element context '{}', field '{}': candidate for field injection",
+                            elementContext.getName(), field.getName());
+                })
+                .forEach(field ->  setDependencyField(elementContext, instance, field));
     }
 
-    private boolean isCandidateForFieldInjection(ElementContext elementContext, Field field) {
-        if(!injectAnnotationScanner.hasAnyInjectAnnotations(field)) {
-            log.debug("Element context '{}', field '{}': not a candidate for field injection, because it is not '@InjectX' annotated",
-                    elementContext.getName(), field.getName());
-            return false;
-        }
-        //field is @InjectX annotated, but that is not enough to be a candidate
+    private void isValidFieldForInjection(ElementContext elementContext, Field field) {
+        List<String> problems = new LinkedList<>();
 
         if(fieldFilter.isStatic(field)) {
-            log.warn("Element context '{}', field '{}' is STATIC, so it will be ignored by field injection",
-                    elementContext.getName(), field.getName());
-            return false;
+            problems.add("Field cannot be static");
         }
         if(fieldFilter.isFinal(field)) {
-            log.warn("Element context '{}', field '{}' is FINAL, so it will be ignored by field injection",
-                    elementContext.getName(), field.getName());
-            return false;
+            problems.add("Field cannot be final");
         }
-        return true;
+
+        if(!problems.isEmpty()) {
+            throw new FieldInjectionException(field, elementContext, problems);
+        }
     }
 
     private void setDependencyField(ElementContext elementContext, Object instance, Field field) {
-        var dependencyDefinition = DependencyDefinition.fromField(field);
-        Object resolvedDependency = dependencyResolver.resolveDependency(
-                dependencyDefinition,
-                elementContext,
-                ElementDependencyGraph.empty(),
-                DEPENDENCY_DECLARED_AS_FIELD
-        );
-        fieldSetter.setFieldValue(instance, field, resolvedDependency);
-        log.debug("Element context '{}', field '{}': injected a dependency: {}",
-                elementContext.getName(), field.getName(), resolvedDependency);
+        try {
+            var dependencyDefinition = DependencyDefinition.fromField(field);
+            Object resolvedDependency = dependencyResolver.resolveDependency(
+                    dependencyDefinition,
+                    elementContext,
+                    ElementDependencyGraph.empty(),
+                    DEPENDENCY_DECLARED_AS_FIELD
+            );
+            fieldSetter.setFieldValue(instance, field, resolvedDependency);
+            log.debug("Element context '{}', field '{}': injected a dependency: {}",
+                    elementContext.getName(), field.getName(), resolvedDependency);
+        } catch (Exception e) {
+            throw new FieldInjectionException(field, elementContext, e);
+        }
     }
 
 }

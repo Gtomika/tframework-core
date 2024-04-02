@@ -49,7 +49,17 @@ public class SimpleMethodFilter implements MethodFilter {
     }
 
     @Override
+    public boolean isAbstract(Method method) {
+        return Modifier.isAbstract(method.getModifiers());
+    }
+
+    @Override
     public boolean hasVoidReturnType(Method method) {
         return Void.TYPE.equals(method.getReturnType()) || Void.class.equals(method.getReturnType());
+    }
+
+    @Override
+    public boolean hasParameters(Method method) {
+        return method.getParameters().length > 0;
     }
 }

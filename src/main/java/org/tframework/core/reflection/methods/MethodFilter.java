@@ -39,9 +39,19 @@ public interface MethodFilter {
     boolean isStatic(Method method);
 
     /**
+     * Checks if the given method is abstract.
+     */
+    boolean isAbstract(Method method);
+
+    /**
      * Checks if the given method has void return type. It will find both the
      * primitive {@code void} and the wrapper {@link Void} return types.
      */
     boolean hasVoidReturnType(Method method);
+
+    /**
+     * Checks if the method has any parameters.
+     */
+    boolean hasParameters(Method method);
 
 }

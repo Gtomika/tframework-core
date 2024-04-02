@@ -13,7 +13,8 @@ public interface FieldSetter {
      * @param object The object whose field should be set.
      * @param field The {@link Field} to set. This must be a field of {@code object}.
      * @param value The value to set into {@code field}. This must be assignable to {@code field}'s type.
+     * @throws FieldSettingException If an underlying exception occurred while setting the method.
      */
-    void setFieldValue(Object object, Field field, Object value);
+    void setFieldValue(Object object, Field field, Object value) throws FieldSettingException;
 
 }

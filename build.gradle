@@ -5,10 +5,26 @@ plugins {
     id 'maven-publish'
     id "com.diffplug.spotless" version "6.25.0"
     id "io.freefair.lombok" version "8.4"
+    id 'me.qoomon.git-versioning' version "6.4.2"
 }
 
 group 'com.github.Gtomika'
-version '0.0.1-SNAPSHOT'
+//git tag will be used as the version
+version '0.0.0-SNAPSHOT'
+
+gitVersioning.apply {
+    refs {
+        //if there is a tag like 'v0.1.2' pointing to current commit, it will be used as version, without 'v'
+        considerTagsOnBranches = true
+        tag('v(?<version>.*)') {
+            version = '${ref.version}'
+        }
+        //otherwise, the branch name will be used to create a SNAPSHOT, such as 'master-SNAPSHOT'
+        branch('.+') {
+            version = '${ref}-SNAPSHOT'
+        }
+    }
+}
 
 ext {
     slf4jVersion = "1.7.25"

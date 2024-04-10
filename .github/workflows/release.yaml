@@ -1,16 +1,17 @@
 name: Release
 on:
   push:
-    # such as v1.0.1
+    # only for tags such as v1.0.1
     tags:
       - 'v[0-9]+.[0-9]+.[0-9]+'
 
 jobs:
 
-  # a release may only be created from master
+  # a release may only be created from master branch
   exit-on-invalid-branch:
     runs-on: ubuntu-latest
     steps:
+      - run: echo "Checking if tag is on the master branch..."
       - name: Exit if not on master branch
         if: endsWith(github.event.base_ref, 'master') == false
         run: exit -1

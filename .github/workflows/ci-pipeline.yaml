@@ -5,6 +5,8 @@ on:
   workflow_dispatch:
   # push is also triggered when PR is merged
   push:
+    branches:
+      - '*'
 
 jobs:
 

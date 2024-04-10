@@ -1,3 +1,5 @@
+![CI pipeline](https://github.com/Gtomika/tframework-core/actions/workflows/ci-pipeline.yaml/badge.svg)
+
 # TFramework
 
 This is the repository of the TFramework, which is an application development framework for Java.

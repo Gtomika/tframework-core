@@ -1,4 +1,4 @@
-name: Push CI pipeline
+name: CI pipeline
 run-name: CI on branch ${{ github.ref_name }} triggered by @${{ github.actor }}
 on:
   # manual trigger
@@ -7,20 +7,6 @@ on:
   push:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: corretto
-          java-version: 21
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2
-      - name: Build with gradle
-        run: ./gradlew build -x test -x spotlessCheck
 
   unit-tests:
     runs-on: ubuntu-latest

@@ -18,6 +18,9 @@ dependencies {
 }
 ```
 
+The versions can be taken from the releases page of the [core module](https://github.com/Gtomika/tframework-core/releases)
+and the [test module](https://github.com/Gtomika/tframework-test/releases).
+
 ## Features
 
 New features are added from time to time.

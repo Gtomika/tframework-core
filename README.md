@@ -140,3 +140,7 @@ public class MyApplication {
     }
 }
 ```
+
+## Additional documents
+
+- [About versioning and release](/docs/versioning_and_release.md)

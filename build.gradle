@@ -10,13 +10,13 @@ plugins {
 
 group 'com.github.Gtomika'
 //git tag will be used as the version
-version '0.0.0-SNAPSHOT'
+version '0.0.0'
 
 gitVersioning.apply {
     refs {
-        //if there is a tag like 'v0.1.2' pointing to current commit, it will be used as version, without 'v'
+        //if there is a tag like '0.1.2' pointing to current commit, it will be used as version
         considerTagsOnBranches = true
-        tag('v(?<version>.*)') {
+        tag('(?<version>.*)') {
             version = '${ref.version}'
         }
         //otherwise, the branch name will be used to create a SNAPSHOT, such as 'master-SNAPSHOT'
@@ -34,12 +34,7 @@ ext {
     junitJupiterVersion = "5.8.2"
     mockitoVersion = "5.8.0"
     log4jVersion = "2.17.2"
-    tframeworkTestVersion = "master-SNAPSHOT" //TODO: use fixed version
-}
-
-//TODO: remove when version is fixed
-configurations.all {
-    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    tframeworkTestVersion = "0.0.3"
 }
 
 repositories {

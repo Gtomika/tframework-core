@@ -1,9 +1,9 @@
 name: Pre-release
 on:
   push:
-    # only for tags such as v1.0.1-pre
+    # only for tags such as 1.0.1-pre
     tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+-pre'
+      - '[0-9]+.[0-9]+.[0-9]+-pre'
 
 jobs:
 

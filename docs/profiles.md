@@ -131,7 +131,45 @@ You are free to place multiple of these annotations on the same element, and it 
 at the same time, to specify required and forbidden profiles. They will be combined with a logical **AND** operation.
 Logical **OR** operation is not supported currently.
 
-```java
-
 > :gear: **Technical note**: This is implemented with "element context filtering".
 > See the [ProfileElementContextFilter](../src/main/java/org/tframework/core/elements/context/filter/ProfileElementContextFilter.java)
+
+## Getting profiles at runtime
+
+If for some reason you need to access the profiles at runtime, the element `ProfilesContainer` can be used. This element
+is always available, and can be injected into any other element. The `ProfilesContainer` is also available from the 
+`Application` element. Here are some ways to get it.
+
+1. Right after starting the application (not recommended):
+
+```java
+@Slf4j
+@TFrameworkRootClass
+public class MyApplication {
+
+    public static void main(String[] args) {
+        Application app = TFramework.start("My cool app", MyApplication.class, args);
+        ProfilesContainer profilesContainer = app.getProfilesContainer();
+        log.info("IS the 'dev' profile set: {}", profilesContainer.isProfileSet("dev"));
+    }
+}
+```
+
+2. Injecting the `ProfilesContainer` into another element:
+
+```java
+@Element
+public class SomeElement {
+
+    private final ProfilesContainer profilesContainer;
+
+    public SomeElement(ProfilesContainer profilesContainer) {
+        this.profilesContainer = profilesContainer;
+    }
+
+    public void checkProfile() {
+        log.info("Is the 'dev' profile set: {}", profilesContainer.isProfileSet("dev"));
+    }
+
+}
+```

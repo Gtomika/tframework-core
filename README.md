@@ -3,7 +3,7 @@
 # TFramework
 
 This is the repository of the TFramework, which is an application development framework for Java.
-**It is a hobby project, and a work in progress**.
+**It is a hobby project** and not meant for serious use.
 
 ```gradle
 repositories {
@@ -23,7 +23,8 @@ and the [test module](https://github.com/Gtomika/tframework-test/releases).
 
 ## Features
 
-New features are added from time to time.
+This is a high level overview of the features of the framework. For more detailed information, linked
+documents (which are in the `docs` directory).
 
 ### Profiles
 
@@ -34,6 +35,10 @@ effect on the configuration of the application. There are several ways to set a 
 * The `TFRAMEWORK_PROFILES` environment variable can be set to a comma separated list of profiles.
 * The `tframework.profiles` system property can be set to a comma separated list of profiles.
 * Command line arguments can be provided in the form of `tframework.profiles=profile1,profile2,...`.
+
+Profiles can activate property files and elements.
+
+For more details, see the [profiles document](./docs/profiles.md).
 
 ### Properties
 

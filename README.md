@@ -59,81 +59,33 @@ nice-list:
 This will add the `some.cool.property1` and `some.cool.property2` properties with the values `value1` and `value2` respectively.
 It will also add the `nice-list` property with the value `["one", "two", "three"]`.
 
-There are several ways to provide property files:
-
-* The file `properties.yaml` is always loaded without additional configuration.
-* For any set profile `p`, the file `properties-p.yaml` is loaded automatically.
-* The `TFRAMEWORK_PROPERTY_FILES` environment variable can be set to a comma separated list of property files.
-* The `tframework.propertyFiles` system property can be set to a comma separated list of property files.
-* Command line arguments can be provided in the form of `tframework.propertyFiles=file1,file2,...`.
-
-Note that the property files should always be specified as a path relative to the application resources.
+For more details, see the [properties document](./docs/properties.md).
 
 ### Elements
 
-The framework supports the concept of **elements**, which are similar to what *beans* are in the
-Spring. These are components managed by the framework, have different names, types and scopes.
-
-#### Declaring elements
-
-There are several ways to declare elements. You can mark a class:
-
-```java
-@Element(name = "cool-service")
-public class CoolService {
-
-}
-```
-
-Name is optional, and if not provided, it will be deduced from the type of the element.
-
-Another useful way to declare an element is via method. This can be helpful if you have no access to the element
-class' source code. The method must be in another element class, usually some sort of configuration.
-
-```java
-import java.nio.file.Paths;
-
-@Element
-public class MyAppConfig {
-
-    @Element(name = "user-data-file")
-    public Path createUserName() {
-        return Paths.get("data/user.xml");
-    }
-
-}
-```
-
-Finally, some classes will be elements by default, and you can inject them without additional configuration. These are:
-`Application`, `ProfilesContainer`, `PropertiesContainer`, `ElementsContainer`.
-
-#### Injecting dependencies
-
-Elements support dependency injection. Right now only constructor injection is supported: all dependencies are
-passed at construction time. The following can be dependencies of an element:
-
-- Other elements: annotate the parameter with `@InjectElement` or leave it unannotated (in this case, the framework will
-try to infer the element name by type.
-- Properties: annotate the parameter with `@InjectProperty`.
-
-For example, here is how to define an element with dependencies. We will use elements and properties from above.
+The framework supports the concept of **elements**, which are similar to what *beans* are in
+Spring. These are components managed by the framework, have different names, types and scopes and
+can be injected into each other.
 
 ```java
 @Element
-public class UserService {
+public class MyElement {
 
-    public UserService(
-            @InjectElement("user-data-file") Path userDataFile, //inject element with explicit name
-            CoolService coolService, //inject element with name deduced from type
-            @InjectProperty("some.cool.property1") String someCoolProperty //inject property by name
-    ) {
-        //do something
+    private final OtherElement otherElement;
+
+    public MyElement(OtherElement otherElement) {
+        this.otherElement = otherElement;
     }
 
+    public void doSomething() {
+        otherElement.doSomethingElse();
+    }
 }
+
 ```
 
-If you have multiple public constructors, the `@ElementConstructor` annotation may be used to select one.
+Custom package scanning, constructor and field injection, element lifecycle management and more are supported.
+For all the details on how to scan, declare and inject elements, see the [elements document](./docs/elements.md).
 
 ### How to run
 

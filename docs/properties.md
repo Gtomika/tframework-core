@@ -45,6 +45,8 @@ nice-list:
 This will add the `some.cool.property1` and `some.cool.property2` properties with the values `value1` and `value2` respectively.
 It will also add the `nice-list` property with the value `["one", "two", "three"]`.
 
+> :gear: **Technical note**: The *SnakeYAML* library is used for parsing the YAML files.
+
 If none of these files suit your needs, you can create your own property file in the resources folder. Below are the ways 
 how custom property files can be activated. Multiple ways can be combined.
 

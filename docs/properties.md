@@ -196,3 +196,8 @@ not possible to add a custom converter at the moment. However, you can always in
 convert it manually.
 
 > :gear: **Technical note**: See the [property converter package](../src/main/java/org/tframework/core/properties/converters)
+
+## Next steps
+
+Now that you understand properties, you can move on to the [elements document](./elements.md).
+This document explains the most interesting feature of the framework: elements.

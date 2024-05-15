@@ -173,3 +173,8 @@ public class SomeElement {
 
 }
 ```
+
+## Next steps
+
+Once you understand profiles, you can move on to the [properties document](./properties.md). This document explains 
+how to set properties in the application, and how to access them from elements.

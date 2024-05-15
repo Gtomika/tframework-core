@@ -26,8 +26,8 @@ An [example project](https://github.com/Gtomika/tframework-example) is also avai
 
 ## Features
 
-This is a high level overview of the features of the framework. For more detailed information, linked
-documents (which are in the `docs` directory).
+This is a high level overview of the features of the framework. For more detailed information, you
+can see the linked documents (which are in the `docs` directory).
 
 ### Profiles
 

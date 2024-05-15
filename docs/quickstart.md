@@ -67,6 +67,8 @@ that will show some nicely formatted logs:
 </Configuration>
 ```
 
+To see more logs from the framework, you can set `<Root level="info">` to "debug" or "trace".
+
 ## Creating the application
 
 In the `src/main/java` directory, create your base package. For example, `com.myapp`. In this package 

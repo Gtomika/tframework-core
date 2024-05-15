@@ -21,6 +21,9 @@ dependencies {
 The versions can be taken from the releases page of the [core module](https://github.com/Gtomika/tframework-core/releases)
 and the [test module](https://github.com/Gtomika/tframework-test/releases).
 
+It is recommended to start from the [quickstart document](./docs/quickstart.md) to get a feel of the framework.
+An [example project](https://github.com/Gtomika/tframework-example) is also available.
+
 ## Features
 
 This is a high level overview of the features of the framework. For more detailed information, linked
@@ -29,14 +32,8 @@ documents (which are in the `docs` directory).
 ### Profiles
 
 The framework supports the concept of profiles. Setting a profile has an
-effect on the configuration of the application. There are several ways to set a profile:
-
-* The profile `default` is always set.
-* The `TFRAMEWORK_PROFILES` environment variable can be set to a comma separated list of profiles.
-* The `tframework.profiles` system property can be set to a comma separated list of profiles.
-* Command line arguments can be provided in the form of `tframework.profiles=profile1,profile2,...`.
-
-Profiles can activate property files and elements.
+effect on the configuration of the application. There are several ways to set a profile.
+Profiles can activate or deactivate property files and elements.
 
 For more details, see the [profiles document](./docs/profiles.md).
 
@@ -89,7 +86,9 @@ For all the details on how to scan, declare and inject elements, see the [elemen
 
 ### How to run
 
-The framework should be started from the `main` method:
+All the info on how to run the framework is in the [quickstart document](./docs/quickstart.md).
+After setting up the project, as described in the document, the framework should be started from
+the `main` method:
 
 ```java
 @TFrameworkRootClass

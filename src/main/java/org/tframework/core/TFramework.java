@@ -22,7 +22,7 @@ public final class TFramework {
      * @param applicationName The name of the application. This is an arbitrary name. Must not be null.
      * @param rootClass The root class of the application. This class and all others in its package and subpackages
      *                  will be scanned for elements. This will typically be the class that the {@code start}
-     *                  method was called from. Must not be null.
+     *                  method was called from. Must not be null. Must be annotated with {@link TFrameworkRootClass}.
      * @param args Command line arguments, as received in the {@code main} method. Must not be null.
      * @return The {@link Application} that was started.
      */
@@ -41,7 +41,7 @@ public final class TFramework {
      * @param applicationName The name of the application. This is an arbitrary name. Must not be null.
      * @param rootClass The root class of the application. This class and all others in its package and subpackages
      *                  will be scanned for elements. This will typically be the class that the {@code start}
-     *                  method was called from. Must not be null.
+     *                  method was called from. Must not be null. Must be annotated with {@link TFrameworkRootClass}.
      * @param args Command line arguments, as received in the {@code main} method. Must not be null.
      * @param preConstructedElementData A collection of {@link PreConstructedElementData} which has information about
      *                                  objects that should be added to the elements.

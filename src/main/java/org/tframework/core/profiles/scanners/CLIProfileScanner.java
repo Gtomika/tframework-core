@@ -48,7 +48,7 @@ public class CLIProfileScanner implements ProfileScanner {
     }
 
     /**
-     * @param argument Must start with 'tframework_profiles='.
+     * @param argument Must start with 'tframework.profiles='.
      */
     private Set<String> extractProfilesFromArgument(String argument) {
         String profiles = CliUtils.extractArgumentValue(argument);

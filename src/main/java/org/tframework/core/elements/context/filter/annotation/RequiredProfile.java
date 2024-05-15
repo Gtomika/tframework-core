@@ -12,7 +12,7 @@ import java.lang.annotation.RetentionPolicy;
  *
  * <pre>{@code
  * @Element
- * @ForbiddenProfile({"a", "b"})
+ * @RequiredProfile({"a", "b"})
  * public class SomeElement {}
  * }</pre>
  *

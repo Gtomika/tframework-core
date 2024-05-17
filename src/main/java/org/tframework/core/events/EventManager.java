@@ -6,13 +6,14 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.PreConstructedElement;
+import org.tframework.core.events.annotations.Subscribe;
 import org.tframework.core.events.publisher.EventPublisher;
 import org.tframework.core.utils.MultiValueMap;
 
 /**
  * Manages {@link Subscription}s and publishes {@link Event}s to subscribers of topics. This is a pre-constructed
  * element in all TFramework applications. It is the recommended way to publish events. As for subscriptions,
- * use the annotation based approach: TODO
+ * use the annotation based approach: please refer to {@link Subscribe}
  */
 @Slf4j
 @PreConstructedElement

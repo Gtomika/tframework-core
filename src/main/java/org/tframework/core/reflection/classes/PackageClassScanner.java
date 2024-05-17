@@ -43,9 +43,10 @@ public class PackageClassScanner implements ClassScanner {
      */
     @Override
     public Set<Class<?>> scanClasses() {
+        var packageNamesArray = packageNames.toArray(new String[0]);
         ClassGraph classGraph = new ClassGraph()
                 .enableClassInfo()
-                .acceptPackages(packageNames.toArray(new String[] {}));
+                .acceptPackages(packageNamesArray);
 
         try(ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             try(ScanResult scanResult = classGraph.scan(executor, THREAD_COUNT)) {

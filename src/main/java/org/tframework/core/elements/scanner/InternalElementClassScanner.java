@@ -44,11 +44,8 @@ public class InternalElementClassScanner extends ElementClassScanner {
             PackageClassScanner classScanner
     ) {
         super(classFilter, annotationScanner, propertiesContainer);
-
         this.classScanner = classScanner;
         this.classScanner.setPackageNames(Set.of(TFRAMEWORK_INTERNAL_PACKAGE));
-        log.debug("The internal element scanner will scan the package '{}' and all its sub-packages", TFRAMEWORK_INTERNAL_PACKAGE);
-
         this.propertyConverter = PropertyConvertersFactory.getConverterByType(Boolean.class);
     }
 
@@ -59,6 +56,7 @@ public class InternalElementClassScanner extends ElementClassScanner {
                 TFRAMEWORK_INTERNAL_PACKAGE_DEFAULT_VALUE
         );
         if(propertyConverter.convert(scanInternalProperty)) {
+            log.debug("The internal element scanner will scan the package '{}' and all its sub-packages", TFRAMEWORK_INTERNAL_PACKAGE);
             return classScanner.scanClasses();
         } else {
             log.debug("The internal element scanner is disabled, no classes will be scanned");

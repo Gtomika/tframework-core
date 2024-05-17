@@ -6,6 +6,7 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.PreConstructedElement;
+import org.tframework.core.events.publisher.EventPublisher;
 import org.tframework.core.utils.MultiValueMap;
 
 /**
@@ -18,9 +19,11 @@ import org.tframework.core.utils.MultiValueMap;
 public class EventManager {
 
     private final MultiValueMap<String, Subscription> subscriptions;
+    private final EventPublisher eventPublisher;
 
-    EventManager() {
+    EventManager(EventPublisher eventPublisher) {
         subscriptions = new MultiValueMap<>();
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -80,7 +83,7 @@ public class EventManager {
     private void publishEventToSubscribers(List<Subscription> subscriptions, Event event) {
         subscriptions.forEach(subscription -> {
             try {
-                subscription.callback().accept(event.payload());
+                eventPublisher.publish(event, subscription);
                 log.trace("Published event to topic '{}' with payload '{}' to subscriber '{}'",
                         event.topic(), event.payload(), subscription.subscriptionId());
             } catch (Exception e) {

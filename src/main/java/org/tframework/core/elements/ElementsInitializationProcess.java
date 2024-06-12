@@ -15,6 +15,7 @@ import org.tframework.core.elements.context.PreConstructedElementContext;
 import org.tframework.core.elements.context.assembler.ClassElementContextAssembler;
 import org.tframework.core.elements.context.assembler.ElementContextAssembler;
 import org.tframework.core.elements.context.assembler.MethodElementContextAssembler;
+import org.tframework.core.elements.context.filter.ElementContextFilter;
 import org.tframework.core.elements.context.filter.ElementContextFilterAggregator;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.scanner.ElementClassScanner;
@@ -26,6 +27,7 @@ import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;
 import org.tframework.core.properties.converters.PropertyConvertersFactory;
 import org.tframework.core.utils.Constants;
+import org.tframework.core.utils.LogUtils;
 
 /**
  * This class is responsible for the elements initialization process. This process consists of the following steps:
@@ -62,6 +64,8 @@ public class ElementsInitializationProcess {
         }
 
         var elementsContainer = ElementsContainer.empty();
+        input.application().setElementsContainer(elementsContainer);
+
         DependencyResolutionInput dependencyResolutionInput = DependencyResolutionInput.builder()
                 .elementsContainer(elementsContainer)
                 .propertiesContainer(input.application().getPropertiesContainer())
@@ -71,7 +75,7 @@ public class ElementsInitializationProcess {
         addPreConstructedElementContexts(elementsContainer, input.application(), input.preConstructedElementData());
         log.info("Successfully assembled a total of {} element contexts", elementsContainer.elementCount());
 
-        filterElementContext(elementsContainer, contextBundle.elementContextFilterAggregator());
+        filterElementContext(elementsContainer, input.application());
         log.info("A total of {} element contexts survived after filtering", elementsContainer.elementCount());
 
         elementsContainer.initializeElementContexts();
@@ -182,11 +186,15 @@ public class ElementsInitializationProcess {
         });
     }
 
-    private void filterElementContext(ElementsContainer elementsContainer, ElementContextFilterAggregator filterAggregator) {
+    private void filterElementContext(ElementsContainer elementsContainer, Application application) {
+        var filters = ElementUtils.initAndGetElementsEagerly(application.getElementsContainer(), ElementContextFilter.class);
+        log.debug("Found {} filters to apply to element contexts: {}", filters.size(), LogUtils.objectClassNames(filters));
+        var filterAggregator = ElementContextFilterAggregator.usingFilters(filters);
+
         List<ElementContext> discardedContexts = new LinkedList<>();
 
         elementsContainer.forEach(elementContext -> {
-            if(filterAggregator.discardElementContext(elementContext)) {
+            if(filterAggregator.discardElementContext(elementContext, application)) {
                 discardedContexts.add(elementContext);
                 log.debug("The element context '{}' is filtered out, and marked for discarding", elementContext.getName());
             } else {

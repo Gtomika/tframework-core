@@ -13,6 +13,9 @@ import java.lang.annotation.Target;
  *     <li>It must be non-static.</li>
  *     <li>It must have a single parameter of any type.</li>
  * </ul>
+ * In order to avoid confusing behavior, it is recommended for any method not to subscribe
+ * to more than one topic. If a method subscribes to more than one topic, it will receive events from all of them,
+ * but it will not be possible to determine which topic the event was published to.
  * For example, the following method is a valid subscriber:
  * <pre>{@code
  * @Element

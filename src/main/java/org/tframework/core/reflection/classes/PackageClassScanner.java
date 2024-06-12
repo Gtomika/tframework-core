@@ -35,6 +35,12 @@ public class PackageClassScanner implements ClassScanner {
     private static final int THREAD_COUNT = 5;
 
     private Set<String> packageNames;
+    private Set<String> rejectedPackages;
+
+    PackageClassScanner(Set<String> packageNames) {
+        this.packageNames = packageNames;
+        this.rejectedPackages = Set.of();
+    }
 
     /**
      * Performs the scan in the packages specified at construction time. If some classes could not
@@ -45,7 +51,8 @@ public class PackageClassScanner implements ClassScanner {
     public Set<Class<?>> scanClasses() {
         ClassGraph classGraph = new ClassGraph()
                 .enableClassInfo()
-                .acceptPackages(packageNames.toArray(new String[] {}));
+                .acceptPackages(safeToArray(packageNames))
+                .rejectPackages(safeToArray(rejectedPackages));
 
         try(ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
             try(ScanResult scanResult = classGraph.scan(executor, THREAD_COUNT)) {
@@ -62,5 +69,12 @@ public class PackageClassScanner implements ClassScanner {
                         .collect(Collectors.toSet());
             }
         }
+    }
+
+    private String[] safeToArray(Set<String> set) {
+        if(set == null) {
+            return new String[0];
+        }
+        return set.toArray(new String[0]);
     }
 }

@@ -2,7 +2,6 @@
 package org.tframework.core.elements;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -26,7 +25,6 @@ import org.tframework.core.elements.annotations.ElementConstructor;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.assembler.ClassElementContextAssembler;
 import org.tframework.core.elements.context.assembler.MethodElementContextAssembler;
-import org.tframework.core.elements.context.filter.ElementContextFilterAggregator;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.scanner.ElementClassScanner;
 import org.tframework.core.elements.scanner.ElementContextBundle;
@@ -55,9 +53,6 @@ class ElementsInitializationProcessTest {
     private ElementMethodScanner elementMethodScanner;
 
     @Mock
-    private ElementContextFilterAggregator elementContextFilterAggregator;
-
-    @Mock
     private ElementContext dummyClassElementContext;
 
     @Mock
@@ -81,7 +76,6 @@ class ElementsInitializationProcessTest {
                 .elementMethodScanners(List.of(elementMethodScanner))
                 .classElementContextAssembler(classElementContextAssembler)
                 .methodElementContextAssembler(methodElementContextAssembler)
-                .elementContextFilterAggregator(elementContextFilterAggregator)
                 .build();
         dummyStringMethod = DummyClass.class.getDeclaredMethod("dummyStringCreator");
     }
@@ -102,10 +96,6 @@ class ElementsInitializationProcessTest {
         when(methodElementContextAssembler.assemble(eq(methodScanningResult), any(DependencyResolutionInput.class)))
                 .thenReturn(dummyStringMethodElementContext);
 
-        //mock that the 'dummyMethodElement' element is filtered out
-        when(elementContextFilterAggregator.discardElementContext(dummyStringMethodElementContext))
-                .thenReturn(true);
-
         var preConstructedElementsData = Set.of(PreConstructedElementData.builder()
                 .preConstructedInstance(new File("."))
                 .name("importantFile")
@@ -116,7 +106,7 @@ class ElementsInitializationProcessTest {
         var elementsContainer = elementsInitializationProcess.initialize(input, elementContextBundle);
 
         assertTrue(elementsContainer.hasElementContext("dummyClassElement")); //from element class
-        assertFalse(elementsContainer.hasElementContext("dummyMethodElement")); //from element method, but it was filtered out
+        assertTrue(elementsContainer.hasElementContext("dummyMethodElement"));
         assertTrue(elementsContainer.hasElementContext(Application.class)); //from DEFAULT pre-constructed elements
         assertTrue(elementsContainer.hasElementContext(ProfilesContainer.class));
         assertTrue(elementsContainer.hasElementContext(PropertiesContainer.class));

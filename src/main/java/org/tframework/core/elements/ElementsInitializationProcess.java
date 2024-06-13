@@ -34,6 +34,7 @@ import org.tframework.core.utils.LogUtils;
  * <ul>
  *     <li>Scanning for elements (see {@link ElementScanner}s).</li>
  *     <li>Assembling {@link ElementContext}s (see {@link ElementContextAssembler}s).</li>
+ *     <li>Filtering out elements using {@link ElementContextFilter}s.</li>
  *     <li>Initializes each element context (see {@link ElementContext#initialize()}).</li>
  * </ul>
  * The result of the process will be an {@link ElementsContainer} with unique {@link ElementContext}s.

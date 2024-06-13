@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectElement;
+import org.tframework.core.elements.annotations.Priority;
 import org.tframework.core.elements.context.ElementContext;
 
 /**
@@ -46,13 +47,15 @@ public final class ElementUtils {
      * and get a list of elements that are assignable to a given type.
      * @param container The {@link ElementsContainer} to use.
      * @param elementType The type of elements to get.
-     * @return A list of element instances that are assignable to the given type.
+     * @return A list of element instances that are assignable to the given type. The ordering of this
+     * list will adhere to the rules of {@link Priority} annotation.
      * @param <T> The type of elements to get.
      */
     public static <T> List<T> initAndGetElementsEagerly(ElementsContainer container, Class<T> elementType) {
         var elementContexts = container.getElementContextsWithType(elementType);
         container.initializeElementContexts(elementContexts);
         return elementContexts.stream()
+                .sorted(PriorityAnnotationComparator.create())
                 .map(ElementContext::requestInstance)
                 .map(elementType::cast) //safe cast, because these are assignable
                 .toList();

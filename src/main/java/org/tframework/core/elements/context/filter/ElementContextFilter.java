@@ -4,6 +4,7 @@ package org.tframework.core.elements.context.filter;
 import org.tframework.core.Application;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.annotations.Element;
+import org.tframework.core.elements.annotations.Priority;
 import org.tframework.core.elements.context.ElementContext;
 
 /**
@@ -13,6 +14,11 @@ import org.tframework.core.elements.context.ElementContext;
  *     <li>
  *         You can define you own filters by implementing this interface and
  *         marking your class as {@link Element}.
+ *     </li>
+ *     <li>
+ *         You can use {@link Priority} to specify the order of execution of multiple filters.
+ *         It is recommended not to use very high or low values, as they may match with built-in filters
+ *         and cause unexpected behavior.
  *     </li>
  *     <li>
  *         If you define your own filters as elements, and those have their own

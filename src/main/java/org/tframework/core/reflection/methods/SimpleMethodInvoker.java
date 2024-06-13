@@ -2,7 +2,9 @@
 package org.tframework.core.reflection.methods;
 
 import java.lang.reflect.Method;
+import org.tframework.core.elements.annotations.Element;
 
+@Element
 public class SimpleMethodInvoker implements MethodInvoker {
 
     @Override

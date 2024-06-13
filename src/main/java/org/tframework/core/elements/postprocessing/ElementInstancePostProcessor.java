@@ -19,6 +19,10 @@ import org.tframework.core.elements.context.ElementContext;
  *         and cause unexpected behavior.
  *     </li>
  * </ul>
+ * In case of defining custom post processors, make sure they are stateless, as they will be shared
+ * between all element instances. Also note that since post-processor elements and any dependencies
+ * they require are eagerly initialized, <b>they will not be post-processed</b> by themselves. So make sure they do not
+ * require any post-processing themselves, such as field injection or method invocation.
  */
 public interface ElementInstancePostProcessor {
 

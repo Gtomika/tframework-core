@@ -5,9 +5,10 @@ import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.annotations.Element;
+import org.tframework.core.elements.annotations.Priority;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.postprocessing.annotations.PostInitialization;
 import org.tframework.core.reflection.AnnotationFilteringResult;
@@ -23,7 +24,8 @@ import org.tframework.core.utils.LogUtils;
  * rules of what methods can be annotated, see {@link PostInitialization}.
  */
 @Slf4j
-@Builder(access = AccessLevel.PACKAGE)
+@Element
+@Priority(Priority.LOWEST)
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class PostInitializationMethodPostProcessor implements ElementInstancePostProcessor {
 

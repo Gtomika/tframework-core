@@ -5,15 +5,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Collection;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.reflection.AnnotationFilteringResult;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 
 /**
  * A default {@link MethodFilter} implementation.
  */
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@Element
 public class SimpleMethodFilter implements MethodFilter {
 
     @Override

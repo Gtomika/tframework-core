@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.annotations.InjectProperty;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
@@ -20,6 +21,7 @@ import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedExce
  * This kind of annotation scanning is always strict, because multiple '@InjectX' annotations are not allowed on the same
  * component: it would be impossible to determine which one to use.
  */
+@Element
 @RequiredArgsConstructor
 public class InjectAnnotationScanner {
 

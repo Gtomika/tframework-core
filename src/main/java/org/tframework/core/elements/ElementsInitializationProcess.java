@@ -73,7 +73,12 @@ public class ElementsInitializationProcess {
                 .build();
 
         assembleElementContexts(elementsContainer, contextBundle, dependencyResolutionInput);
-        addPreConstructedElementContexts(elementsContainer, input.application(), input.preConstructedElementData());
+        addPreConstructedElementContexts(
+                elementsContainer,
+                input.application(),
+                input.preConstructedElementData(),
+                dependencyResolutionInput
+        );
         log.info("Successfully assembled a total of {} element contexts", elementsContainer.elementCount());
 
         filterElementContext(elementsContainer, input.application());
@@ -167,13 +172,15 @@ public class ElementsInitializationProcess {
     private void addPreConstructedElementContexts(
             ElementsContainer elementsContainer,
             Application application,
-            Set<PreConstructedElementData> preConstructedElementData
+            Set<PreConstructedElementData> preConstructedElementData,
+            DependencyResolutionInput dependencyResolutionInput
     ) {
         //certain objects are added by default as pre-constructed elements
         elementsContainer.addElementContext(PreConstructedElementContext.of(elementsContainer));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application.getProfilesContainer()));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application.getPropertiesContainer()));
+        elementsContainer.addElementContext(PreConstructedElementContext.of(dependencyResolutionInput));
 
         //custom pre-constructed elements may be provided as well
         preConstructedElementData.forEach(data -> {

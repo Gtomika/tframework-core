@@ -18,6 +18,8 @@ import org.tframework.core.elements.context.assembler.MethodElementContextAssemb
 import org.tframework.core.elements.context.filter.ElementContextFilter;
 import org.tframework.core.elements.context.filter.ElementContextFilterAggregator;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
+import org.tframework.core.elements.postprocessing.ElementInstancePostProcessor;
+import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorAggregator;
 import org.tframework.core.elements.scanner.ElementClassScanner;
 import org.tframework.core.elements.scanner.ElementContextBundle;
 import org.tframework.core.elements.scanner.ElementMethodScanner;
@@ -83,6 +85,11 @@ public class ElementsInitializationProcess {
 
         filterElementContext(elementsContainer, input.application());
         log.info("A total of {} element contexts survived after filtering", elementsContainer.elementCount());
+
+        var postProcessors = ElementUtils.initAndGetElementsEagerly(elementsContainer, ElementInstancePostProcessor.class);
+        log.debug("Found {} post-processors to apply to element instances: {}", postProcessors.size(), LogUtils.objectClassNames(postProcessors));
+        var postProcessorAggregator = ElementInstancePostProcessorAggregator.usingPostProcessors(postProcessors);
+        elementsContainer.forEach(context -> context.setPostProcessor(postProcessorAggregator));
 
         elementsContainer.initializeElementContexts();
         log.info("Successfully initialized {} element contexts", elementsContainer.elementCount());

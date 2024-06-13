@@ -27,7 +27,8 @@ import org.tframework.core.reflection.field.FieldSetter;
  *     <li>The field is not final.</li>
  *     <li>The field is annotated with some {@code InjectX} annotation, such as {@link InjectElement}.</li>
  * </ul>
- * visibility is not relevant, fields can be private as well.
+ * visibility is not relevant, fields can be private as well. This post-processor will be the
+ * first to be executed.
  */
 @Slf4j
 @Element

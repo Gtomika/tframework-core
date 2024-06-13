@@ -4,7 +4,6 @@ package org.tframework.core.elements.postprocessing;
 import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.Element;
@@ -21,12 +20,14 @@ import org.tframework.core.utils.LogUtils;
 /**
  * This {@link ElementInstancePostProcessor} is responsible for finding methods of
  * elements that are annotated with {@link PostInitialization}, and invoke them. For the
- * rules of what methods can be annotated, see {@link PostInitialization}.
+ * rules of what methods can be annotated, see {@link PostInitialization}. This post processor
+ * is executed after all other post processors, so that the element is fully initialized
+ * before the post-initialization method is invoked.
  */
 @Slf4j
 @Element
 @Priority(Priority.LOWEST)
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@RequiredArgsConstructor
 public class PostInitializationMethodPostProcessor implements ElementInstancePostProcessor {
 
     private final AnnotationScanner annotationScanner;

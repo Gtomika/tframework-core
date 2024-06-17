@@ -3,7 +3,9 @@ package org.tframework.core.reflection.field;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import org.tframework.core.elements.annotations.Element;
 
+@Element
 public class SimpleFieldFilter implements FieldFilter {
 
     @Override

@@ -11,10 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.tframework.core.Application;
 import org.tframework.core.elements.context.ElementContext;
 
 @ExtendWith(MockitoExtension.class)
 public class ElementContextFilterAggregatorTest {
+
+    private static final Application APPLICATION = Application.builder().build();
 
     @Mock
     private ElementContext elementContext;
@@ -34,15 +37,15 @@ public class ElementContextFilterAggregatorTest {
 
     @Test
     public void shouldDiscardElementContext_whenAnyFiltersDiscardIt() {
-        when(filter1.discardElementContext(elementContext)).thenReturn(false);
-        when(filter2.discardElementContext(elementContext)).thenReturn(true);
-        assertTrue(aggregator.discardElementContext(elementContext));
+        when(filter1.discardElementContext(elementContext, APPLICATION)).thenReturn(false);
+        when(filter2.discardElementContext(elementContext, APPLICATION)).thenReturn(true);
+        assertTrue(aggregator.discardElementContext(elementContext, APPLICATION));
     }
 
     @Test
     public void shouldKeepElementContext_whenAllFiltersKeepIt() {
-        when(filter1.discardElementContext(elementContext)).thenReturn(false);
-        when(filter2.discardElementContext(elementContext)).thenReturn(false);
-        assertFalse(aggregator.discardElementContext(elementContext));
+        when(filter1.discardElementContext(elementContext, APPLICATION)).thenReturn(false);
+        when(filter2.discardElementContext(elementContext, APPLICATION)).thenReturn(false);
+        assertFalse(aggregator.discardElementContext(elementContext, APPLICATION));
     }
 }

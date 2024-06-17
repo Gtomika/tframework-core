@@ -235,6 +235,14 @@ Here are some examples of what is considered a circular dependency:
 - A depends on B, and B depends on A.
 - A depends on itself.
 
+## Element filtering
+
+Elements can be filtered out by the framework. This can be useful in some cases, for example, to exclude certain elements from
+being created. An example is shown in the [profiles](profiles.md) document, where elements can be filtered by profile.
+
+You can also define your own element filters by implementing the `ElementContextFilter` interface, and marking it as an element.
+The framework will pick up your filter and call it for each element context.
+
 ## Element lifecycle callbacks
 
 Elements can have lifecycle callbacks. These are methods that are called at certain points in the element's lifecycle.
@@ -252,3 +260,9 @@ Such method must be:
 - No parameters are allowed.
 
 An example can be seen above in the field injection section.
+
+### Custom actions on element
+
+You can define your own element post processors by implementing the `ElementInstancePostProcessor` interface, and 
+marking it as an element. The framework will pick up your post processor and call it for each element instance. For example, 
+this can be used to invoke some method on each element after it is created, or to do some logging.

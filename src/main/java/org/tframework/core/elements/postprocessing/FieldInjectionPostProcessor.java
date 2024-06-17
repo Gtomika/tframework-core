@@ -4,16 +4,17 @@ package org.tframework.core.elements.postprocessing;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
-import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectElement;
+import org.tframework.core.elements.annotations.Priority;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
+import org.tframework.core.elements.dependency.resolver.DependencyResolverConfig;
 import org.tframework.core.reflection.field.FieldFilter;
 import org.tframework.core.reflection.field.FieldScanner;
 import org.tframework.core.reflection.field.FieldSetter;
@@ -27,11 +28,13 @@ import org.tframework.core.reflection.field.FieldSetter;
  *     <li>The field is not final.</li>
  *     <li>The field is annotated with some {@code InjectX} annotation, such as {@link InjectElement}.</li>
  * </ul>
- * visibility is not relevant, fields can be private as well.
+ * visibility is not relevant, fields can be private as well. This post-processor will be the
+ * first to be executed.
  */
 @Slf4j
 @Builder
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@Element
+@Priority(Priority.HIGHEST)
 public class FieldInjectionPostProcessor implements ElementInstancePostProcessor {
 
     static final String DEPENDENCY_DECLARED_AS_FIELD = "Field";
@@ -41,6 +44,20 @@ public class FieldInjectionPostProcessor implements ElementInstancePostProcessor
     private final FieldFilter fieldFilter;
     private final FieldSetter fieldSetter;
     private final DependencyResolverAggregator dependencyResolver;
+
+    public FieldInjectionPostProcessor(
+            InjectAnnotationScanner injectAnnotationScanner,
+            FieldScanner fieldScanner,
+            FieldFilter fieldFilter,
+            FieldSetter fieldSetter,
+            @InjectElement(DependencyResolverConfig.FIELD_DEPENDENCY_RESOLVER_ELEMENT_NAME) DependencyResolverAggregator dependencyResolver
+    ) {
+        this.injectAnnotationScanner = injectAnnotationScanner;
+        this.fieldScanner = fieldScanner;
+        this.fieldFilter = fieldFilter;
+        this.fieldSetter = fieldSetter;
+        this.dependencyResolver = dependencyResolver;
+    }
 
     @Override
     public void postProcessInstance(ElementContext elementContext, Object instance) {

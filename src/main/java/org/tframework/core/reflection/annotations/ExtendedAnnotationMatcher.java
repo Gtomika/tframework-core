@@ -6,9 +6,8 @@ import java.lang.annotation.Repeatable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.annotations.Element;
 
 /**
  * The annotation matcher implements a sort of 'extended equality' check between annotations, including
@@ -17,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  * @see AnnotationMatchingResult
  */
 @Slf4j
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@Element
 public class ExtendedAnnotationMatcher implements AnnotationMatcher {
 
     /**

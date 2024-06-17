@@ -19,9 +19,9 @@ import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
-import org.tframework.core.reflection.field.FieldFiltersFactory;
-import org.tframework.core.reflection.field.FieldScannersFactory;
-import org.tframework.core.reflection.field.FieldSettersFactory;
+import org.tframework.core.reflection.field.SimpleFieldFilter;
+import org.tframework.core.reflection.field.SimpleFieldScanner;
+import org.tframework.core.reflection.field.SimpleFieldSetter;
 
 @ExtendWith(MockitoExtension.class)
 public class FieldInjectionPostProcessorTest {
@@ -51,9 +51,9 @@ public class FieldInjectionPostProcessorTest {
                 .injectAnnotationScanner(injectAnnotationScanner)
                 .dependencyResolver(dependencyResolver)
                 //field reflection dependencies are not mocked to greatly simplify test
-                .fieldScanner(FieldScannersFactory.createDefaultFieldScanner())
-                .fieldFilter(FieldFiltersFactory.createDefaultFieldFilter())
-                .fieldSetter(FieldSettersFactory.createDefaultFieldSetter())
+                .fieldScanner(new SimpleFieldScanner())
+                .fieldFilter(new SimpleFieldFilter())
+                .fieldSetter(new SimpleFieldSetter())
                 .build();
     }
 

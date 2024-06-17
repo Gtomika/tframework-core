@@ -1,8 +1,6 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.events.publisher;
 
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 import org.tframework.core.events.Event;
 import org.tframework.core.events.Subscription;
 
@@ -12,7 +10,6 @@ import org.tframework.core.events.Subscription;
  * danger that if a callback takes too long to complete, it will block the event management from
  * handling other events.
  */
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
 public class SimpleEventPublisher implements EventPublisher {
 
     @Override

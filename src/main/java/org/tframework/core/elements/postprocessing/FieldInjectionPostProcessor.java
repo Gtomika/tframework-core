@@ -16,7 +16,6 @@ import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverConfig;
 import org.tframework.core.reflection.field.FieldFilter;
-import org.tframework.core.reflection.field.FieldScanner;
 import org.tframework.core.reflection.field.FieldSetter;
 
 /**
@@ -40,20 +39,17 @@ public class FieldInjectionPostProcessor implements ElementInstancePostProcessor
     static final String DEPENDENCY_DECLARED_AS_FIELD = "Field";
 
     private final InjectAnnotationScanner injectAnnotationScanner;
-    private final FieldScanner fieldScanner;
     private final FieldFilter fieldFilter;
     private final FieldSetter fieldSetter;
     private final DependencyResolverAggregator dependencyResolver;
 
     public FieldInjectionPostProcessor(
             InjectAnnotationScanner injectAnnotationScanner,
-            FieldScanner fieldScanner,
             FieldFilter fieldFilter,
             FieldSetter fieldSetter,
             @InjectElement(DependencyResolverConfig.FIELD_DEPENDENCY_RESOLVER_ELEMENT_NAME) DependencyResolverAggregator dependencyResolver
     ) {
         this.injectAnnotationScanner = injectAnnotationScanner;
-        this.fieldScanner = fieldScanner;
         this.fieldFilter = fieldFilter;
         this.fieldSetter = fieldSetter;
         this.dependencyResolver = dependencyResolver;
@@ -61,8 +57,7 @@ public class FieldInjectionPostProcessor implements ElementInstancePostProcessor
 
     @Override
     public void postProcessInstance(ElementContext elementContext, Object instance) {
-        fieldScanner.getAllFields(elementContext.getType())
-                .stream()
+        elementContext.getFields().stream()
                 .filter(injectAnnotationScanner::hasAnyInjectAnnotations)
                 .peek(field -> {
                     isValidFieldForInjection(elementContext, field);

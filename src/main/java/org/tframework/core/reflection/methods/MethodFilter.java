@@ -54,4 +54,9 @@ public interface MethodFilter {
      */
     boolean hasParameters(Method method);
 
+    /**
+     * Checks if the method has exactly one parameter.
+     */
+    boolean hasExactlyOneParameter(Method method);
+
 }

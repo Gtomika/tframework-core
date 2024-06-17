@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.events.Event;
 import org.tframework.core.events.Subscription;
 
@@ -14,6 +15,7 @@ import org.tframework.core.events.Subscription;
  * block the event management from handling other events.
  */
 @Slf4j
+@Element
 public class AsyncVirtualEventPublisher implements EventPublisher {
 
     private final ExecutorService executorService;

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.function.Consumer;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.events.annotations.Subscribe;
 import org.tframework.core.events.publisher.EventPublisher;
 import org.tframework.core.utils.MultiValueMap;
@@ -15,12 +16,13 @@ import org.tframework.core.utils.MultiValueMap;
  * use the annotation based approach: please refer to {@link Subscribe}
  */
 @Slf4j
+@Element
 public class EventManager {
 
     private final MultiValueMap<String, Subscription> subscriptions;
     private final EventPublisher eventPublisher;
 
-    EventManager(EventPublisher eventPublisher) {
+    public EventManager(EventPublisher eventPublisher) {
         subscriptions = new MultiValueMap<>();
         this.eventPublisher = eventPublisher;
     }

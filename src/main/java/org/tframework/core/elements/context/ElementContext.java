@@ -1,6 +1,9 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements.context;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.util.Set;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -14,6 +17,8 @@ import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorAggregator;
+import org.tframework.core.reflection.field.SimpleFieldScanner;
+import org.tframework.core.reflection.methods.DeclaredMethodScanner;
 
 /**
  * A wrapper for an element, that keeps track of all the data of this element, and
@@ -29,6 +34,9 @@ public abstract class ElementContext {
     protected final ElementScope scope;
     protected final ElementSource source;
     protected final ElementAssembler elementAssembler;
+
+    protected Set<Method> methods;
+    protected Set<Field> fields;
 
     @Setter
     private ElementInstancePostProcessorAggregator postProcessor;
@@ -54,10 +62,19 @@ public abstract class ElementContext {
         this.scope = scope;
         this.source = source;
         this.elementAssembler = initializeElementAssembler(dependencyResolutionInput);
+        collectTypeData();
     }
 
     private ElementAssembler initializeElementAssembler(DependencyResolutionInput dependencyResolutionInput) {
         return ElementAssemblersFactory.createElementAssembler(this, dependencyResolutionInput);
+    }
+
+    private void collectTypeData() {
+        var methodScanner = new DeclaredMethodScanner();
+        methods = methodScanner.scanMethods(type);
+
+        var fieldScanner = new SimpleFieldScanner();
+        fields = fieldScanner.getAllFields(type);
     }
 
     /**

@@ -11,11 +11,10 @@ import java.lang.annotation.Target;
  * <ul>
  *     <li>It must be public.</li>
  *     <li>It must be non-static.</li>
+ *     <li>It must not be abstract.</li>
  *     <li>It must have a single parameter of any type.</li>
  * </ul>
- * In order to avoid confusing behavior, it is recommended for any method not to subscribe
- * to more than one topic. If a method subscribes to more than one topic, it will receive events from all of them,
- * but it will not be possible to determine which topic the event was published to.
+ * In order to avoid confusing behavior, methods cannot subscribe to multiple topics.
  * For example, the following method is a valid subscriber:
  * <pre>{@code
  * @Element
@@ -28,7 +27,8 @@ import java.lang.annotation.Target;
  * }
  * }</pre>
  * The parameter of the method will be the payload of the event that is published to the topic. The type of the parameter
- * can be any type, as long as the payload of the event is of the same type.
+ * can be any type, as long as the payload of the event is of the same type. This will not be checked at compile or
+ * framework startup time, so it is up to the developer to ensure that the types match.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.tframework.core.events.publisher.EventPublisherFactory;
+import org.tframework.core.events.publisher.SimpleEventPublisher;
 
 @Slf4j
 public class EventManagerTest {
@@ -20,7 +20,7 @@ public class EventManagerTest {
 
     @BeforeEach
     public void setUp() {
-        eventManager = new EventManager(EventPublisherFactory.createSimpleEventPublisher());
+        eventManager = new EventManager(new SimpleEventPublisher());
         eventHandled = false;
     }
 

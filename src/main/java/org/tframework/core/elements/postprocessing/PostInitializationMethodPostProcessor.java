@@ -14,7 +14,6 @@ import org.tframework.core.reflection.AnnotationFilteringResult;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.reflection.methods.MethodInvoker;
-import org.tframework.core.reflection.methods.MethodScanner;
 import org.tframework.core.utils.LogUtils;
 
 /**
@@ -31,16 +30,13 @@ import org.tframework.core.utils.LogUtils;
 public class PostInitializationMethodPostProcessor implements ElementInstancePostProcessor {
 
     private final AnnotationScanner annotationScanner;
-    private final MethodScanner methodScanner;
     private final MethodFilter methodFilter;
     private final MethodInvoker methodInvoker;
 
     @Override
     public void postProcessInstance(ElementContext elementContext, Object instance) {
-        var allMethods = methodScanner.scanMethods(elementContext.getType());
-
         methodFilter.filterByAnnotation(
-                allMethods,
+                elementContext.getMethods(),
                 PostInitialization.class,
                 annotationScanner,
                 false

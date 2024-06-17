@@ -4,10 +4,10 @@ package org.tframework.core.elements.postprocessing;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,7 +20,6 @@ import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
 import org.tframework.core.reflection.field.SimpleFieldFilter;
-import org.tframework.core.reflection.field.SimpleFieldScanner;
 import org.tframework.core.reflection.field.SimpleFieldSetter;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,7 +50,6 @@ public class FieldInjectionPostProcessorTest {
                 .injectAnnotationScanner(injectAnnotationScanner)
                 .dependencyResolver(dependencyResolver)
                 //field reflection dependencies are not mocked to greatly simplify test
-                .fieldScanner(new SimpleFieldScanner())
                 .fieldFilter(new SimpleFieldFilter())
                 .fieldSetter(new SimpleFieldSetter())
                 .build();
@@ -59,7 +57,7 @@ public class FieldInjectionPostProcessorTest {
 
     @Test
     public void shouldInjectFieldDependencies() {
-        doReturn(ValidElement.class).when(elementContext).getType();
+        when(elementContext.getFields()).thenReturn(Set.of(dependencyField, nonDependencyField));
         when(injectAnnotationScanner.hasAnyInjectAnnotations(dependencyField)).thenReturn(true);
         when(injectAnnotationScanner.hasAnyInjectAnnotations(nonDependencyField)).thenReturn(false);
 
@@ -80,7 +78,7 @@ public class FieldInjectionPostProcessorTest {
 
     @Test
     public void shouldThrowFieldInjectionException_whenAnnotatedFieldIsInvalid() {
-        doReturn(InvalidElement.class).when(elementContext).getType();
+        when(elementContext.getFields()).thenReturn(Set.of(invalidDependencyField));
         when(injectAnnotationScanner.hasAnyInjectAnnotations(invalidDependencyField)).thenReturn(true);
 
         InvalidElement instance = new InvalidElement();
@@ -90,7 +88,7 @@ public class FieldInjectionPostProcessorTest {
 
     @Test
     public void shouldThrowFieldInjectionException_whenDependencyResolutionFails() {
-        doReturn(ValidElement.class).when(elementContext).getType();
+        when(elementContext.getFields()).thenReturn(Set.of(dependencyField));
         when(injectAnnotationScanner.hasAnyInjectAnnotations(dependencyField)).thenReturn(true);
 
         when(dependencyResolver.resolveDependency(

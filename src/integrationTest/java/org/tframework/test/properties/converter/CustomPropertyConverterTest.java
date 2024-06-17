@@ -1,4 +1,7 @@
+/* Licensed under Apache-2.0 2024. */
 package org.tframework.test.properties.converter;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Test;
@@ -13,8 +16,6 @@ import org.tframework.core.properties.filescanners.CliArgumentPropertyFileScanne
 import org.tframework.core.utils.CliUtils;
 import org.tframework.test.commons.annotations.SetCommandLineArguments;
 import org.tframework.test.junit5.IsolatedTFrameworkTest;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SetCommandLineArguments(
         CliArgumentPropertyFileScanner.PROPERTY_FILE_ARGUMENT_KEY + CliUtils.CLI_KEY_VALUE_SEPARATOR + "custom-properties.yaml"

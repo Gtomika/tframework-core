@@ -4,7 +4,6 @@ package org.tframework.core.properties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
 import lombok.Setter;

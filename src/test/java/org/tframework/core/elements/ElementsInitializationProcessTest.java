@@ -32,8 +32,6 @@ import org.tframework.core.elements.scanner.ElementScanningResult;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.PropertiesContainerFactory;
-import org.tframework.core.properties.Property;
-import org.tframework.core.properties.SinglePropertyValue;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)

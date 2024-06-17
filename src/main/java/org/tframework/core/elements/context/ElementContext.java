@@ -101,7 +101,7 @@ public abstract class ElementContext {
         if(postProcessor != null) {
             postProcessor.postProcessInstance(this, instance);
         } else {
-            log.warn("No post-processor set for element context '{}', instance will not be post-processed.", name);
+            log.debug("No post-processor set for element context '{}', instance will not be post-processed.", name);
         }
     }
 

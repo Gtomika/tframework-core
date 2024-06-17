@@ -4,6 +4,8 @@ package org.tframework.core.elements.postprocessing;
 import java.lang.reflect.Field;
 import java.util.LinkedList;
 import java.util.List;
+
+import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectElement;
@@ -31,6 +33,7 @@ import org.tframework.core.reflection.field.FieldSetter;
  * first to be executed.
  */
 @Slf4j
+@Builder
 @Element
 @Priority(Priority.HIGHEST)
 public class FieldInjectionPostProcessor implements ElementInstancePostProcessor {

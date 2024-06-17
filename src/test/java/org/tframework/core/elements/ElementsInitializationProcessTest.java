@@ -1,7 +1,6 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.elements;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -112,18 +111,6 @@ class ElementsInitializationProcessTest {
         assertTrue(elementsContainer.hasElementContext(PropertiesContainer.class));
         assertTrue(elementsContainer.hasElementContext(ElementsContainer.class));
         assertTrue(elementsContainer.hasElementContext("importantFile")); //from CUSTOM pre-constructed elements
-    }
-
-    @Test
-    public void shouldNotInitializeElementsProcess_whenDisabledWithProperty() {
-        var properties = PropertiesContainerFactory.fromProperties(List.of(
-                new Property(ElementsInitializationProcess.ELEMENTS_INITIALIZATION_ENABLED_PROPERTY, new SinglePropertyValue("false"))
-        ));
-        var input = createDependencyInjectionInput(properties, Set.of());
-
-        var elementsContainer = elementsInitializationProcess.initialize(input, elementContextBundle);
-
-        assertEquals(0, elementsContainer.elementCount());
     }
 
     private ElementsInitializationInput createDependencyInjectionInput(

@@ -26,9 +26,8 @@ import org.tframework.core.elements.scanner.ElementMethodScanner;
 import org.tframework.core.elements.scanner.ElementScanner;
 import org.tframework.core.elements.scanner.ElementScanningResult;
 import org.tframework.core.properties.PropertiesContainer;
-import org.tframework.core.properties.SinglePropertyValue;
-import org.tframework.core.properties.converters.PropertyConvertersFactory;
-import org.tframework.core.utils.Constants;
+import org.tframework.core.properties.converters.PropertyConverter;
+import org.tframework.core.properties.converters.PropertyConverterAggregator;
 import org.tframework.core.utils.LogUtils;
 
 /**
@@ -40,18 +39,10 @@ import org.tframework.core.utils.LogUtils;
  *     <li>Initializes each element context (see {@link ElementContext#initialize()}).</li>
  * </ul>
  * The result of the process will be an {@link ElementsContainer} with unique {@link ElementContext}s.
- * <p><br>
- * The {@value ELEMENTS_INITIALIZATION_ENABLED_PROPERTY} can be set to {@code false}, which will
- * disable element initialization all together. By default, this property is treated as {@code true}, so
- * elements are initialized.
  */
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ElementsInitializationProcess {
-
-    public static final String ELEMENTS_INITIALIZATION_ENABLED_PROPERTY =
-            Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.enabled";
-    private static final SinglePropertyValue ELEMENTS_INITIALIZATION_PROPERTY_DEFAULT = new SinglePropertyValue("true");
 
     /**
      * Initializes the elements.
@@ -61,11 +52,6 @@ public class ElementsInitializationProcess {
      * @return the {@link ElementsContainer} containing the assembled {@link ElementContext}s
      */
     public ElementsContainer initialize(ElementsInitializationInput input, ElementContextBundle contextBundle) {
-        if(isElementInitializationDisabled(input.application().getPropertiesContainer())) {
-            log.info("The element initialization is disabled. No elements will be scanned, dependency injection is disabled.");
-            return ElementsContainer.empty();
-        }
-
         var elementsContainer = ElementsContainer.empty();
         input.application().setElementsContainer(elementsContainer);
 
@@ -83,6 +69,8 @@ public class ElementsInitializationProcess {
         );
         log.info("Successfully assembled a total of {} element contexts", elementsContainer.elementCount());
 
+        addPropertyConverters(input.application().getPropertiesContainer(), elementsContainer);
+
         filterElementContext(elementsContainer, input.application());
         log.info("A total of {} element contexts survived after filtering", elementsContainer.elementCount());
 
@@ -95,14 +83,6 @@ public class ElementsInitializationProcess {
         log.info("Successfully initialized {} element contexts", elementsContainer.elementCount());
 
         return elementsContainer;
-    }
-
-    private boolean isElementInitializationDisabled(PropertiesContainer properties) {
-        var booleanPropertyConverter = PropertyConvertersFactory.getConverterByType(Boolean.class);
-        var elementInitializationEnabled = properties.getPropertyValueObject(
-                ELEMENTS_INITIALIZATION_ENABLED_PROPERTY, ELEMENTS_INITIALIZATION_PROPERTY_DEFAULT
-        );
-        return !booleanPropertyConverter.convert(elementInitializationEnabled);
     }
 
     /**
@@ -199,6 +179,14 @@ public class ElementsInitializationProcess {
                 elementsContainer.addElementContext(preConstructedContext);
             }
         });
+    }
+
+    @SuppressWarnings("unchecked")
+    private void addPropertyConverters(PropertiesContainer propertiesContainer, ElementsContainer elementsContainer) {
+        var propertyConverters = (List<PropertyConverter<?>>) (List<?>) ElementUtils.initAndGetElementsEagerly(elementsContainer, PropertyConverter.class);
+        log.debug("Found {} property converters: {}", propertyConverters.size(), LogUtils.objectClassNames(propertyConverters));
+        var propertyConverterAggregator = PropertyConverterAggregator.usingConverters(propertyConverters);
+        propertiesContainer.setPropertyConverterAggregator(propertyConverterAggregator);
     }
 
     private void filterElementContext(ElementsContainer elementsContainer, Application application) {

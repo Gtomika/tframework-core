@@ -26,7 +26,7 @@ class PropertiesContainerTest {
 
     @BeforeEach
     public void setUp() {
-        container = PropertiesContainerFactory.fromProperties(List.of(
+        container = new PropertiesContainer(List.of(
                 new Property("p1", new SinglePropertyValue("v1")),
                 new Property("p2", new ListPropertyValue(List.of("v2-1", "v2-2"))
         )), aggregator);

@@ -6,8 +6,8 @@ import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;
+import org.tframework.core.properties.converters.BooleanPropertyConverter;
 import org.tframework.core.properties.converters.PropertyConverter;
-import org.tframework.core.properties.converters.PropertyConvertersFactory;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.classes.ClassFilter;
 import org.tframework.core.reflection.classes.PackageClassScanner;
@@ -48,7 +48,7 @@ public class InternalElementClassScanner extends ElementClassScanner {
         this.classScanner = classScanner;
         this.classScanner.setPackageNames(Set.of(TFRAMEWORK_INTERNAL_PACKAGE));
         this.classScanner.setRejectedPackages(Set.of(TFRAMEWORK_REJECTED_INTERNAL_PACKAGE));
-        this.propertyConverter = PropertyConvertersFactory.getConverterByType(Boolean.class);
+        this.propertyConverter = new BooleanPropertyConverter();
     }
 
     @Override

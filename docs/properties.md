@@ -153,7 +153,7 @@ The source of the properties container can be seen here: [PropertiesContainer](.
 
 Properties are always stored as strings, or list of strings, in case of multi-valued properties. However, we often need to 
 inject these properties into objects of other types: most commonly integers or booleans. The framework supports automatic
-conversion of properties to some other types. There are:
+conversion of properties to some other types. These are:
 
 - `String` (no conversion needed)
 - `List<String>`
@@ -191,9 +191,9 @@ public class CoolElement {
 }
 ```
 
-A current **limitation** of the framework is that not all types are supported for automatic conversion. Also, it is 
-not possible to add a custom converter at the moment. However, you can always inject the property as a string, and
-convert it manually.
+You can define your own property converters, if needed. This is done by implementing the `PropertyConverter` interface, 
+and marking your class as an element. The framework will automatically pick up and use your converter. Of course, it is 
+also possible to just inject the property as string, and do the conversion manually.
 
 > :gear: **Technical note**: See the [property converter package](../src/main/java/org/tframework/core/properties/converters)
 

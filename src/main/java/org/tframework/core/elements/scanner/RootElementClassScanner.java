@@ -9,8 +9,8 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.properties.SinglePropertyValue;
+import org.tframework.core.properties.converters.BooleanPropertyConverter;
 import org.tframework.core.properties.converters.PropertyConverter;
-import org.tframework.core.properties.converters.PropertyConvertersFactory;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.classes.ClassFilter;
 import org.tframework.core.reflection.classes.NestedClassScanner;
@@ -59,7 +59,7 @@ public class RootElementClassScanner extends ElementClassScanner {
         super(classFilter, annotationScanner, propertiesContainer);
         this.packageClassScanner = packageClassScanner;
         this.rootClassScanner = rootClassScanner;
-        this.propertyConverter = PropertyConvertersFactory.getConverterByType(Boolean.class);
+        this.propertyConverter = new BooleanPropertyConverter();
         this.rootClass = rootClass;
     }
 

@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.tframework.core.elements.annotations.Element;
 
+@Element
 public class SimpleFieldScanner implements FieldScanner {
 
     @Override

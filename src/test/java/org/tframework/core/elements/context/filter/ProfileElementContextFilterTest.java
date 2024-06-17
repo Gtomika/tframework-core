@@ -6,9 +6,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.tframework.core.Application;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.filter.annotation.ForbiddenProfile;
 import org.tframework.core.elements.context.filter.annotation.RequiredProfile;
@@ -42,6 +42,7 @@ public class ProfileElementContextFilterTest {
 
     @BeforeEach
     public void setUp() {
+        filter = new ProfileElementContextFilter(annotationScanner);
         when(elementSource.annotatedSource()).thenReturn(ELEMENT_CLASS);
         when(elementContext.getSource()).thenReturn(elementSource);
         when(elementContext.getName()).thenReturn("test element");
@@ -49,65 +50,63 @@ public class ProfileElementContextFilterTest {
 
     @Test
     public void shouldKeepElement_whenNoRequiredAndForbiddenProfiles() {
-        initFilterWithProfiles();
+        var app = applicationWithProfiles(Set.of("a", "b"));
         mockScannerToReturnRequiredProfilesAnnotation();
         mockScannerToReturnForbiddenProfilesAnnotation();
 
-        assertFalse(filter.discardElementContext(elementContext));
+        assertFalse(filter.discardElementContext(elementContext, app));
     }
 
     @Test
     public void shouldKeepElement_whenRequiredProfiles_arePresent() {
-        initFilterWithProfiles("a", "b");
+        var app = applicationWithProfiles(Set.of("a", "b"));
         mockScannerToReturnRequiredProfilesAnnotation("a", "b");
         mockScannerToReturnForbiddenProfilesAnnotation();
 
-        assertFalse(filter.discardElementContext(elementContext));
+        assertFalse(filter.discardElementContext(elementContext, app));
     }
 
     @Test
     public void shouldKeepElement_whenForbiddenProfiles_areAbsent() {
-        initFilterWithProfiles();
+        var app = applicationWithProfiles(Set.of());
         mockScannerToReturnRequiredProfilesAnnotation();
         mockScannerToReturnForbiddenProfilesAnnotation("a", "b");
 
-        assertFalse(filter.discardElementContext(elementContext));
+        assertFalse(filter.discardElementContext(elementContext, app));
     }
 
     @Test
     public void shouldDiscardElement_whenRequiredProfiles_areNotPresent() {
-        initFilterWithProfiles("a");
+        var app = applicationWithProfiles(Set.of("a"));
         mockScannerToReturnRequiredProfilesAnnotation("a", "b");
         mockScannerToReturnForbiddenProfilesAnnotation();
 
-        assertTrue(filter.discardElementContext(elementContext));
+        assertTrue(filter.discardElementContext(elementContext, app));
     }
 
     @Test
     public void shouldDiscardElement_whenForbiddenProfiles_arePresent() {
-        initFilterWithProfiles("a", "b");
+        var app = applicationWithProfiles(Set.of("a", "b"));
         mockScannerToReturnRequiredProfilesAnnotation();
         mockScannerToReturnForbiddenProfilesAnnotation("b");
 
-        assertTrue(filter.discardElementContext(elementContext));
+        assertTrue(filter.discardElementContext(elementContext, app));
     }
 
     @Test
     public void shouldDiscardElement_whenForbiddenProfiles_arePresent_andRequiredProfiles_areNotPresent() {
-        initFilterWithProfiles("a", "b");
+        var app = applicationWithProfiles(Set.of("a", "b"));
         mockScannerToReturnRequiredProfilesAnnotation("c");
         mockScannerToReturnForbiddenProfilesAnnotation("b");
 
-        assertTrue(filter.discardElementContext(elementContext));
+        assertTrue(filter.discardElementContext(elementContext, app));
     }
 
-    private void initFilterWithProfiles(String... profiles) {
-        filter = new ProfileElementContextFilter(
-                ProfilesContainer.fromProfiles(
-                        Arrays.stream(profiles).collect(Collectors.toSet())
-                ),
-                annotationScanner
-        );
+    private Application applicationWithProfiles(Set<String> profiles) {
+       var container = ProfilesContainer.fromProfiles(profiles);
+       return Application.builder()
+               .profilesContainer(container)
+               .build();
     }
 
     private void mockScannerToReturnRequiredProfilesAnnotation(String... profiles) {

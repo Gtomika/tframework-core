@@ -41,6 +41,7 @@ public class ElementsContainer implements Iterable<ElementContext> {
 
     /**
      * Returns the {@link ElementContext} of the element with the given name.
+     *
      * @param name Name of the requested element, must not be null.
      * @throws ElementNotFoundException If no element with the given name is found.
      */
@@ -54,10 +55,11 @@ public class ElementsContainer implements Iterable<ElementContext> {
     /**
      * Returns the {@link ElementContext} of the element with the given type.
      * See {@link ElementByTypeResolver#getElementByType(List, Class)} for the rules on how this type is resolved.
+     *
      * @param elementType Type of the requested element, must not be null.
-     * @throws ElementNotFoundException If no element is found which is assignable to the required type.
+     * @throws ElementNotFoundException      If no element is found which is assignable to the required type.
      * @throws AmbiguousElementTypeException If there are multiple candidate elements that can be assigned to
-     *            the type, and it cannot be determined which one to choose.
+     *                                       the type, and it cannot be determined which one to choose.
      */
     public ElementContext getElementContext(@NonNull Class<?> elementType) {
         return elementByTypeResolver.getElementByType(elementContexts, elementType);
@@ -65,6 +67,7 @@ public class ElementsContainer implements Iterable<ElementContext> {
 
     /**
      * Checks if the element with the given name is stored in this container.
+     *
      * @param name Name of the element to check, must not be null.
      */
     public boolean hasElementContext(@NonNull String name) {
@@ -75,11 +78,20 @@ public class ElementsContainer implements Iterable<ElementContext> {
     /**
      * Checks if the element with the given type is stored in this container.
      * See {@link ElementByTypeResolver#hasElementByType(List, Class)} for the rules on how this type is resolved.
+     *
      * @param elementType Type of the element to check, must not be null.
      * @return True only if there is at least element that is assignable to the type.
      */
     public boolean hasElementContext(@NonNull Class<?> elementType) {
         return elementByTypeResolver.hasElementByType(elementContexts, elementType);
+    }
+
+    /**
+     * Returns all elements stored in this container that are assignable to the given type.
+     * @param elementType Type of the elements to return, must not be null.
+     */
+    public List<ElementContext> getElementContextsWithType(@NonNull Class<?> elementType) {
+        return elementByTypeResolver.filterElementsWithAssignableType(elementContexts, elementType);
     }
 
     /**
@@ -91,7 +103,7 @@ public class ElementsContainer implements Iterable<ElementContext> {
      */
     @TFrameworkInternal
     public void addElementContext(@NonNull ElementContext elementContext) throws ElementNameNotUniqueException {
-        if(initialized) {
+        if (initialized) {
             throw new IllegalStateException("New element context cannot be added after the container is initialized.");
         }
         try {
@@ -105,13 +117,14 @@ public class ElementsContainer implements Iterable<ElementContext> {
     /**
      * Adds the given {@link ElementContext} to the container. If the container already has a context with this name,
      * it will be overridden.
+     *
      * @param elementContext The element context to add, must not be null.
      * @return True if there was an override, false if there was no element context with this name.
      * @throws IllegalStateException If the container is already initialized.
      */
     @TFrameworkInternal
     public boolean overrideElementContext(@NonNull ElementContext elementContext) {
-        if(initialized) {
+        if (initialized) {
             throw new IllegalStateException("Element contexts cannot be overridden after the container is initialized.");
         }
         try {
@@ -131,12 +144,13 @@ public class ElementsContainer implements Iterable<ElementContext> {
 
     /**
      * Removes the given {@link ElementContext} from the container.
+     *
      * @param elementContext The element context to remove, must not be null.
      * @throws IllegalStateException If the container is already initialized.
      */
     @TFrameworkInternal
     public void removeElementContext(@NonNull ElementContext elementContext) {
-        if(initialized) {
+        if (initialized) {
             throw new IllegalStateException("Element contexts cannot be removed after the container is initialized.");
         }
         elementContexts.remove(elementContext);
@@ -155,9 +169,18 @@ public class ElementsContainer implements Iterable<ElementContext> {
      */
     @TFrameworkInternal
     public void initializeElementContexts() {
-        if(initialized) {
+        if (initialized) {
             throw new IllegalStateException("This container has already been initialized");
         }
+        elementContexts.forEach(ElementContext::initialize);
+    }
+
+    /**
+     * Similar to {@link #initializeElementContexts()}, but allows the caller to provide the
+     * element contexts to initialize instead of applying to all contexts.
+     * @param elementContexts The element contexts to initialize, must not be null.
+     */
+    public void initializeElementContexts(@NonNull List<ElementContext> elementContexts) {
         elementContexts.forEach(ElementContext::initialize);
     }
 

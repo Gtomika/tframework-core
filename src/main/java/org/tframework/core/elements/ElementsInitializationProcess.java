@@ -15,38 +15,34 @@ import org.tframework.core.elements.context.PreConstructedElementContext;
 import org.tframework.core.elements.context.assembler.ClassElementContextAssembler;
 import org.tframework.core.elements.context.assembler.ElementContextAssembler;
 import org.tframework.core.elements.context.assembler.MethodElementContextAssembler;
+import org.tframework.core.elements.context.filter.ElementContextFilter;
 import org.tframework.core.elements.context.filter.ElementContextFilterAggregator;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
+import org.tframework.core.elements.postprocessing.ElementInstancePostProcessor;
+import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorAggregator;
 import org.tframework.core.elements.scanner.ElementClassScanner;
 import org.tframework.core.elements.scanner.ElementContextBundle;
 import org.tframework.core.elements.scanner.ElementMethodScanner;
 import org.tframework.core.elements.scanner.ElementScanner;
 import org.tframework.core.elements.scanner.ElementScanningResult;
 import org.tframework.core.properties.PropertiesContainer;
-import org.tframework.core.properties.SinglePropertyValue;
-import org.tframework.core.properties.converters.PropertyConvertersFactory;
-import org.tframework.core.utils.Constants;
+import org.tframework.core.properties.converters.PropertyConverter;
+import org.tframework.core.properties.converters.PropertyConverterAggregator;
+import org.tframework.core.utils.LogUtils;
 
 /**
  * This class is responsible for the elements initialization process. This process consists of the following steps:
  * <ul>
  *     <li>Scanning for elements (see {@link ElementScanner}s).</li>
  *     <li>Assembling {@link ElementContext}s (see {@link ElementContextAssembler}s).</li>
+ *     <li>Filtering out elements using {@link ElementContextFilter}s.</li>
  *     <li>Initializes each element context (see {@link ElementContext#initialize()}).</li>
  * </ul>
  * The result of the process will be an {@link ElementsContainer} with unique {@link ElementContext}s.
- * <p><br>
- * The {@value ELEMENTS_INITIALIZATION_ENABLED_PROPERTY} can be set to {@code false}, which will
- * disable element initialization all together. By default, this property is treated as {@code true}, so
- * elements are initialized.
  */
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class ElementsInitializationProcess {
-
-    public static final String ELEMENTS_INITIALIZATION_ENABLED_PROPERTY =
-            Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.enabled";
-    private static final SinglePropertyValue ELEMENTS_INITIALIZATION_PROPERTY_DEFAULT = new SinglePropertyValue("true");
 
     /**
      * Initializes the elements.
@@ -56,36 +52,37 @@ public class ElementsInitializationProcess {
      * @return the {@link ElementsContainer} containing the assembled {@link ElementContext}s
      */
     public ElementsContainer initialize(ElementsInitializationInput input, ElementContextBundle contextBundle) {
-        if(isElementInitializationDisabled(input.application().getPropertiesContainer())) {
-            log.info("The element initialization is disabled. No elements will be scanned, dependency injection is disabled.");
-            return ElementsContainer.empty();
-        }
-
         var elementsContainer = ElementsContainer.empty();
+        input.application().setElementsContainer(elementsContainer);
+
         DependencyResolutionInput dependencyResolutionInput = DependencyResolutionInput.builder()
                 .elementsContainer(elementsContainer)
                 .propertiesContainer(input.application().getPropertiesContainer())
                 .build();
 
         assembleElementContexts(elementsContainer, contextBundle, dependencyResolutionInput);
-        addPreConstructedElementContexts(elementsContainer, input.application(), input.preConstructedElementData());
+        addPreConstructedElementContexts(
+                elementsContainer,
+                input.application(),
+                input.preConstructedElementData(),
+                dependencyResolutionInput
+        );
         log.info("Successfully assembled a total of {} element contexts", elementsContainer.elementCount());
 
-        filterElementContext(elementsContainer, contextBundle.elementContextFilterAggregator());
+        addPropertyConverters(input.application().getPropertiesContainer(), elementsContainer);
+
+        filterElementContext(elementsContainer, input.application());
         log.info("A total of {} element contexts survived after filtering", elementsContainer.elementCount());
+
+        var postProcessors = ElementUtils.initAndGetElementsEagerly(elementsContainer, ElementInstancePostProcessor.class);
+        log.debug("Found {} post-processors to apply to element instances: {}", postProcessors.size(), LogUtils.objectClassNames(postProcessors));
+        var postProcessorAggregator = ElementInstancePostProcessorAggregator.usingPostProcessors(postProcessors);
+        elementsContainer.forEach(context -> context.setPostProcessor(postProcessorAggregator));
 
         elementsContainer.initializeElementContexts();
         log.info("Successfully initialized {} element contexts", elementsContainer.elementCount());
 
         return elementsContainer;
-    }
-
-    private boolean isElementInitializationDisabled(PropertiesContainer properties) {
-        var booleanPropertyConverter = PropertyConvertersFactory.getConverterByType(Boolean.class);
-        var elementInitializationEnabled = properties.getPropertyValueObject(
-                ELEMENTS_INITIALIZATION_ENABLED_PROPERTY, ELEMENTS_INITIALIZATION_PROPERTY_DEFAULT
-        );
-        return !booleanPropertyConverter.convert(elementInitializationEnabled);
     }
 
     /**
@@ -162,13 +159,15 @@ public class ElementsInitializationProcess {
     private void addPreConstructedElementContexts(
             ElementsContainer elementsContainer,
             Application application,
-            Set<PreConstructedElementData> preConstructedElementData
+            Set<PreConstructedElementData> preConstructedElementData,
+            DependencyResolutionInput dependencyResolutionInput
     ) {
         //certain objects are added by default as pre-constructed elements
         elementsContainer.addElementContext(PreConstructedElementContext.of(elementsContainer));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application.getProfilesContainer()));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application.getPropertiesContainer()));
+        elementsContainer.addElementContext(PreConstructedElementContext.of(dependencyResolutionInput));
 
         //custom pre-constructed elements may be provided as well
         preConstructedElementData.forEach(data -> {
@@ -182,11 +181,23 @@ public class ElementsInitializationProcess {
         });
     }
 
-    private void filterElementContext(ElementsContainer elementsContainer, ElementContextFilterAggregator filterAggregator) {
+    @SuppressWarnings("unchecked")
+    private void addPropertyConverters(PropertiesContainer propertiesContainer, ElementsContainer elementsContainer) {
+        var propertyConverters = (List<PropertyConverter<?>>) (List<?>) ElementUtils.initAndGetElementsEagerly(elementsContainer, PropertyConverter.class);
+        log.debug("Found {} property converters: {}", propertyConverters.size(), LogUtils.objectClassNames(propertyConverters));
+        var propertyConverterAggregator = PropertyConverterAggregator.usingConverters(propertyConverters);
+        propertiesContainer.setPropertyConverterAggregator(propertyConverterAggregator);
+    }
+
+    private void filterElementContext(ElementsContainer elementsContainer, Application application) {
+        var filters = ElementUtils.initAndGetElementsEagerly(application.getElementsContainer(), ElementContextFilter.class);
+        log.debug("Found {} filters to apply to element contexts: {}", filters.size(), LogUtils.objectClassNames(filters));
+        var filterAggregator = ElementContextFilterAggregator.usingFilters(filters);
+
         List<ElementContext> discardedContexts = new LinkedList<>();
 
         elementsContainer.forEach(elementContext -> {
-            if(filterAggregator.discardElementContext(elementContext)) {
+            if(filterAggregator.discardElementContext(elementContext, application)) {
                 discardedContexts.add(elementContext);
                 log.debug("The element context '{}' is filtered out, and marked for discarding", elementContext.getName());
             } else {

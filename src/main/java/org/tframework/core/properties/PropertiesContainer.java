@@ -4,10 +4,9 @@ package org.tframework.core.properties;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.PreConstructedElement;
 import org.tframework.core.properties.converters.PropertyConversionException;
@@ -19,11 +18,29 @@ import org.tframework.core.properties.converters.PropertyConverterAggregator;
 @Slf4j
 @EqualsAndHashCode
 @PreConstructedElement
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public final class PropertiesContainer {
 
     private final List<Property> properties;
-    private final PropertyConverterAggregator propertyConverterAggregator;
+
+    @Setter
+    private PropertyConverterAggregator propertyConverterAggregator;
+
+    /**
+     * Creates a container from the specified properties. The {@link PropertyConverterAggregator} will be set
+     * later, when the converter elements are available.
+     */
+    public PropertiesContainer(List<Property> properties) {
+        this.properties = properties;
+    }
+
+    /**
+     * Creates a container from the specified properties using a given {@link PropertyConverterAggregator}.
+     * This is mainly used for testing purposes and copying.
+     */
+    public PropertiesContainer(List<Property> properties, PropertyConverterAggregator propertyConverterAggregator) {
+        this.properties = properties;
+        this.propertyConverterAggregator = propertyConverterAggregator;
+    }
 
     /**
      * Gets the {@link PropertyValue} of a property.
@@ -129,7 +146,7 @@ public final class PropertiesContainer {
                 mergedProperties.add(property);
             }
         }
-        return PropertiesContainerFactory.fromProperties(mergedProperties, propertyConverterAggregator);
+        return new PropertiesContainer(mergedProperties, propertyConverterAggregator);
     }
 
     /**

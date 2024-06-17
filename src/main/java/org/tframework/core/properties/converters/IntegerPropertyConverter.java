@@ -1,6 +1,7 @@
 /* Licensed under Apache-2.0 2024. */
 package org.tframework.core.properties.converters;
 
+import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.PropertyValue;
 import org.tframework.core.properties.SinglePropertyValue;
@@ -9,6 +10,7 @@ import org.tframework.core.properties.SinglePropertyValue;
  * A {@link PropertyConverter} that converts to integer, as specified in
  * {@link Integer#parseInt(String)}.
  */
+@Element
 public class IntegerPropertyConverter implements PropertyConverter<Integer> {
 
     @Override

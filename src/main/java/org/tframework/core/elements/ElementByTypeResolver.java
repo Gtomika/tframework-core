@@ -100,7 +100,7 @@ public class ElementByTypeResolver {
                 .toList();
     }
 
-    private List<ElementContext> filterElementsWithAssignableType(List<ElementContext> contexts, Class<?> requiredType) {
+    public List<ElementContext> filterElementsWithAssignableType(List<ElementContext> contexts, Class<?> requiredType) {
         return contexts.stream()
                 .filter(context -> requiredType.isAssignableFrom(context.getType()))
                 .toList();

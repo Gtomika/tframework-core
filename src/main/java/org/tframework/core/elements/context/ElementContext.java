@@ -3,6 +3,7 @@ package org.tframework.core.elements.context;
 
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.ElementUtils;
@@ -13,12 +14,11 @@ import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorAggregator;
-import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorFactory;
-import org.tframework.core.elements.postprocessing.PostProcessingInput;
 
 /**
  * A wrapper for an element, that keeps track of all the data of this element, and
- * all currently known instances as well.
+ * all currently known instances as well. It handles element lifecycle, and is responsible
+ * for creating new instances of the element.
  */
 @Slf4j
 @Getter
@@ -29,7 +29,9 @@ public abstract class ElementContext {
     protected final ElementScope scope;
     protected final ElementSource source;
     protected final ElementAssembler elementAssembler;
-    private final ElementInstancePostProcessorAggregator postProcessor;
+
+    @Setter
+    private ElementInstancePostProcessorAggregator postProcessor;
 
     /**
      * Creates a new element context. To activate this context, {@link #initialize()} must also be called.
@@ -52,18 +54,10 @@ public abstract class ElementContext {
         this.scope = scope;
         this.source = source;
         this.elementAssembler = initializeElementAssembler(dependencyResolutionInput);
-        this.postProcessor = initializePostProcessor(dependencyResolutionInput);
     }
 
     private ElementAssembler initializeElementAssembler(DependencyResolutionInput dependencyResolutionInput) {
         return ElementAssemblersFactory.createElementAssembler(this, dependencyResolutionInput);
-    }
-
-    private ElementInstancePostProcessorAggregator initializePostProcessor(DependencyResolutionInput dependencyResolutionInput) {
-        var postProcessingInput = PostProcessingInput.builder()
-                .dependencyResolutionInput(dependencyResolutionInput)
-                .build();
-        return ElementInstancePostProcessorFactory.createDefaultAggregator(postProcessingInput);
     }
 
     /**
@@ -104,7 +98,11 @@ public abstract class ElementContext {
     protected abstract InstanceRequest requestInstanceInternal(ElementDependencyGraph dependencyGraph);
 
     protected void postProcessInstance(Object instance) {
-        postProcessor.postProcessInstance(this, instance);
+        if(postProcessor != null) {
+            postProcessor.postProcessInstance(this, instance);
+        } else {
+            log.debug("No post-processor set for element context '{}', instance will not be post-processed.", name);
+        }
     }
 
     @Override

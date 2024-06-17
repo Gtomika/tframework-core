@@ -3,8 +3,7 @@ package org.tframework.core.properties.converters;
 
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.properties.ListPropertyValue;
 import org.tframework.core.properties.PropertyValue;
 import org.tframework.core.properties.SinglePropertyValue;
@@ -14,7 +13,7 @@ import org.tframework.core.properties.SinglePropertyValue;
  * Lists with other types are not supported. This converter will work for even single valued properties,
  * by create a collection with a single element. The returned list is mutable.
  */
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
+@Element
 public class StringListPropertyConverter implements PropertyConverter<List<String>> {
 
     private static final List<String> STRING_LIST = List.of();

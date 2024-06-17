@@ -3,9 +3,10 @@ package org.tframework.core.elements.context.filter;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
-import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.Application;
+import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.context.filter.annotation.ForbiddenProfile;
 import org.tframework.core.elements.context.filter.annotation.RequiredProfile;
@@ -21,19 +22,22 @@ import org.tframework.core.reflection.annotations.AnnotationScanner;
  * </ul>
  */
 @Slf4j
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
+@Element
+@RequiredArgsConstructor
 public class ProfileElementContextFilter implements ElementContextFilter {
 
-    private final ProfilesContainer propertiesContainer;
     private final AnnotationScanner annotationScanner;
 
     @Override
-    public boolean discardElementContext(ElementContext elementContext) {
-        return !allRequiredProfilesPresent(elementContext)
-                || !allForbiddenProfilesAbsent(elementContext);
+    public boolean discardElementContext(ElementContext elementContext, Application application) {
+        return !allRequiredProfilesPresent(elementContext, application.getProfilesContainer())
+                || !allForbiddenProfilesAbsent(elementContext, application.getProfilesContainer());
     }
 
-    private boolean allRequiredProfilesPresent(ElementContext elementContext) {
+    private boolean allRequiredProfilesPresent(
+            ElementContext elementContext,
+            ProfilesContainer profilesContainer
+    ) {
         var annotatedElementSource = elementContext.getSource().annotatedSource();
         var requiredProfiles = annotationScanner.scan(annotatedElementSource, RequiredProfile.class)
                 .stream()
@@ -46,12 +50,16 @@ public class ProfileElementContextFilter implements ElementContextFilter {
         } else {
             log.debug("Element context '{}' requires the following profiles: {}", elementContext.getName(), requiredProfiles);
             return requiredProfiles.stream()
-                    .allMatch(requiredProfile -> isRequiredProfilePresent(requiredProfile, elementContext));
+                    .allMatch(requiredProfile -> isRequiredProfilePresent(requiredProfile, elementContext, profilesContainer));
         }
     }
 
-    private boolean isRequiredProfilePresent(String requiredProfile, ElementContext elementContext) {
-        if(propertiesContainer.isProfileSet(requiredProfile)) {
+    private boolean isRequiredProfilePresent(
+            String requiredProfile,
+            ElementContext elementContext,
+            ProfilesContainer profilesContainer
+    ) {
+        if(profilesContainer.isProfileSet(requiredProfile)) {
             return true;
         } else {
             log.debug("The element context '{}' requires profile '{}', but it isn't present",
@@ -60,7 +68,10 @@ public class ProfileElementContextFilter implements ElementContextFilter {
         }
     }
 
-    private boolean allForbiddenProfilesAbsent(ElementContext elementContext) {
+    private boolean allForbiddenProfilesAbsent(
+            ElementContext elementContext,
+            ProfilesContainer profilesContainer
+    ) {
         var annotatedElementSource = elementContext.getSource().annotatedSource();
         var forbiddenProfiles = annotationScanner.scan(annotatedElementSource, ForbiddenProfile.class)
                 .stream()
@@ -73,12 +84,16 @@ public class ProfileElementContextFilter implements ElementContextFilter {
         } else {
             log.debug("Element context '{}' forbids the following profiles: {}", elementContext.getName(), forbiddenProfiles);
             return forbiddenProfiles.stream()
-                    .allMatch(forbiddenProfile -> isForbiddenProfileAbsent(forbiddenProfile, elementContext));
+                    .allMatch(forbiddenProfile -> isForbiddenProfileAbsent(forbiddenProfile, elementContext, profilesContainer));
         }
     }
 
-    private boolean isForbiddenProfileAbsent(String forbiddenProfile, ElementContext elementContext) {
-        if(propertiesContainer.isProfileSet(forbiddenProfile)) {
+    private boolean isForbiddenProfileAbsent(
+            String forbiddenProfile,
+            ElementContext elementContext,
+            ProfilesContainer profilesContainer
+    ) {
+        if(profilesContainer.isProfileSet(forbiddenProfile)) {
             log.debug("The element context '{}' requires profile '{}' to be absent, but it is present",
                     elementContext.getName(), forbiddenProfile);
             return false;

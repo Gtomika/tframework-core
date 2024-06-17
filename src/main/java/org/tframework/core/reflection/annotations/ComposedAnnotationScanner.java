@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.tframework.core.elements.annotations.Element;
 
 /**
  * The composed annotation scanner implements 'extended annotation detection', which is more elaborate than
@@ -29,20 +31,13 @@ import lombok.Getter;
  * @see AnnotationMatcher
  */
 @Getter
+@Element
+@RequiredArgsConstructor
 public class ComposedAnnotationScanner implements AnnotationScanner {
 
     private static final Set<String> UNSUPPORTED_PACKAGES = Set.of("java.lang.annotation");
 
     private final AnnotationMatcher annotationMatcher;
-
-    /**
-     * Creates a composed annotation scanner that uses the provided {@link AnnotationMatcher}.
-     * @param annotationMatcher {@link AnnotationMatcher} used to match the found
-     *                          annotation and the one to scan for.
-     */
-    ComposedAnnotationScanner(AnnotationMatcher annotationMatcher) {
-        this.annotationMatcher = annotationMatcher;
-    }
 
     /**
      * Scans the class (provided at construction time) for composed annotations.

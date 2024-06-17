@@ -3,8 +3,10 @@ package org.tframework.core.reflection.field;
 
 import java.lang.reflect.Field;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.annotations.Element;
 
 @Slf4j
+@Element
 public class SimpleFieldSetter implements FieldSetter {
 
     @Override

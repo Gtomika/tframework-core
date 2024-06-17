@@ -5,7 +5,6 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.tframework.core.elements.context.assembler.ElementContextAssemblersFactory;
-import org.tframework.core.elements.context.filter.ElementContextFilterFactory;
 import org.tframework.core.elements.scanner.ElementContextBundle;
 import org.tframework.core.elements.scanner.ElementScannersFactory;
 
@@ -30,14 +29,12 @@ public final class ElementsInitializationProcessFactory {
         var methodElementScanners = ElementScannersFactory.createDefaultElementMethodScanners(input);
         var classContextAssembler = ElementContextAssemblersFactory.createDefaultClassElementContextAssembler();
         var methodContextAssembler = ElementContextAssemblersFactory.createDefaultMethodElementContextAssembler();
-        var filterAggregator = ElementContextFilterFactory.createDefaultElementContextFilterAggregator(input);
 
         return ElementContextBundle.builder()
                 .elementClassScanners(classElementScanners)
                 .elementMethodScanners(methodElementScanners)
                 .classElementContextAssembler(classContextAssembler)
                 .methodElementContextAssembler(methodContextAssembler)
-                .elementContextFilterAggregator(filterAggregator)
                 .build();
     }
 

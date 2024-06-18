@@ -25,6 +25,11 @@ import org.tframework.core.utils.LogUtils;
 @RequiredArgsConstructor
 public class SubscribeElementPostProcessor implements ElementInstancePostProcessor {
 
+    static final String METHOD_IS_NOT_PUBLIC_ERROR = "method is not public";
+    static final String METHOD_IS_STATIC_ERROR = "method is static";
+    static final String METHOD_IS_ABSTRACT_ERROR = "method is abstract";
+    static final String METHOD_DOES_NOT_HAVE_EXACTLY_ONE_PARAMETER_ERROR = "method does not have exactly one parameter";
+
     private final AnnotationScanner annotationScanner;
     private final MethodFilter methodFilter;
     private final MethodInvoker methodInvoker;
@@ -50,16 +55,16 @@ public class SubscribeElementPostProcessor implements ElementInstancePostProcess
         List<String> problems = new LinkedList<>();
 
         if(!methodFilter.isPublic(method)) {
-            problems.add("method is not public");
+            problems.add(METHOD_IS_NOT_PUBLIC_ERROR);
         }
         if(methodFilter.isStatic(method)) {
-            problems.add("method is static");
+            problems.add(METHOD_IS_STATIC_ERROR);
         }
         if(methodFilter.isAbstract(method)) {
-            problems.add("method is abstract");
+            problems.add(METHOD_IS_ABSTRACT_ERROR);
         }
         if(!methodFilter.hasExactlyOneParameter(method)) {
-            problems.add("method does not have exactly one parameter");
+            problems.add(METHOD_DOES_NOT_HAVE_EXACTLY_ONE_PARAMETER_ERROR);
         }
 
         if(!problems.isEmpty()) {

@@ -53,6 +53,21 @@ public class ElementsContainer implements Iterable<ElementContext> {
     }
 
     /**
+     * Returns the element with the given name. See {@link #getElementContext(String)} for details.
+     * This method extracts the instance from the context and performs a cast.
+     * @param name The element name, must not be null.
+     * @param elementType The type of the element, must not be null.
+     * @throws ElementNotFoundException If no element is found with the given name.
+     * @throws ClassCastException If the element is not of the given type.
+     * @return The element instance.
+     * @param <T> Type of the element.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getElement(@NonNull String name, @NonNull Class<T> elementType) {
+        return (T) getElementContext(name).requestInstance();
+    }
+
+    /**
      * Returns the {@link ElementContext} of the element with the given type.
      * See {@link ElementByTypeResolver#getElementByType(List, Class)} for the rules on how this type is resolved.
      *
@@ -63,6 +78,21 @@ public class ElementsContainer implements Iterable<ElementContext> {
      */
     public ElementContext getElementContext(@NonNull Class<?> elementType) {
         return elementByTypeResolver.getElementByType(elementContexts, elementType);
+    }
+
+    /**
+     * Returns the element with the given type. Please see {@link #getElementContext(Class)} for details.
+     * This method extracts the instance from the context and performs a cast.
+     * @param elementType Type of the requested element, must not be null.
+     * @throws ElementNotFoundException      If no element is found which is assignable to the required type.
+     * @throws AmbiguousElementTypeException If there are multiple candidate elements that can be assigned to
+     *                                       the type, and it cannot be determined which one to choose.
+     * @return The element instance.
+     * @param <T> Type of the element.
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getElement(@NonNull Class<T> elementType) {
+        return (T) getElementContext(elementType).requestInstance();
     }
 
     /**

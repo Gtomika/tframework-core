@@ -20,7 +20,7 @@ public class AsyncVirtualEventPublisher implements EventPublisher {
 
     private final ExecutorService executorService;
 
-    AsyncVirtualEventPublisher() {
+    public AsyncVirtualEventPublisher() {
         this.executorService = Executors.newVirtualThreadPerTaskExecutor();
     }
 

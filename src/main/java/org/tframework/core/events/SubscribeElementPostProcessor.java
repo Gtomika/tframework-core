@@ -11,8 +11,7 @@ import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.postprocessing.ElementInstancePostProcessor;
 import org.tframework.core.events.annotations.Subscribe;
-import org.tframework.core.events.exception.ElementPublishingException;
-import org.tframework.core.events.exception.ElementSubscriptionException;
+import org.tframework.core.events.exception.EventSubscriptionException;
 import org.tframework.core.reflection.AnnotationFilteringResult;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.methods.MethodFilter;
@@ -20,6 +19,10 @@ import org.tframework.core.reflection.methods.MethodInvocationException;
 import org.tframework.core.reflection.methods.MethodInvoker;
 import org.tframework.core.utils.LogUtils;
 
+/**
+ * This {@link ElementInstancePostProcessor} is responsible for checking each method of an element instance for the
+ * {@link Subscribe} annotation and subscribing to the topics specified in the annotation.
+ */
 @Slf4j
 @Element
 @RequiredArgsConstructor
@@ -68,7 +71,7 @@ public class SubscribeElementPostProcessor implements ElementInstancePostProcess
         }
 
         if(!problems.isEmpty()) {
-            throw new ElementSubscriptionException(elementContext, method, problems);
+            throw new EventSubscriptionException(elementContext, method, problems);
         }
     }
 
@@ -84,7 +87,9 @@ public class SubscribeElementPostProcessor implements ElementInstancePostProcess
             try {
                 methodInvoker.invokeMethodWithOneParameterAndIgnoreResult(instance, method, payload);
             } catch (MethodInvocationException e) {
-                throw new ElementPublishingException(elementContext, method, e);
+                log.error("Element context '{}', method '{}': failed to publish event. Topic '{}', payload '{}'",
+                        elementContext.getName(), LogUtils.niceExecutableName(method),
+                        subscribeAnnotation.value(), payload, e);
             }
         });
         log.debug("Element context '{}', method '{}': subscribed to topic '{}', subscription ID '{}'",

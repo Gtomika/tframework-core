@@ -29,6 +29,7 @@ import java.lang.annotation.Target;
  * The parameter of the method will be the payload of the event that is published to the topic. The type of the parameter
  * can be any type, as long as the payload of the event is of the same type. This will not be checked at compile or
  * framework startup time, so it is up to the developer to ensure that the types match.
+ * @see org.tframework.core.events.CoreEvents
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)

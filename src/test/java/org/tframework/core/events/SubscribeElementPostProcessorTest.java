@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.events.annotations.Subscribe;
-import org.tframework.core.events.exception.ElementSubscriptionException;
+import org.tframework.core.events.exception.EventSubscriptionException;
 import org.tframework.core.reflection.AnnotationFilteringResult;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.methods.MethodFilter;
@@ -93,7 +93,7 @@ public class SubscribeElementPostProcessorTest {
         );
         mockMethodFilterAsInvalid(invalidSubscribeMethod);
 
-        var exception = assertThrows(ElementSubscriptionException.class, () -> {
+        var exception = assertThrows(EventSubscriptionException.class, () -> {
             postProcessor.postProcessInstance(elementContext, this);
         });
         assertEquals(invalidSubscribeMethod, exception.getMethod());

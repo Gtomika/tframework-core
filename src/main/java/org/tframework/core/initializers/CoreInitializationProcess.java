@@ -11,6 +11,8 @@ import org.tframework.core.TFrameworkRootClass;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.ElementsInitializationInput;
 import org.tframework.core.elements.PreConstructedElementData;
+import org.tframework.core.events.CoreEvents;
+import org.tframework.core.events.EventManager;
 import org.tframework.core.profiles.ProfileInitializationInput;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
@@ -68,6 +70,10 @@ public class CoreInitializationProcess {
 
             application.finalizeApplication();
             log.info("Successfully initialized the application '{}'! Let's get started!", application.getName());
+
+            var eventManager = elementsContainer.getElement(EventManager.class);
+            eventManager.publish(CoreEvents.APPLICATION_INITIALIZED, application);
+
             return application;
         } catch (InitializationException e) {
             throw e;

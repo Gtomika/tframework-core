@@ -61,4 +61,9 @@ public class SimpleMethodFilter implements MethodFilter {
     public boolean hasParameters(Method method) {
         return method.getParameters().length > 0;
     }
+
+    @Override
+    public boolean hasExactlyOneParameter(Method method) {
+        return method.getParameters().length == 1;
+    }
 }

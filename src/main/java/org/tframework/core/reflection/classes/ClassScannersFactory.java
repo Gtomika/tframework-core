@@ -21,7 +21,7 @@ public final class ClassScannersFactory {
 
     /**
      * Creates a {@link PackageClassScanner} with no packages assigned. This can be done
-     * later with {@link PackageClassScanner#setPackageNames(Set)}.
+     * later with {@link PackageClassScanner#setPackageNames(Set)} and {@link PackageClassScanner#setRejectedPackages(Set)}.
      */
     public static PackageClassScanner createPackageClassScanner() {
         return new PackageClassScanner();

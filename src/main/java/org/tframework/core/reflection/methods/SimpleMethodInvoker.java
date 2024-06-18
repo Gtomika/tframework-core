@@ -18,4 +18,17 @@ public class SimpleMethodInvoker implements MethodInvoker {
             throw new MethodInvocationException(method, instance.getClass(), e);
         }
     }
+
+    @Override
+    public void invokeMethodWithOneParameterAndIgnoreResult(
+            Object instance,
+            Method method,
+            Object parameter
+    ) throws MethodInvocationException {
+        try {
+            method.invoke(instance, parameter);
+        } catch (Exception e) {
+            throw new MethodInvocationException(method, instance.getClass(), e);
+        }
+    }
 }

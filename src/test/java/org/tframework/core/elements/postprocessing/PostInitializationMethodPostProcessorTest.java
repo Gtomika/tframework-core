@@ -2,7 +2,6 @@
 package org.tframework.core.elements.postprocessing;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -23,7 +22,6 @@ import org.tframework.core.reflection.AnnotationFilteringResult;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.reflection.methods.MethodInvoker;
-import org.tframework.core.reflection.methods.MethodScanner;
 
 @ExtendWith(MockitoExtension.class)
 public class PostInitializationMethodPostProcessorTest {
@@ -33,9 +31,6 @@ public class PostInitializationMethodPostProcessorTest {
 
     @Mock
     private AnnotationScanner annotationScanner;
-
-    @Mock
-    private MethodScanner methodScanner;
 
     @Mock
     private MethodFilter methodFilter;
@@ -58,7 +53,6 @@ public class PostInitializationMethodPostProcessorTest {
     @BeforeEach
     public void setUp() throws Exception {
         when(elementContext.getName()).thenReturn("test-element");
-        doReturn(this.getClass()).when(elementContext).getType();
 
         postInit1Method = this.getClass().getDeclaredMethod("postInit1");
         postInit2Method = this.getClass().getDeclaredMethod("postInit2");
@@ -67,7 +61,7 @@ public class PostInitializationMethodPostProcessorTest {
     @Test
     public void shouldInvokeValidPostInitializationMethod() {
         var methods = Set.of(postInit1Method, postInit2Method);
-        when(methodScanner.scanMethods(this.getClass())).thenReturn(methods);
+        when(elementContext.getMethods()).thenReturn(methods);
         mockFilteringByAnnotation(methods);
         mockThatPostInitMethodIsValid(methods);
 
@@ -78,7 +72,7 @@ public class PostInitializationMethodPostProcessorTest {
     @Test
     public void shouldThrowException_whenPostInitializationMethodIsInvalid() {
         var methods = Set.of(postInit1Method);
-        when(methodScanner.scanMethods(this.getClass())).thenReturn(methods);
+        when(elementContext.getMethods()).thenReturn(methods);
         mockFilteringByAnnotation(methods);
         mockThatPostInitMethodIsInvalid(methods);
 
@@ -88,7 +82,7 @@ public class PostInitializationMethodPostProcessorTest {
     @Test
     public void shouldThrowException_whenPostInitializationMethodIsValid_butCannotBeExecuted() {
         var methods = Set.of(postInit1Method);
-        when(methodScanner.scanMethods(this.getClass())).thenReturn(methods);
+        when(elementContext.getMethods()).thenReturn(methods);
         mockFilteringByAnnotation(methods);
         mockThatPostInitMethodIsValid(methods);
         mockPostInitMethodThrowingAnException(postInit1Method);

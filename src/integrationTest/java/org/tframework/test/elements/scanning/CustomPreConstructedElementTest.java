@@ -21,7 +21,6 @@ public class CustomPreConstructedElementTest {
             .preConstructedElements(Set.of(
                     PreConstructedElementData.from(CUSTOM_PRE_CONSTRUCTED_ELEMENT)
             ))
-            .rootClass(CustomPreConstructedElementTest.class)
             .build()
             .toJunit5Extension();
 

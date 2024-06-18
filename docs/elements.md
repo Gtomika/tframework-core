@@ -266,3 +266,8 @@ An example can be seen above in the field injection section.
 You can define your own element post processors by implementing the `ElementInstancePostProcessor` interface, and 
 marking it as an element. The framework will pick up your post processor and call it for each element instance. For example, 
 this can be used to invoke some method on each element after it is created, or to do some logging.
+
+## Next steps
+
+You can proceed to [events document](./events.md). This document explains how to publish and subscribe to 
+events.

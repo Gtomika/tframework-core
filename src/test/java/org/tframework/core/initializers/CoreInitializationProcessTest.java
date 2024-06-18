@@ -4,8 +4,11 @@ package org.tframework.core.initializers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +19,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.Application;
 import org.tframework.core.TFrameworkRootClass;
 import org.tframework.core.elements.ElementsContainer;
+import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.events.CoreEvents;
+import org.tframework.core.events.EventManager;
 import org.tframework.core.profiles.InvalidProfileException;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainerFactory;
@@ -37,6 +43,12 @@ class CoreInitializationProcessTest {
     private ElementsCoreInitializer elementsCoreInitializer;
 
     @Mock
+    private EventManager eventManager;
+
+    @Mock
+    private ElementContext eventManagerContext;
+
+    @Mock
     private AnnotationScanner annotationScanner;
 
     @BeforeEach
@@ -51,12 +63,15 @@ class CoreInitializationProcessTest {
 
     @Test
     public void shouldPerformCoreInitialization() {
+        when(eventManagerContext.requestInstance()).thenReturn(eventManager);
+        doReturn(EventManager.class).when(eventManagerContext).getType();
+        var elementsContainer = ElementsContainer.fromElementContexts(List.of(eventManagerContext));
         var expectedApp = Application.builder()
                 .name("testApp")
                 .rootClass(CoreInitializationProcessTest.class)
                 .profilesContainer(ProfilesContainer.fromProfiles(Set.of("a, b")))
                 .propertiesContainer(PropertiesContainerFactory.empty())
-                .elementsContainer(ElementsContainer.empty())
+                .elementsContainer(elementsContainer)
                 .build();
         expectedApp.finalizeApplication();
 
@@ -75,6 +90,7 @@ class CoreInitializationProcessTest {
         var actualApp = coreInitializationProcess.performCoreInitialization(input);
 
         assertEquals(expectedApp, actualApp);
+        verify(eventManager).publish(CoreEvents.APPLICATION_INITIALIZED, actualApp);
     }
 
     @Test

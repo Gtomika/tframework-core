@@ -11,7 +11,6 @@ import java.lang.annotation.Target;
  * This annotation marks a constructor as the one to be used when instantiating the element.
  * It is required only to when there are multiple constructors available, and the framework otherwise
  * wouldn't know which one to use.
- *
  * <pre>{@code
  * @Element
  * public class MyElement {

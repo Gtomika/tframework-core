@@ -6,22 +6,29 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.Element;
+import org.tframework.core.elements.annotations.InjectProperty;
 import org.tframework.core.events.Event;
 import org.tframework.core.events.Subscription;
 
 /**
- * This {@link EventPublisher} uses virtual threads to publish events asynchronously. It is
- * the recommended publisher, because virtual threads can scale well and this publisher does not
- * block the event management from handling other events.
+ * This {@link EventPublisher} uses several threads to publish events asynchronously. It is
+ * the recommended publisher, because it does not block the event management from handling other events.
+ * The {@value #EVENT_PUBLISHER_THREAD_POOL_SIZE_PROPERTY} property can be used to configure the number of threads
+ * used by this publisher. The default is 3.
  */
 @Slf4j
 @Element
-public class AsyncVirtualEventPublisher implements EventPublisher {
+public class AsyncMultithreadedEventPublisher implements EventPublisher {
+
+    public static final String EVENT_PUBLISHER_THREAD_POOL_SIZE_PROPERTY =
+            "org.tframework.core.events.thread-pool-size";
 
     private final ExecutorService executorService;
 
-    public AsyncVirtualEventPublisher() {
-        this.executorService = Executors.newVirtualThreadPerTaskExecutor();
+    public AsyncMultithreadedEventPublisher(
+            @InjectProperty(value = EVENT_PUBLISHER_THREAD_POOL_SIZE_PROPERTY, defaultValue = "3") int threadPoolSize
+    ) {
+        this.executorService = Executors.newFixedThreadPool(threadPoolSize);
     }
 
     @Override

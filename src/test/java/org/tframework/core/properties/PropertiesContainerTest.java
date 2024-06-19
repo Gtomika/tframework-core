@@ -33,7 +33,7 @@ class PropertiesContainerTest {
     }
 
     @Test
-    public void shouldGetPropertyValueObject_whenExists() {
+    public void shouldGetPropertyValue_Object_whenExists() {
         PropertyValue propertyValue = container.getPropertyValueObject("p1");
         if(propertyValue instanceof SinglePropertyValue(String value)) {
             assertEquals("v1", value);
@@ -55,7 +55,7 @@ class PropertiesContainerTest {
     }
 
     @Test
-    public void shouldGetPropertyValueObject_whenDoesNotExist_withDefaultValue() {
+    public void shouldGetPropertyValueObject_whenDoesNotExist_withDefaultValueObject() {
         PropertyValue propertyValue = container.getPropertyValueObject("p3", new SinglePropertyValue("default"));
         if(propertyValue instanceof SinglePropertyValue(String value)) {
             assertEquals("default", value);

@@ -43,7 +43,7 @@ public final class PropertiesContainer {
     }
 
     /**
-     * Gets the {@link PropertyValue} of a property.
+     * Gets the {@link PropertyValue} of a property, without any conversion.
      * @return The {@link PropertyValue} for the given property name.
      * @throws PropertyNotFoundException If the property does not exist.
      */
@@ -52,7 +52,8 @@ public final class PropertiesContainer {
     }
 
     /**
-     * Gets the {@link PropertyValue} of a property, or the provided default one.
+     * Gets the {@link PropertyValue} of a property, or the provided default one,
+     * without any conversion.
      * @param propertyName The property to get.
      * @param defaultValue A default value to return if the property does not exist.
      */
@@ -78,6 +79,20 @@ public final class PropertiesContainer {
     }
 
     /**
+     * Gets a property by name, and converts it to the desired type. Returns the
+     * converted property as an {@link Object}. When it is more convenient, the
+     * {@link #getPropertyValue(String, Class)} is also available, which is generic.
+     * @param propertyName The property to get.
+     * @param requiredType The type to convert this property to.
+     * @throws PropertyNotFoundException If the property does not exist.
+     * @throws PropertyConversionException If the conversion failed to the required type.
+     */
+    public Object getPropertyValueNonGeneric(String propertyName, Class<?> requiredType) {
+        var propertyValueObject = getPropertyValueObject(propertyName);
+        return propertyConverterAggregator.convert(propertyValueObject, requiredType);
+    }
+
+    /**
      * A version of {@link #getPropertyValue(String, Class)} that returns a default value instead of throwing
      * {@link PropertyNotFoundException} when the given property does not exist.
      */
@@ -87,6 +102,25 @@ public final class PropertiesContainer {
         } catch (PropertyNotFoundException e) {
             log.debug("Property '{}' not found. Returning default value '{}'", propertyName, defaultValue);
             return defaultValue;
+        }
+    }
+
+    /**
+     * A version of {@link #getPropertyValueNonGeneric(String, Class)} that returns a default value instead of throwing
+     * {@link PropertyNotFoundException} when the given property does not exist. When it is more convenient, the
+     * {@link #getPropertyValue(String, Class, Object)} is also available, which is generic.
+     * @param propertyName The property to get.
+     * @param requiredType The type to convert this property to.
+     * @param defaultValue A {@link String} representation of the default value. It will be converted to
+     *                     the required type.
+     */
+    public Object getPropertyValueNonGeneric(String propertyName, Class<?> requiredType, String defaultValue) {
+        try {
+            return getPropertyValueNonGeneric(propertyName, requiredType);
+        } catch (PropertyNotFoundException e) {
+            log.debug("Property '{}' not found. Returning default value '{}'", propertyName, defaultValue);
+            var defaultPropertyValue = new SinglePropertyValue(defaultValue);
+            return propertyConverterAggregator.convert(defaultPropertyValue, requiredType);
         }
     }
 

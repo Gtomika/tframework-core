@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.Element;
 
 /**
@@ -30,12 +31,28 @@ import org.tframework.core.elements.annotations.Element;
  * placed on each other), the scanning will stop at the first match.
  * @see AnnotationMatcher
  */
+@Slf4j
 @Getter
 @Element
 @RequiredArgsConstructor
 public class ComposedAnnotationScanner implements AnnotationScanner {
 
-    private static final Set<String> UNSUPPORTED_PACKAGES = Set.of("java.lang.annotation");
+    /**
+     * Maximum depth of recursion when scanning for composed annotations. This is a safety measure to prevent
+     * infinite loops in case of circular annotations. If the depth is exceeded, the scanning will stop.
+     */
+    private static final int MAX_DEPTH = 10;
+
+    /**
+     * A set of packages that commonly have unsupported annotations. This is no a complete list,
+     * but it covers the most common cases, and it's used for performance reasons.
+     * Annotations in these packages will not be scanned. But in general, and annotation that is annotated
+     * with itself will also be skipped.
+     * @see #isUnsupportedAnnotation(Class)
+     */
+    private static final Set<String> UNSUPPORTED_PACKAGES = Set.of(
+            "java.lang.annotation", "kotlin.annotation", "kotlin"
+    );
 
     private final AnnotationMatcher annotationMatcher;
 
@@ -51,7 +68,7 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
     @Override
     public <A extends Annotation> List<A> scan(AnnotatedElement annotatedElement, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        return scan(annotatedElement, annotationToFind, false);
+        return scan(annotatedElement, annotationToFind, false, 0);
     }
 
     /**
@@ -68,7 +85,7 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
     @Override
     public <A extends Annotation> Optional<A> scanOne(AnnotatedElement annotatedElement, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        var scannedAnnotations = scan(annotatedElement, annotationToFind, true);
+        var scannedAnnotations = scan(annotatedElement, annotationToFind, true, 0);
         if(!scannedAnnotations.isEmpty()) {
             return Optional.of(scannedAnnotations.getFirst());
         } else {
@@ -89,7 +106,7 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
     @Override
     public <A extends Annotation> Optional<A> scanOneStrict(AnnotatedElement annotatedElement, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        var scannedAnnotations = scan(annotatedElement, annotationToFind, false);
+        var scannedAnnotations = scan(annotatedElement, annotationToFind, false, 0);
         if(scannedAnnotations.size() == 1) {
             return Optional.of(scannedAnnotations.getFirst());
         } else if(scannedAnnotations.size() > 1) {
@@ -102,13 +119,22 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
     /**
      * Checks if the annotation is unsupported for composed annotation scanning. The following annotations are unsupported:
      * <ul>
-     *      <li>Annotations in package {@code java.lang.annotation}.</li>
+     *      <li>Annotations in packages {@link #UNSUPPORTED_PACKAGES}.</li>
+     *      <li>Annotations that are annotated with themselves.</li>
      * </ul>
      * @param annotationClass The annotation to check.
      * @return True only of the {@code annotationClass} is unsupported.
      */
     public boolean isUnsupportedAnnotation(Class<? extends Annotation> annotationClass) {
-        return UNSUPPORTED_PACKAGES.contains(annotationClass.getPackageName());
+        if(UNSUPPORTED_PACKAGES.contains(annotationClass.getPackageName())) {
+            log.trace("Annotation '{}' is in an unsupported package, skipping.", annotationClass.getName());
+            return true;
+        }
+        if(annotationClass.isAnnotationPresent(annotationClass)) {
+            log.trace("Annotation '{}' is annotated with itself, skipping.", annotationClass.getName());
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -126,8 +152,18 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
     private <A extends Annotation> List<A> scan(
             AnnotatedElement annotatedElement,
             Class<A> annotationToFind,
-            boolean stopOnFirstFind
+            boolean stopOnFirstFind,
+            int depth
     ) {
+        if(depth > MAX_DEPTH) {
+            log.warn("Maximum depth of recursion exceeded, stopping the composed annotation scan."
+                    + " This is likely due to circular annotations.");
+            return new LinkedList<>();
+        }
+
+        log.trace("Scanning for composed annotation '{}' on class '{}'.",
+                annotationToFind.getName(), annotatedElement.getClass().getName());
+
         List<A> composedAnnotations = new LinkedList<>();
 
         for(Annotation annotationOnScannedClass: annotatedElement.getAnnotations()) {
@@ -148,7 +184,12 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
                 composedAnnotations.addAll(matchedAnnotations);
             } else {
                 //this annotation on 'scannedClass' is a different one, must check annotations on it
-                var result = scan(annotationOnScannedClass.annotationType(), annotationToFind, stopOnFirstFind);
+                var result = scan(
+                        annotationOnScannedClass.annotationType(),
+                        annotationToFind,
+                        stopOnFirstFind,
+                        depth + 1
+                );
                 if(stopOnFirstFind && !result.isEmpty()) {
                     composedAnnotations.add(result.getFirst());
                     break;

@@ -192,11 +192,16 @@ class ComposedAnnotationScannerTest {
     static class DirectlyPresentSelfAnnotation {}
 
     @Test
-    public void shouldFindComposedAnnotation_whenDirectlyPresentOnClass_andIsSelfAnnotation() {
-        List<TestSelfAnnotation> composedAnnotations = scanner.scan(DirectlyPresentSelfAnnotation.class, TestSelfAnnotation.class);
+    public void shouldNotFindComposedAnnotation_whenDirectlyPresentOnClass_andIsSelfAnnotation() {
+        assertThrows(UnsupportedAnnotationException.class,
+                () ->scanner.scan(DirectlyPresentSelfAnnotation.class, TestSelfAnnotation.class));
+    }
 
-        assertEquals(1, composedAnnotations.size());
-        assertEquals("TestSelfAnnotation on DirectlyPresentSelfAnnotation", composedAnnotations.getFirst().value());
+    @Test
+    public void shouldNotFindComposedAnnotation_whenNotPresent_butAnotherSelfAnnotationIsPresent() {
+        List<TestAnnotationA> composedAnnotations = scanner.scan(DirectlyPresentSelfAnnotation.class, TestAnnotationA.class);
+
+        assertEquals(0, composedAnnotations.size());
     }
 
     @TestCircularAnnotationB
@@ -209,6 +214,13 @@ class ComposedAnnotationScannerTest {
 
         assertEquals(1, composedAnnotationsA.size());
         assertEquals(1, composedAnnotationsB.size());
+    }
+
+    @Test
+    public void shouldNotFindComposedAnnotation_whenNotPresent_butAnotherCircularAnnotationIsPresent() {
+        List<TestAnnotationA> composedAnnotations = scanner.scan(CircularAnnotations.class, TestAnnotationA.class);
+
+        assertEquals(0, composedAnnotations.size());
     }
 
 }

@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import org.tframework.core.events.Event;
 import org.tframework.core.events.Subscription;
 
-public class AsyncVirtualEventPublisherTest {
+public class AsyncMultithreadedEventPublisherTest {
 
-    private final AsyncVirtualEventPublisher publisher = new AsyncVirtualEventPublisher();
+    private final AsyncMultithreadedEventPublisher publisher = new AsyncMultithreadedEventPublisher(1);
 
     private boolean published = false;
 

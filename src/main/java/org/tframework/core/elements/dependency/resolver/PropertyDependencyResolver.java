@@ -33,7 +33,19 @@ public class PropertyDependencyResolver implements BasicDependencyResolver {
             String dependencyName = injectAnnotation.value();
             log.debug("Attempting to resolve dependency with name '{}' from the properties...", dependencyName);
             try {
-                Object resolvedDependency = propertiesContainer.getPropertyValue(dependencyName, dependencyDefinition.dependencyType());
+                Object resolvedDependency;
+                if(injectAnnotation.defaultValue().equals(InjectProperty.DEFAULT_VALUE_NOT_PROVIDED)) {
+                    resolvedDependency = propertiesContainer.getPropertyValueNonGeneric(
+                            dependencyName,
+                            dependencyDefinition.dependencyType()
+                    );
+                } else {
+                    resolvedDependency = propertiesContainer.getPropertyValueNonGeneric(
+                            dependencyName,
+                            dependencyDefinition.dependencyType(),
+                            injectAnnotation.defaultValue()
+                    );
+                }
                 log.debug("Resolved dependency with name '{}' from the properties: {}", dependencyName, resolvedDependency);
                 return Optional.of(resolvedDependency);
             } catch (Exception e) {

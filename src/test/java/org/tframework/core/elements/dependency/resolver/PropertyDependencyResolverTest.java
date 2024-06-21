@@ -30,8 +30,13 @@ class PropertyDependencyResolverTest {
     private PropertyDependencyResolver propertyDependencyResolver;
 
     private Field someField;
+    private Field someFieldWithDefaultValue;
+
     private InjectProperty injectPropertyAnnotation;
+    private InjectProperty injectPropertyAnnotationWithDefaultValue;
+
     private DependencyDefinition dependencyDefinition;
+    private DependencyDefinition dependencyDefinitionWithDefaultValue;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -39,7 +44,12 @@ class PropertyDependencyResolverTest {
 
         someField = this.getClass().getDeclaredField("someString");
         injectPropertyAnnotation = someField.getAnnotation(InjectProperty.class);
+
+        someFieldWithDefaultValue = this.getClass().getDeclaredField("someString2");
+        injectPropertyAnnotationWithDefaultValue = someFieldWithDefaultValue.getAnnotation(InjectProperty.class);
+
         dependencyDefinition = new DependencyDefinition(someField, someField.getType());
+        dependencyDefinitionWithDefaultValue = new DependencyDefinition(someFieldWithDefaultValue, someFieldWithDefaultValue.getType());
     }
 
     @Test
@@ -47,7 +57,7 @@ class PropertyDependencyResolverTest {
         String dependencyValue = "test";
         when(injectAnnotationScanner.findInjectAnnotation(someField, InjectProperty.class))
                 .thenReturn(Optional.of(injectPropertyAnnotation));
-        when(propertiesContainer.getPropertyValue(injectPropertyAnnotation.value(), String.class))
+        when(propertiesContainer.getPropertyValueNonGeneric(injectPropertyAnnotation.value(), String.class))
                 .thenReturn(dependencyValue);
 
         var resolvedDependency = propertyDependencyResolver.resolveDependency(dependencyDefinition);
@@ -56,7 +66,6 @@ class PropertyDependencyResolverTest {
             assertEquals(dependencyValue, resolvedString);
         } else {
             fail("Resolved dependency is not a String");
-
         }
     }
 
@@ -64,12 +73,32 @@ class PropertyDependencyResolverTest {
     public void shouldNotResolveDependency_whenNotPresentInProperties() {
         when(injectAnnotationScanner.findInjectAnnotation(someField, InjectProperty.class))
                 .thenReturn(Optional.of(injectPropertyAnnotation));
-        when(propertiesContainer.getPropertyValue(injectPropertyAnnotation.value(), String.class))
+        when(propertiesContainer.getPropertyValueNonGeneric(injectPropertyAnnotation.value(), String.class))
                 .thenThrow(new RuntimeException("Dependency not found"));
 
         var resolvedDependency = propertyDependencyResolver.resolveDependency(dependencyDefinition);
 
         assertTrue(resolvedDependency.isEmpty());
+    }
+
+    @Test
+    public void shouldResolveDependency_whenNotPresentInProperties_butHasDefaultValue() {
+        String dependencyValue = "test";
+        when(injectAnnotationScanner.findInjectAnnotation(someFieldWithDefaultValue, InjectProperty.class))
+                .thenReturn(Optional.of(injectPropertyAnnotationWithDefaultValue));
+        when(propertiesContainer.getPropertyValueNonGeneric(
+                injectPropertyAnnotationWithDefaultValue.value(),
+                String.class,
+                injectPropertyAnnotationWithDefaultValue.defaultValue()
+        )).thenReturn(dependencyValue);
+
+        var resolvedDependency = propertyDependencyResolver.resolveDependency(dependencyDefinitionWithDefaultValue);
+
+        if(resolvedDependency.isPresent() && resolvedDependency.get() instanceof String resolvedString) {
+            assertEquals(dependencyValue, resolvedString);
+        } else {
+            fail("Resolved dependency is not a String");
+        }
     }
 
     @Test
@@ -84,5 +113,8 @@ class PropertyDependencyResolverTest {
 
     @InjectProperty("someString")
     private String someString;
+
+    @InjectProperty(value = "someString2", defaultValue = "default")
+    private String someString2;
 
 }

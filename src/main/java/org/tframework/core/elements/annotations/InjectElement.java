@@ -16,7 +16,17 @@ import org.tframework.core.elements.ElementUtils;
  *     <li>Visibility can be any.</li>
  * </ul>
  * In all cases, when using {@link #value()} to specify an element by name, the element must be assignable
- * to the type of the field or parameter you are trying to inject it into.
+ * to the type of the field or parameter you are trying to inject it into. For example:
+ * <pre>{@code
+ * //assuming there is an element which is assignable to MyElement type
+ * @InjectElement
+ * private MyElement myElement;
+ *
+ * //assuming there is an element named 'my.element' which is assignable to MyElement type
+ * @InjectElement("my.element")
+ * private MyElement myElement;
+ * }</pre>
+ * These examples were for field injection, but the same applies to constructor injection.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)

@@ -5,18 +5,14 @@ import java.util.Set;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.properties.PropertiesContainer;
-import org.tframework.core.properties.SinglePropertyValue;
-import org.tframework.core.properties.converters.BooleanPropertyConverter;
-import org.tframework.core.properties.converters.PropertyConverter;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.classes.ClassFilter;
 import org.tframework.core.reflection.classes.PackageClassScanner;
-import org.tframework.core.utils.Constants;
 
 /**
  * An {@link ElementClassScanner} implementation which scans the internal TFramework packages
- * ({@value TFRAMEWORK_INTERNAL_PACKAGE}). By default, this scanner is enabled, but can be enabled by setting the
- * {@value TFRAMEWORK_INTERNAL_SCAN_ENABLED_PROPERTY} to {@code false}.
+ * ({@value TFRAMEWORK_INTERNAL_PACKAGE}). This scanner cannot be disabled, as the internal elements
+ * are crucial for the framework.
  */
 @Slf4j
 public class InternalElementClassScanner extends ElementClassScanner {
@@ -28,15 +24,7 @@ public class InternalElementClassScanner extends ElementClassScanner {
     public static final String TFRAMEWORK_INTERNAL_PACKAGE = "org.tframework";
     public static final String TFRAMEWORK_REJECTED_INTERNAL_PACKAGE = "org.tframework.test";
 
-    /**
-     * The property that enables/disables this scanner.
-     */
-    public static final String TFRAMEWORK_INTERNAL_SCAN_ENABLED_PROPERTY = Constants.TFRAMEWORK_PROPERTIES_PREFIX + ".elements.scan-internal";
-
-    private static final SinglePropertyValue TFRAMEWORK_INTERNAL_PACKAGE_DEFAULT_VALUE = new SinglePropertyValue("true");
-
     private final PackageClassScanner classScanner;
-    private final PropertyConverter<Boolean> propertyConverter;
 
     InternalElementClassScanner(
             AnnotationScanner annotationScanner,
@@ -48,23 +36,15 @@ public class InternalElementClassScanner extends ElementClassScanner {
         this.classScanner = classScanner;
         this.classScanner.setPackageNames(Set.of(TFRAMEWORK_INTERNAL_PACKAGE));
         this.classScanner.setRejectedPackages(Set.of(TFRAMEWORK_REJECTED_INTERNAL_PACKAGE));
-        this.propertyConverter = new BooleanPropertyConverter();
     }
 
     @Override
     public Set<Class<?>> scanPotentialElements() {
-        var scanInternalProperty = propertiesContainer.getPropertyValueObject(
-                TFRAMEWORK_INTERNAL_SCAN_ENABLED_PROPERTY,
-                TFRAMEWORK_INTERNAL_PACKAGE_DEFAULT_VALUE
-        );
-        if(propertyConverter.convert(scanInternalProperty)) {
-            log.debug("The internal element scanner will scan the package '{}' and all its sub-packages", TFRAMEWORK_INTERNAL_PACKAGE);
-            log.debug("The internal element scanner will ignore the package '{}' and all its sub-packages", TFRAMEWORK_REJECTED_INTERNAL_PACKAGE);
-            return classScanner.scanClasses();
-        } else {
-            log.debug("The internal element scanner is disabled, no classes will be scanned");
-            return Set.of();
-        }
+        log.debug("The internal element scanner will scan the package '{}' and all its sub-packages",
+                TFRAMEWORK_INTERNAL_PACKAGE);
+        log.debug("The internal element scanner will ignore the package '{}' and all its sub-packages",
+                TFRAMEWORK_REJECTED_INTERNAL_PACKAGE);
+        return classScanner.scanClasses();
     }
 
     @Builder

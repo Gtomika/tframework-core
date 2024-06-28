@@ -20,7 +20,7 @@ public non-sealed interface ElementDependencyResolver extends DependencyResolver
      * @param dependencyGraph {@link ElementDependencyGraph} with the current state of the dependency resolution.
      * @return {@link Optional} with the element instance, if resolved, empty if not.
      */
-    public abstract Optional<Object> resolveDependency(
+    Optional<Object> resolveDependency(
             DependencyDefinition dependencyDefinition,
             ElementContext originalElementContext,
             ElementDependencyGraph dependencyGraph

@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectElement;
+import org.tframework.core.elements.dependency.DependencyDefinition;
 
 @Slf4j
 public class ElementUtilsTest {
@@ -58,5 +59,25 @@ public class ElementUtilsTest {
     public void shouldReturnFalse_ifInjectElementIsNotNamed() throws Exception {
         var elementAnnotation = this.getClass().getDeclaredField("otherString").getAnnotation(InjectElement.class);
         assertFalse(ElementUtils.isNamedElementInjection(elementAnnotation));
+    }
+
+    @InjectElement
+    private List<Integer> genericListDependency;
+
+    @Test
+    public void shouldGetDependencyTypeParameter_whenInputIsField() throws Exception {
+        var field = this.getClass().getDeclaredField("genericListDependency");
+        var listType = ElementUtils.getDependencyTypeParameter(DependencyDefinition.fromField(field));
+        assertEquals(Integer.class, listType);
+    }
+
+    private void someMethod(List<String> genericListDependency) {}
+
+    @Test
+    public void shouldGetDependencyTypeParameter_whenInputIsMethodParameter() throws Exception {
+        var method = this.getClass().getDeclaredMethod("someMethod", List.class);
+        var parameter = method.getParameters()[0];
+        var listType = ElementUtils.getDependencyTypeParameter(DependencyDefinition.fromParameter(parameter));
+        assertEquals(String.class, listType);
     }
 }

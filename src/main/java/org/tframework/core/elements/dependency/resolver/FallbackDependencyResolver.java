@@ -34,6 +34,8 @@ public class FallbackDependencyResolver implements ElementDependencyResolver {
         //we have no '@InjectX' annotations, so the type will be used to resolve
         log.debug("Attempting to resolve dependency with type '{}' from the elements", dependencyDefinition.dependencyType());
         try {
+
+
             ElementContext dependencyElementContext = elementsContainer.getElementContext(dependencyDefinition.dependencyType());
             // graph will be validated at another place
             dependencyGraph.addDependency(originalElementContext, dependencyElementContext);

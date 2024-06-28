@@ -74,7 +74,7 @@ public class ElementsInitializationProcess {
         filterElementContext(elementsContainer, input.application());
         log.info("A total of {} element contexts survived after filtering", elementsContainer.elementCount());
 
-        var postProcessors = ElementUtils.initAndGetElementsEagerly(elementsContainer, ElementInstancePostProcessor.class);
+        var postProcessors = ElementUtils.getElementInstances(elementsContainer, ElementInstancePostProcessor.class, true);
         log.debug("Found {} post-processors to apply to element instances: {}", postProcessors.size(), LogUtils.objectClassNames(postProcessors));
         var postProcessorAggregator = ElementInstancePostProcessorAggregator.usingPostProcessors(postProcessors);
         elementsContainer.forEach(context -> context.setPostProcessor(postProcessorAggregator));
@@ -183,14 +183,14 @@ public class ElementsInitializationProcess {
 
     @SuppressWarnings("unchecked")
     private void addPropertyConverters(PropertiesContainer propertiesContainer, ElementsContainer elementsContainer) {
-        var propertyConverters = (List<PropertyConverter<?>>) (List<?>) ElementUtils.initAndGetElementsEagerly(elementsContainer, PropertyConverter.class);
+        var propertyConverters = (List<PropertyConverter<?>>) (List<?>) ElementUtils.getElementInstances(elementsContainer, PropertyConverter.class, true);
         log.debug("Found {} property converters: {}", propertyConverters.size(), LogUtils.objectClassNames(propertyConverters));
         var propertyConverterAggregator = PropertyConverterAggregator.usingConverters(propertyConverters);
         propertiesContainer.setPropertyConverterAggregator(propertyConverterAggregator);
     }
 
     private void filterElementContext(ElementsContainer elementsContainer, Application application) {
-        var filters = ElementUtils.initAndGetElementsEagerly(application.getElementsContainer(), ElementContextFilter.class);
+        var filters = ElementUtils.getElementInstances(application.getElementsContainer(), ElementContextFilter.class, true);
         log.debug("Found {} filters to apply to element contexts: {}", filters.size(), LogUtils.objectClassNames(filters));
         var filterAggregator = ElementContextFilterAggregator.usingFilters(filters);
 

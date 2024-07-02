@@ -28,7 +28,7 @@ public interface SpecialElementDependencyHandler {
      * @return {@link Optional} with the object that is the result of the special dependency handling. If this
      * handler cannot handle the dependency, it should return an empty {@link Optional}.
      */
-    Optional<Object> handleSpecialDependency(
+    Optional<Object> handleDependency(
             ElementsContainer elementsContainer,
             DependencyDefinition dependencyDefinition,
             ElementContext originalElementContext,

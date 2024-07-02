@@ -28,6 +28,6 @@ public class SpecialDependencyHandlerBaseTest {
     protected SpecialElementDependencyHandler handler;
 
     protected Optional<?> whenSpecialDependencyHandlerIsCalled(DependencyDefinition dependencyDefinition) {
-        return handler.handleSpecialDependency(elementsContainer, dependencyDefinition, originalElementContext, graph);
+        return handler.handleDependency(elementsContainer, dependencyDefinition, originalElementContext, graph);
     }
 }

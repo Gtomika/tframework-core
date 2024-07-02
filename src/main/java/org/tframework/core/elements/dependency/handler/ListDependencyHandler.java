@@ -26,7 +26,7 @@ import org.tframework.core.utils.TypeUtils;
 public class ListDependencyHandler implements SpecialElementDependencyHandler {
 
     @Override
-    public Optional<Object> handleSpecialDependency(
+    public Optional<Object> handleDependency(
             ElementsContainer elementsContainer,
             DependencyDefinition dependencyDefinition,
             ElementContext originalElementContext,

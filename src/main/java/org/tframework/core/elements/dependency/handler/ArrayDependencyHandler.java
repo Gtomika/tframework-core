@@ -24,7 +24,7 @@ import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 public class ArrayDependencyHandler implements SpecialElementDependencyHandler {
 
     @Override
-    public Optional<Object> handleSpecialDependency(
+    public Optional<Object> handleDependency(
             ElementsContainer elementsContainer,
             DependencyDefinition dependencyDefinition,
             ElementContext originalElementContext,

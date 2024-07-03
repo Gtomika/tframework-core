@@ -3,6 +3,7 @@ package org.tframework.core.elements.dependency.handler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -44,5 +45,6 @@ public class ListDependencyHandlerTest extends SpecialDependencyHandlerBaseTest 
 
         assertTrue(handledResult.isPresent());
         assertEquals(listDependency, handledResult.get());
+        verify(graph).addDependency(originalElementContext, dependencyElementContext);
     }
 }

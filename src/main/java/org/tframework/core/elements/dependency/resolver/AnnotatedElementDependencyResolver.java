@@ -14,6 +14,7 @@ import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerAggregator;
 import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
 
 /**
@@ -27,6 +28,7 @@ public class AnnotatedElementDependencyResolver implements ElementDependencyReso
 
     private final ElementsContainer elementsContainer;
     private final InjectAnnotationScanner injectAnnotationScanner;
+    private final SpecialDependencyHandlerAggregator specialDependencyHandlerAggregator;
 
     @Override
     public Optional<Object> resolveDependency(

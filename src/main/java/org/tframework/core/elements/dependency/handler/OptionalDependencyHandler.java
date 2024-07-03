@@ -44,10 +44,12 @@ public class OptionalDependencyHandler implements SpecialElementDependencyHandle
             var optionalItemType = TypeUtils.getTypeParameter(dependencyDefinition);
             log.debug("Optional dependency detected, with item type '{}'", optionalItemType.getName());
 
-            var elementInstance = elementsContainer.getElementContext(optionalItemType)
-                    .requestInstance(dependencyGraph);
+            var dependencyElementContext = elementsContainer.getElementContext(optionalItemType);
+            //registering dependency to the graph before requesting instance
+            dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
+            var dependencyElementInstance = dependencyElementContext.requestInstance(dependencyGraph);
             //the double Optional is intentional here, as the 'SpecialElementDependencyHandler' also uses it
-            return Optional.of(Optional.of(elementInstance));
+            return Optional.of(Optional.of(dependencyElementInstance));
         } else {
             //this dependency is not an optional, ignoring it
             return Optional.empty();

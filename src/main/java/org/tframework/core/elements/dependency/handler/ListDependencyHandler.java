@@ -36,9 +36,15 @@ public class ListDependencyHandler implements SpecialElementDependencyHandler {
             var listItemType = TypeUtils.getTypeParameter(dependencyDefinition);
             log.debug("List dependency detected, with item type '{}'", listItemType.getName());
 
-            var itemElements = ElementUtils.getElementInstances(elementsContainer, listItemType, dependencyGraph);
-            log.debug("Found {} elements of type '{}', building list...", itemElements.size(), listItemType.getName());
+            var itemElementContexts = ElementUtils.getElementContexts(elementsContainer, listItemType);
+            log.debug("Found {} elements of type '{}', building list...", itemElementContexts.size(), listItemType.getName());
+            //register dependencies in the graph before requesting instances
+            itemElementContexts.forEach(itemElementContext ->
+                    dependencyGraph.addDependency(originalElementContext, itemElementContext));
 
+            var itemElements = itemElementContexts.stream()
+                    .map(context -> context.requestInstance(dependencyGraph))
+                    .toList();
             return Optional.of(new ArrayList<>(itemElements));
         } else {
             return Optional.empty();

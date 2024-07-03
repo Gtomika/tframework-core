@@ -34,12 +34,16 @@ public class ArrayDependencyHandler implements SpecialElementDependencyHandler {
             var arrayItemType = dependencyDefinition.dependencyType().getComponentType();
             log.debug("Array dependency detected, with item type '{}'", arrayItemType.getName());
 
-            var itemElements = ElementUtils.getElementInstances(elementsContainer, arrayItemType, dependencyGraph);
-            log.debug("Found {} elements of type '{}', building array...", itemElements.size(), arrayItemType.getName());
+            var itemElementContexts = ElementUtils.getElementContexts(elementsContainer, arrayItemType);
+            log.debug("Found {} elements of type '{}', building array...", itemElementContexts.size(), arrayItemType.getName());
+            //register dependencies in the graph before requesting instances
+            itemElementContexts.forEach(itemElementContext ->
+                    dependencyGraph.addDependency(originalElementContext, itemElementContext));
 
-            var array = Array.newInstance(arrayItemType, itemElements.size());
-            for(int i = 0; i < itemElements.size(); i++) {
-                Array.set(array, i, itemElements.get(i));
+            var array = Array.newInstance(arrayItemType, itemElementContexts.size());
+            for(int i = 0; i < itemElementContexts.size(); i++) {
+                var itemElementInstance = itemElementContexts.get(i).requestInstance(dependencyGraph);
+                Array.set(array, i, itemElementInstance);
             }
 
             return Optional.of(array);

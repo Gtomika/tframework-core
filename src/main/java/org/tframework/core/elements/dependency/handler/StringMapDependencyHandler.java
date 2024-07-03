@@ -54,10 +54,12 @@ public class StringMapDependencyHandler implements SpecialElementDependencyHandl
             if(String.class.equals(keyType)) {
                 log.debug("Found a map dependency with string keys and '{}' values.", valueType.getName());
 
-                var elements = ElementUtils.getElementContexts(elementsContainer, valueType);
-                log.debug("Found {} elements with type '{}', building map...", elements.size(), valueType.getName());
+                var dependencyElementContexts = ElementUtils.getElementContexts(elementsContainer, valueType);
+                log.debug("Found {} elements with type '{}', building map...", dependencyElementContexts.size(), valueType.getName());
 
-                var elementsMap = elements.stream()
+                var elementsMap = dependencyElementContexts.stream()
+                        //add dependency to graph before requesting instance
+                        .peek(dependencyContext -> dependencyGraph.addDependency(originalElementContext, dependencyContext))
                         .collect(Collectors.toMap(
                                 ElementContext::getName,
                                 context -> context.requestInstance(dependencyGraph)

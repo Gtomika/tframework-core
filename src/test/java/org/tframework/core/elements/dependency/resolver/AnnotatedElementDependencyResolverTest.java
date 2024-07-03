@@ -20,6 +20,7 @@ import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerAggregator;
 
 @ExtendWith(MockitoExtension.class)
 class AnnotatedElementDependencyResolverTest {
@@ -36,6 +37,9 @@ class AnnotatedElementDependencyResolverTest {
     @Mock
     private ElementsContainer dependencySource;
 
+    @Mock
+    private SpecialDependencyHandlerAggregator specialDependencyHandlerAggregator;
+
     private AnnotatedElementDependencyResolver elementDependencyResolver;
 
     private Field someField;
@@ -48,7 +52,11 @@ class AnnotatedElementDependencyResolverTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        elementDependencyResolver = new AnnotatedElementDependencyResolver(dependencySource, injectAnnotationScanner);
+        elementDependencyResolver = new AnnotatedElementDependencyResolver(
+                dependencySource,
+                injectAnnotationScanner,
+                specialDependencyHandlerAggregator
+        );
 
         someField = this.getClass().getDeclaredField("someString");
         injectElementWithNameProvided = someField.getAnnotation(InjectElement.class);

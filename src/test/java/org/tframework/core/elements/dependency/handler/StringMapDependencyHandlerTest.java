@@ -3,6 +3,7 @@ package org.tframework.core.elements.dependency.handler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -60,5 +61,6 @@ public class StringMapDependencyHandlerTest extends SpecialDependencyHandlerBase
 
         assertTrue(handledResult.isPresent());
         assertEquals(stringMapDependency, handledResult.get());
+        verify(graph).addDependency(originalElementContext, dependencyElementContext);
     }
 }

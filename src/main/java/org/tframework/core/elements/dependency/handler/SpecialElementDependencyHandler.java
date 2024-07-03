@@ -20,7 +20,8 @@ import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 public interface SpecialElementDependencyHandler {
 
     /**
-     * Gets the object that is the result of the special dependency handling.
+     * Gets the object that is the result of the special dependency handling. The handler is
+     * responsible for adding the necessary relations into {@code dependencyGraph} if it uses any elements.
      * @param elementsContainer {@link ElementsContainer} to use for resolving the dependency.
      * @param dependencyDefinition {@link DependencyDefinition} that describes the dependency.
      * @param originalElementContext The original {@link ElementContext} whose dependencies are being resolved.

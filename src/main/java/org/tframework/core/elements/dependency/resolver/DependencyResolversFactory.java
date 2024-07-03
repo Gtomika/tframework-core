@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
+import org.tframework.core.elements.dependency.handler.SpecialElementDependencyHandlerFactory;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 
@@ -42,9 +43,11 @@ public final class DependencyResolversFactory {
 
     public static AnnotatedElementDependencyResolver createElementDependencyResolver(ElementsContainer elementsContainer) {
         var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
+        var handlerAggregator = SpecialElementDependencyHandlerFactory.createDefaultHandlerAggregator();
         return new AnnotatedElementDependencyResolver(
                 elementsContainer,
-                InjectAnnotationScanner.wrappingScanner(annotationScanner)
+                InjectAnnotationScanner.wrappingScanner(annotationScanner),
+                handlerAggregator
         );
     }
 
@@ -57,7 +60,8 @@ public final class DependencyResolversFactory {
     }
 
     public static FallbackDependencyResolver createFallbackDependencyResolver(ElementsContainer elementsContainer) {
-        return new FallbackDependencyResolver(elementsContainer);
+        var handlerAggregator = SpecialElementDependencyHandlerFactory.createDefaultHandlerAggregator();
+        return new FallbackDependencyResolver(elementsContainer, handlerAggregator);
     }
 
 }

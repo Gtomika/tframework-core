@@ -9,6 +9,7 @@ import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerAggregator;
 
 /**
  * This {@link ElementDependencyResolver} is responsible for resolving dependencies that <b>are not</b>
@@ -24,6 +25,7 @@ import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 public class FallbackDependencyResolver implements ElementDependencyResolver {
 
     private final ElementsContainer elementsContainer;
+    private final SpecialDependencyHandlerAggregator specialDependencyHandlerAggregator;
 
     @Override
     public Optional<Object> resolveDependency(
@@ -34,14 +36,19 @@ public class FallbackDependencyResolver implements ElementDependencyResolver {
         //we have no '@InjectX' annotations, so the type will be used to resolve
         log.debug("Attempting to resolve dependency with type '{}' from the elements", dependencyDefinition.dependencyType());
         try {
-
-
-            ElementContext dependencyElementContext = elementsContainer.getElementContext(dependencyDefinition.dependencyType());
-            // graph will be validated at another place
-            dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
-            Object resolvedDependency = dependencyElementContext.requestInstance(dependencyGraph);
-            log.debug("Resolved dependency from the elements: {}", resolvedDependency);
-            return Optional.of(resolvedDependency);
+            var handledSpecialResult = specialDependencyHandlerAggregator.handleDependency(
+                    elementsContainer, dependencyDefinition, originalElementContext, dependencyGraph
+            );
+            if(handledSpecialResult.isPresent()) {
+                return handledSpecialResult;
+            } else {
+                ElementContext dependencyElementContext = elementsContainer.getElementContext(dependencyDefinition.dependencyType());
+                // graph will be validated at another place
+                dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
+                Object resolvedDependency = dependencyElementContext.requestInstance(dependencyGraph);
+                log.debug("Resolved dependency from the elements: {}", resolvedDependency);
+                return Optional.of(resolvedDependency);
+            }
         } catch (Exception e) {
             log.debug("Failed to resolve dependency from the elements", e);
             return Optional.empty();

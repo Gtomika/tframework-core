@@ -16,6 +16,7 @@ import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerAggregator;
 
 @ExtendWith(MockitoExtension.class)
 class FallbackDependencyResolverTest {
@@ -29,13 +30,19 @@ class FallbackDependencyResolverTest {
     @Mock
     private ElementContext dependencyElementContext;
 
+    @Mock
+    private SpecialDependencyHandlerAggregator specialDependencyHandlerAggregator;
+
     private FallbackDependencyResolver fallbackDependencyResolver;
     private Field someField;
     private DependencyDefinition dependencyDefinition;
 
     @BeforeEach
     void setUp() throws Exception {
-        fallbackDependencyResolver = new FallbackDependencyResolver(dependencySource);
+        fallbackDependencyResolver = new FallbackDependencyResolver(
+                dependencySource,
+                specialDependencyHandlerAggregator
+        );
         someField = this.getClass().getDeclaredField("someString");
         dependencyDefinition = new DependencyDefinition(someField, someField.getType());
     }

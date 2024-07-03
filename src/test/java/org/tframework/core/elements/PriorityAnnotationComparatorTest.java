@@ -2,7 +2,6 @@
 package org.tframework.core.elements;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
@@ -16,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.tframework.core.elements.annotations.Priority;
 import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.elements.context.source.ClassElementSource;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -28,7 +28,7 @@ public class PriorityAnnotationComparatorTest {
     private PriorityAnnotationComparator comparator;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         comparator = new PriorityAnnotationComparator(annotationScanner);
 
         when(annotationScanner.scanOneStrict(TestClass1.class, Priority.class))
@@ -40,22 +40,18 @@ public class PriorityAnnotationComparatorTest {
     }
 
     @Test
-    public void shouldCompareCorrectly_whenBothObjectsAreAnnotated() {
-        var e1 = Mockito.mock(ElementContext.class);
-        doReturn(TestClass1.class).when(e1).getType();
-        var e2 = Mockito.mock(ElementContext.class);
-        doReturn(TestClass2.class).when(e2).getType();
+    public void shouldCompareCorrectly_whenBothObjectsAreAnnotated() throws Exception {
+        var e1 = mockedContext(TestClass1.class);
+        var e2 = mockedContext(TestClass2.class);
 
         var result = comparator.compare(e1, e2);
         assertTrue(result > 0);
     }
 
     @Test
-    public void shouldCompareCorrectly_whenOneObjectIsAnnotated() {
-        var e1 = Mockito.mock(ElementContext.class);
-        doReturn(TestClass1.class).when(e1).getType();
-        var e2 = Mockito.mock(ElementContext.class);
-        doReturn(TestClass3.class).when(e2).getType();
+    public void shouldCompareCorrectly_whenOneObjectIsAnnotated() throws Exception {
+        var e1 = mockedContext(TestClass1.class);
+        var e2 = mockedContext(TestClass3.class);
 
         var result = comparator.compare(e1, e2);
         assertTrue(result < 0);
@@ -63,15 +59,25 @@ public class PriorityAnnotationComparatorTest {
 
     @Priority(1)
     static class TestClass1 {
+        public TestClass1() {}
     }
 
     @Priority(2)
     static class TestClass2 {
+        public TestClass2() {}
     }
 
     /**
      * Defaults to {@link Priority#DEFAULT}
      */
     static class TestClass3 {
+        public TestClass3() {}
+    }
+
+    private ElementContext mockedContext(Class<?> sourceClass) throws Exception {
+        var mockContext = Mockito.mock(ElementContext.class);
+        var elementSource = new ClassElementSource(sourceClass, sourceClass.getConstructor());
+        when(mockContext.getSource()).thenReturn(elementSource);
+        return mockContext;
     }
 }

@@ -20,10 +20,10 @@ public class PriorityAnnotationComparator implements Comparator<ElementContext> 
 
     @Override
     public int compare(ElementContext e1, ElementContext e2) {
-        Integer e1Priority = annotationScanner.scanOneStrict(e1.getType(), Priority.class)
+        Integer e1Priority = annotationScanner.scanOneStrict(e1.getSource().annotatedSource(), Priority.class)
                 .map(Priority::value)
                 .orElse(Priority.DEFAULT);
-        Integer e2Priority = annotationScanner.scanOneStrict(e2.getType(), Priority.class)
+        Integer e2Priority = annotationScanner.scanOneStrict(e2.getSource().annotatedSource(), Priority.class)
                 .map(Priority::value)
                 .orElse(Priority.DEFAULT);
         //reversed because higher priority means it should come first

@@ -15,6 +15,7 @@ import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerAggregator;
+import org.tframework.core.elements.dependency.resolver.helper.ElementDependencyResolverHelper;
 import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
 
 /**
@@ -28,6 +29,8 @@ public class AnnotatedElementDependencyResolver implements ElementDependencyReso
 
     private final ElementsContainer elementsContainer;
     private final InjectAnnotationScanner injectAnnotationScanner;
+    private final ElementDependencyResolverHelper byNameResolverHelper;
+    private final ElementDependencyResolverHelper byTypeResolverHelper;
     private final SpecialDependencyHandlerAggregator specialDependencyHandlerAggregator;
 
     @Override
@@ -40,14 +43,11 @@ public class AnnotatedElementDependencyResolver implements ElementDependencyReso
         if(matchingResult.matches()) {
             InjectElement injectAnnotation = matchingResult.matchedAnnotations().getFirst();
             try {
-                ElementContext dependencyElementContext;
                 if(ElementUtils.isNamedElementInjection(injectAnnotation)) {
                     String dependencyName = injectAnnotation.value();
-                    log.debug("Attempting to resolve dependency with name '{}' from the elements", dependencyName);
-                    dependencyElementContext = elementsContainer.getElementContext(dependencyName);
-                    dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
-                    Object resolvedDependency = dependencyElementContext.requestInstance(dependencyGraph);
-                    log.debug("Resolved dependency from the elements: {}", resolvedDependency);
+                    var resolvedDependency = byNameResolverHelper.resolveElementDependency(
+                            elementsContainer, originalElementContext, dependencyDefinition, dependencyName, dependencyGraph
+                    );
                     return Optional.of(resolvedDependency);
                 } else {
                     var handledSpecialResult = specialDependencyHandlerAggregator.handleDependency(
@@ -56,11 +56,9 @@ public class AnnotatedElementDependencyResolver implements ElementDependencyReso
                     if(handledSpecialResult.isPresent()) {
                         return handledSpecialResult;
                     } else {
-                        log.debug("Attempting to resolve dependency with type '{}' from the elements", dependencyDefinition.dependencyType());
-                        dependencyElementContext = elementsContainer.getElementContext(dependencyDefinition.dependencyType());
-                        dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
-                        Object resolvedDependency = dependencyElementContext.requestInstance(dependencyGraph);
-                        log.debug("Resolved dependency from the elements: {}", resolvedDependency);
+                        var resolvedDependency = byTypeResolverHelper.resolveElementDependency(
+                                elementsContainer, originalElementContext, dependencyDefinition, null, dependencyGraph
+                        );
                         return Optional.of(resolvedDependency);
                     }
                 }

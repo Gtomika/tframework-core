@@ -10,6 +10,7 @@ import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerAggregator;
+import org.tframework.core.elements.dependency.resolver.helper.ElementDependencyResolverHelper;
 
 /**
  * This {@link ElementDependencyResolver} is responsible for resolving dependencies that <b>are not</b>
@@ -25,6 +26,7 @@ import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerA
 public class FallbackDependencyResolver implements ElementDependencyResolver {
 
     private final ElementsContainer elementsContainer;
+    private final ElementDependencyResolverHelper byTypeResolverHelper;
     private final SpecialDependencyHandlerAggregator specialDependencyHandlerAggregator;
 
     @Override
@@ -42,11 +44,9 @@ public class FallbackDependencyResolver implements ElementDependencyResolver {
             if(handledSpecialResult.isPresent()) {
                 return handledSpecialResult;
             } else {
-                ElementContext dependencyElementContext = elementsContainer.getElementContext(dependencyDefinition.dependencyType());
-                // graph will be validated at another place
-                dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
-                Object resolvedDependency = dependencyElementContext.requestInstance(dependencyGraph);
-                log.debug("Resolved dependency from the elements: {}", resolvedDependency);
+                var resolvedDependency = byTypeResolverHelper.resolveElementDependency(
+                        elementsContainer, originalElementContext, dependencyDefinition, null, dependencyGraph
+                );
                 return Optional.of(resolvedDependency);
             }
         } catch (Exception e) {

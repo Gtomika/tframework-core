@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.AmbiguousElementTypeException;
+import org.tframework.core.elements.ElementNotFoundException;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
@@ -44,12 +45,17 @@ public class OptionalDependencyHandler implements SpecialElementDependencyHandle
             var optionalItemType = TypeUtils.getTypeParameter(dependencyDefinition);
             log.debug("Optional dependency detected, with item type '{}'", optionalItemType.getName());
 
-            var dependencyElementContext = elementsContainer.getElementContext(optionalItemType);
-            //registering dependency to the graph before requesting instance
-            dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
-            var dependencyElementInstance = dependencyElementContext.requestInstance(dependencyGraph);
-            //the double Optional is intentional here, as the 'SpecialElementDependencyHandler' also uses it
-            return Optional.of(Optional.of(dependencyElementInstance));
+            try {
+                var dependencyElementContext = elementsContainer.getElementContext(optionalItemType);
+                //registering dependency to the graph before requesting instance
+                dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
+                var dependencyElementInstance = dependencyElementContext.requestInstance(dependencyGraph);
+                //the double Optional is intentional here, as the 'SpecialElementDependencyHandler' also uses it
+                return Optional.of(Optional.of(dependencyElementInstance));
+            } catch (ElementNotFoundException e) {
+                //the double Optional is intentional here, as the 'SpecialElementDependencyHandler' also uses it
+                return Optional.of(Optional.empty());
+            }
         } else {
             //this dependency is not an optional, ignoring it
             return Optional.empty();

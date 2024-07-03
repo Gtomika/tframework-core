@@ -45,15 +45,25 @@ public class AnnotatedElementDependencyResolver implements ElementDependencyReso
                     String dependencyName = injectAnnotation.value();
                     log.debug("Attempting to resolve dependency with name '{}' from the elements", dependencyName);
                     dependencyElementContext = elementsContainer.getElementContext(dependencyName);
+                    dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
+                    Object resolvedDependency = dependencyElementContext.requestInstance(dependencyGraph);
+                    log.debug("Resolved dependency from the elements: {}", resolvedDependency);
+                    return Optional.of(resolvedDependency);
                 } else {
-                    log.debug("Attempting to resolve dependency with type '{}' from the elements", dependencyDefinition.dependencyType());
-                    dependencyElementContext = elementsContainer.getElementContext(dependencyDefinition.dependencyType());
+                    var handledSpecialResult = specialDependencyHandlerAggregator.handleDependency(
+                            elementsContainer, dependencyDefinition, originalElementContext, dependencyGraph
+                    );
+                    if(handledSpecialResult.isPresent()) {
+                        return handledSpecialResult;
+                    } else {
+                        log.debug("Attempting to resolve dependency with type '{}' from the elements", dependencyDefinition.dependencyType());
+                        dependencyElementContext = elementsContainer.getElementContext(dependencyDefinition.dependencyType());
+                        dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
+                        Object resolvedDependency = dependencyElementContext.requestInstance(dependencyGraph);
+                        log.debug("Resolved dependency from the elements: {}", resolvedDependency);
+                        return Optional.of(resolvedDependency);
+                    }
                 }
-
-                dependencyGraph.addDependency(originalElementContext, dependencyElementContext);
-                Object resolvedDependency = dependencyElementContext.requestInstance(dependencyGraph);
-                log.debug("Resolved dependency from the elements: {}", resolvedDependency);
-                return Optional.of(resolvedDependency);
             } catch (Exception e) {
                 log.debug("Failed to resolve dependency from the elements", e);
                 return Optional.empty();

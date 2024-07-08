@@ -9,6 +9,7 @@ import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.annotations.Priority;
 import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 
 /**
  * Utility class for operations on elements.
@@ -51,14 +52,40 @@ public final class ElementUtils {
      * list will adhere to the rules of {@link Priority} annotation.
      * @param <T> The type of elements to get.
      */
-    public static <T> List<T> initAndGetElementsEagerly(ElementsContainer container, Class<T> elementType) {
+    public static <T> List<T> getElementInstances(ElementsContainer container, Class<T> elementType) {
+        return getElementInstances(container, elementType, ElementDependencyGraph.empty());
+    }
+
+    /**
+     * A version of {@link #getElementInstances(ElementsContainer, Class)} which supports continuing the
+     * dependency resolution from a given {@link ElementDependencyGraph}.
+     */
+    public static <T> List<T> getElementInstances(
+            ElementsContainer container,
+            Class<T> elementType,
+            ElementDependencyGraph graph
+    ) {
+       return getElementContexts(container, elementType).stream()
+               .map(context -> context.requestInstance(graph))
+               .map(elementType::cast) //safe cast, because these are assignable
+               .toList();
+    }
+
+    /**
+     * Gets a list of {@link ElementContext}s that have the given type. This is a wrapper over
+     * {@link ElementsContainer#getElementContextsWithType(Class)} which performs initialization
+     * and sorting as well.
+     * @param container The {@link ElementsContainer} to use.
+     * @param elementType The type of elements to get.
+     * @return A list of element contexts that have the given type. The ordering of this
+     * list will adhere to the rules of {@link Priority} annotation.
+     */
+    public static List<ElementContext> getElementContexts(ElementsContainer container, Class<?> elementType) {
         var elementContexts = container.getElementContextsWithType(elementType);
+        //if some elements are already initialized, that's not a problem, those will be skipped
         container.initializeElementContexts(elementContexts);
         return elementContexts.stream()
                 .sorted(PriorityAnnotationComparator.create())
-                .map(ElementContext::requestInstance)
-                .map(elementType::cast) //safe cast, because these are assignable
                 .toList();
     }
-
 }

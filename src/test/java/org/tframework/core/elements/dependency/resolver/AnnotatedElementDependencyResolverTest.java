@@ -4,7 +4,6 @@ package org.tframework.core.elements.dependency.resolver;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
@@ -20,9 +19,14 @@ import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerAggregator;
+import org.tframework.core.elements.dependency.resolver.helper.ElementDependencyResolverHelper;
 
 @ExtendWith(MockitoExtension.class)
 class AnnotatedElementDependencyResolverTest {
+
+    private static final String DEPENDENCY_NAME = "testElement";
+    private static final String DEPENDENCY_VALUE = "value";
 
     @Mock
     private InjectAnnotationScanner injectAnnotationScanner;
@@ -31,10 +35,19 @@ class AnnotatedElementDependencyResolverTest {
     private ElementContext originalElementContext;
 
     @Mock
-    private ElementContext dependencyElementContext;
+    private ElementsContainer elementsContainer;
 
     @Mock
-    private ElementsContainer dependencySource;
+    private ElementDependencyResolverHelper byNameResolverHelper;
+
+    @Mock
+    private ElementDependencyResolverHelper byTypeResolverHelper;
+
+    @Mock
+    private SpecialDependencyHandlerAggregator specialDependencyHandlerAggregator;
+
+    @Mock
+    private ElementDependencyGraph dependencyGraph;
 
     private AnnotatedElementDependencyResolver elementDependencyResolver;
 
@@ -48,7 +61,13 @@ class AnnotatedElementDependencyResolverTest {
 
     @BeforeEach
     void setUp() throws Exception {
-        elementDependencyResolver = new AnnotatedElementDependencyResolver(dependencySource, injectAnnotationScanner);
+        elementDependencyResolver = new AnnotatedElementDependencyResolver(
+                elementsContainer,
+                injectAnnotationScanner,
+                byNameResolverHelper,
+                byTypeResolverHelper,
+                specialDependencyHandlerAggregator
+        );
 
         someField = this.getClass().getDeclaredField("someString");
         injectElementWithNameProvided = someField.getAnnotation(InjectElement.class);
@@ -60,16 +79,16 @@ class AnnotatedElementDependencyResolverTest {
     }
 
     @Test
-    public void shouldResolveDependency_whenPresentInDependencySource_withNameProvided() {
-        var dependencyGraph = ElementDependencyGraph.empty();
-        String expectedDependencyValue = "testDependencyValue";
-
+    public void shouldResolveDependency_whenDelegatedToByNameResolver() {
         when(injectAnnotationScanner.findInjectAnnotation(someField, InjectElement.class))
                 .thenReturn(Optional.of(injectElementWithNameProvided));
-        when(dependencySource.getElementContext(injectElementWithNameProvided.value()))
-                .thenReturn(dependencyElementContext);
-        when(dependencyElementContext.requestInstance(dependencyGraph))
-                .thenReturn(expectedDependencyValue);
+        when(byNameResolverHelper.resolveElementDependency(
+                elementsContainer,
+                originalElementContext,
+                dependencyDefinitionWithNameProvided,
+                DEPENDENCY_NAME,
+                dependencyGraph
+        )).thenReturn(DEPENDENCY_VALUE);
 
         var resolvedDependency = elementDependencyResolver.resolveDependency(
                 dependencyDefinitionWithNameProvided,
@@ -77,25 +96,21 @@ class AnnotatedElementDependencyResolverTest {
                 dependencyGraph
         );
 
-        assertTrue(dependencyGraph.containsDependency(originalElementContext, dependencyElementContext));
-        if(resolvedDependency.isPresent() && resolvedDependency.get() instanceof String resolvedString) {
-            assertEquals(expectedDependencyValue, resolvedString);
-        } else {
-            fail("Resolved dependency is not a String");
-        }
+        assertTrue(resolvedDependency.isPresent());
+        assertEquals(DEPENDENCY_VALUE, resolvedDependency.get());
     }
 
     @Test
-    public void shouldResolveDependency_whenPresentInDependencySource_withNameNotProvided() {
-        var dependencyGraph = ElementDependencyGraph.empty();
-        String expectedDependencyValue = "testDependencyValue";
-
+    public void shouldResolveDependency_whenDelegatedToByTypeResolver() {
         when(injectAnnotationScanner.findInjectAnnotation(otherField, InjectElement.class))
                 .thenReturn(Optional.of(injectElementWithNameNotProvided));
-        when(dependencySource.getElementContext(otherField.getType()))
-                .thenReturn(dependencyElementContext);
-        when(dependencyElementContext.requestInstance(dependencyGraph))
-                .thenReturn(expectedDependencyValue);
+        when(byTypeResolverHelper.resolveElementDependency(
+                elementsContainer,
+                originalElementContext,
+                dependencyDefinitionWithNameNotProvided,
+                null,
+                dependencyGraph
+        )).thenReturn(DEPENDENCY_VALUE);
 
         var resolvedDependency = elementDependencyResolver.resolveDependency(
                 dependencyDefinitionWithNameNotProvided,
@@ -103,20 +118,21 @@ class AnnotatedElementDependencyResolverTest {
                 dependencyGraph
         );
 
-        assertTrue(dependencyGraph.containsDependency(originalElementContext, dependencyElementContext));
-        if(resolvedDependency.isPresent() && resolvedDependency.get() instanceof String resolvedString) {
-            assertEquals(expectedDependencyValue, resolvedString);
-        } else {
-            fail("Resolved dependency is not a String");
-        }
+        assertTrue(resolvedDependency.isPresent());
+        assertEquals(DEPENDENCY_VALUE, resolvedDependency.get());
     }
 
     @Test
-    public void shouldNotResolveDependency_whenNotPresentInDependencySource() {
+    public void shouldNotResolveDependency_whenExceptionHappensDuringResolution() {
         when(injectAnnotationScanner.findInjectAnnotation(someField, InjectElement.class))
                 .thenReturn(Optional.of(injectElementWithNameProvided));
-        when(dependencySource.getElementContext(injectElementWithNameProvided.value()))
-                .thenThrow(new RuntimeException("Dependency not found"));
+        when(byNameResolverHelper.resolveElementDependency(
+                elementsContainer,
+                originalElementContext,
+                dependencyDefinitionWithNameProvided,
+                DEPENDENCY_NAME,
+                dependencyGraph
+        )).thenThrow(new RuntimeException("I die"));
 
         var resolvedDependency = elementDependencyResolver.resolveDependency(
                 dependencyDefinitionWithNameProvided,
@@ -127,7 +143,7 @@ class AnnotatedElementDependencyResolverTest {
     }
 
     @Test
-    public void shouldThrowException_whenDependencyResolutionFails() {
+    public void shouldThrowException_whenInjectAnnotationPlacementIsInvalid() {
         when(injectAnnotationScanner.findInjectAnnotation(someField, InjectElement.class))
                 .thenThrow(new RuntimeException("Illegal, multiple inject annotations found"));
 
@@ -140,7 +156,7 @@ class AnnotatedElementDependencyResolverTest {
         });
     }
 
-    @InjectElement("testDependency")
+    @InjectElement(DEPENDENCY_NAME)
     private String someString;
 
     @InjectElement // no name provided

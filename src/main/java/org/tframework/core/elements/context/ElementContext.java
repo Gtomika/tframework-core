@@ -79,6 +79,7 @@ public abstract class ElementContext {
 
     /**
      * Initializes this element context so that it is ready to create instances of the element.
+     * This method should handle gracefully if the element is already initialized previously.
      */
     public abstract void initialize();
 

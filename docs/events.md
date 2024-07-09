@@ -84,3 +84,8 @@ as constants.
 
 - `CoreEvents.APPLICATION_INITIALIZED`: This event is published when the application is initialized. The 
 payload is the `Application` element.
+
+## Next steps
+
+You can proceed to [logging document](./logging.md). This document explains the default logging 
+config and how to change it.

@@ -235,6 +235,45 @@ Here are some examples of what is considered a circular dependency:
 - A depends on B, and B depends on A.
 - A depends on itself.
 
+## Special dependencies
+
+There are some dependencies that are resolved in a special way. These are:
+
+- `List<T>`: A list of elements can be injected. The framework will inject all elements that are
+assignable to `T`.
+- `T[]`: Similarly to lists, an array of elements can also be injected.
+- `Map<String, T>`: In case of a map with string keys, all elements assignable to `T` will be put into
+the map, with the element names as keys.
+- `Optional<T>`: When a dependency is an optional, the framework will inject an empty optional if it 
+cannot resolve the element. Otherwise, it will inject an optional with the element as its value.
+
+In case you want to ignore the special dependency handling, you can inject an element by name. For example:
+
+```java
+@Element
+public class MyElement {
+
+    //this will inject a list of all elements that are assignable to String
+    @IjectElement
+    private List<String> stringElements;
+
+    //this will inject the element with the name "someElement"
+    @InjectElement("someElement")
+    private List<String> someElement;
+}
+```
+
+The same works for constructor injection as well, of course. For collections that support ordering, you can use 
+the `@Priority` annotation to specify the order of elements in the collection. You place the annotation on the
+element source (which is a class or a method). Higher priority values will be placed first in the collection.
+
+Please note that when injecting a collection 
+of elements, the original element will depend on each of the collection elements. Be mindful of circular 
+dependencies.
+
+> :gear: **Technical note:** See [SpecialElementDependencyHandler](../src/main/java/org/tframework/core/elements/dependency/handler/SpecialElementDependencyHandler.java)
+> and its implementations.
+
 ## Element filtering
 
 Elements can be filtered out by the framework. This can be useful in some cases, for example, to exclude certain elements from

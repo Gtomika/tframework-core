@@ -36,9 +36,8 @@ class ResourceFileReaderTest {
     public void shouldThrowResourceNotFoundException_whenAccessorDoesNotFindResource() {
         var resourceReader = new ResourceFileReader(name -> null);
 
-        var exception = assertThrows(ResourceNotFoundException.class, () -> {
-            resourceReader.readResourceFile(TEST_RESOURCE_NAME);
-        });
+        var exception = assertThrows(ResourceNotFoundException.class, () ->
+                resourceReader.readResourceFile(TEST_RESOURCE_NAME));
 
         assertEquals(
                 exception.getMessageTemplate().formatted(TEST_RESOURCE_NAME),

@@ -44,9 +44,8 @@ public final class ReadersFactory {
      * Creates a {@link ResourceFileReader} to access application resources.
      */
     public static ResourceFileReader createResourceFileReader() {
-        Function<String, String> resourceAccessor = (String resourceName) -> {
-            return ClassLoaderUtils.getResourceAsString(resourceName, ResourceFileReader.class);
-        };
+        Function<String, String> resourceAccessor = (String resourceName) ->
+                ClassLoaderUtils.getResourceAsString(resourceName, ResourceFileReader.class);
         return new ResourceFileReader(resourceAccessor);
     }
 

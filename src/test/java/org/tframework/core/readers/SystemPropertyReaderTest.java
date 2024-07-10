@@ -33,9 +33,8 @@ class SystemPropertyReaderTest {
     @Test
     public void shouldThrowException_whenSystemPropertyDoesNotExist() {
         SystemPropertyReader reader = new SystemPropertyReader(name -> null, null);
-        var exception = assertThrows(SystemPropertyNotFoundException.class, () -> {
-            reader.readSystemProperty("test");
-        });
+        var exception = assertThrows(SystemPropertyNotFoundException.class, () ->
+                reader.readSystemProperty("test"));
         assertEquals(
                 exception.getMessageTemplate().formatted("test"),
                 exception.getMessage()

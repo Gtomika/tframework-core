@@ -23,7 +23,7 @@ import org.tframework.core.TFrameworkException;
  */
 public class MethodInvocationException extends TFrameworkException {
 
-    private static final String TEMPLATE = "Method '%s' of class '{}' could not be invoked";
+    private static final String TEMPLATE = "Method '%s' of class '%s' could not be invoked";
 
     public MethodInvocationException(Method method, Class<?> clazz, Exception cause) {
         super(TEMPLATE.formatted(method.getName(), clazz.getName()), cause);

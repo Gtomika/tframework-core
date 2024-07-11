@@ -277,7 +277,10 @@ dependencies.
 ## Element filtering
 
 Elements can be filtered out by the framework. This can be useful in some cases, for example, to exclude certain elements from
-being created. An example is shown in the [profiles](profiles.md) document, where elements can be filtered by profile.
+being created. A few examples are shown:
+
+- In the [profiles](profiles.md) document, where elements can be filtered by existing/missing profile.
+- In the [properties](properties.md) document, where elements can be filtered by property name and value.
 
 You can also define your own element filters by implementing the `ElementContextFilter` interface, and marking it as an element.
 The framework will pick up your filter and call it for each element context.

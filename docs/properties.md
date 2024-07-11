@@ -197,6 +197,43 @@ also possible to just inject the property as string, and do the conversion manua
 
 > :gear: **Technical note**: See the [property converter package](../src/main/java/org/tframework/core/properties/converters)
 
+## Filtering elements based on properties
+
+An element filter is available which can filter out elements based on properties and their values. This is 
+done with the `@RequiredProperty` annotation. This annotation can be placed on the element source (class or method).
+For example, this element will only be active if the `some.cool.property` property is present (value not important):
+
+```java
+@Element
+@RequiredProperty(name = "some.cool.property")
+public class CoolElement {
+    //stuff
+}
+```
+
+If we want to also check the value of the property, we can use the `hasValue` attribute of the annotation. For example:
+
+```java
+@Element
+@RequiredProperty(name = "some.cool.property", hasValue = "42")
+public class CoolElement {
+    //stuff
+}
+```
+
+It's also possible to filter based on not having a specific value.
+
+```java
+@Element
+@RequiredProperty(name = "some.cool.property", hasNoValue = "42")
+public class CoolElement {
+    //stuff
+}
+```
+
+You are free to use multiple `@RequiredProperty` annotations on the same element. They will be combined
+with a logical **AND** operation.
+
 ## Next steps
 
 Now that you understand properties, you can move on to the [elements document](./elements.md).

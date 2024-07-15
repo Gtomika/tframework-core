@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.tframework.core.Application;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.properties.PropertiesContainer;
 
@@ -34,7 +35,12 @@ class DependencyResolversFactoryTest {
     @Mock
     private PropertiesContainer propertiesContainer;
 
-    private final DependencyResolutionInput input = new DependencyResolutionInput(elementsContainer, propertiesContainer);
+    private final DependencyResolutionInput input = DependencyResolutionInput.builder()
+            .application(Application.builder()
+                    .elementsContainer(elementsContainer)
+                    .propertiesContainer(propertiesContainer)
+                    .build())
+            .build();
 
     @Test
     void shouldCreateParameterDependencyResolvers() {

@@ -15,17 +15,22 @@ limitations under the License.
 */
 package org.tframework.core.elements.dependency.resolver;
 
-import lombok.RequiredArgsConstructor;
+import org.tframework.core.Application;
 import org.tframework.core.elements.annotations.Element;
 
 @Element
-@RequiredArgsConstructor
 public class DependencyResolverConfig {
 
     public static final String FIELD_DEPENDENCY_RESOLVER_ELEMENT_NAME = "fieldDependencyResolver";
     public static final String PARAMETER_DEPENDENCY_RESOLVER_ELEMENT_NAME = "parameterDependencyResolver";
 
     private final DependencyResolutionInput dependencyResolutionInput;
+
+    public DependencyResolverConfig(Application application) {
+        this.dependencyResolutionInput = DependencyResolutionInput.builder()
+                .application(application)
+                .build();
+    }
 
     @Element(name = FIELD_DEPENDENCY_RESOLVER_ELEMENT_NAME)
     public DependencyResolverAggregator provideFieldDependencyResolver() {

@@ -16,15 +16,12 @@ limitations under the License.
 package org.tframework.core.elements.dependency.resolver;
 
 import lombok.Builder;
-import org.tframework.core.elements.ElementsContainer;
-import org.tframework.core.properties.PropertiesContainer;
+import org.tframework.core.Application;
 
 /**
  * All input for creating {@link BasicDependencyResolver}s.
+ * @param application The {@link Application}. Can be used to access profiles, properties, elements.
  */
 @Builder
-public record DependencyResolutionInput(
-        ElementsContainer elementsContainer,
-        PropertiesContainer propertiesContainer
-) {
+public record DependencyResolutionInput(Application application) {
 }

@@ -282,8 +282,25 @@ being created. A few examples are shown:
 - In the [profiles](profiles.md) document, where elements can be filtered by existing/missing profile.
 - In the [properties](properties.md) document, where elements can be filtered by property name and value.
 
+Additionally, there is the `@RequiredElement` annotation to filter based on the existence of other elements.
+
+```java
+@Element //will only be kept if there is an element with the name "someElement"
+@RequiredElement(name = "someElement")
+public class Element1 {
+    // Element implementation
+}
+
+@Element //will only be kept if Element1 was also kept
+@RequiredElement(type = Element1.class)
+public class Element2 {
+    // Element implementation
+}    
+```
+
 You can also define your own element filters by implementing the `ElementContextFilter` interface, and marking it as an element.
-The framework will pick up your filter and call it for each element context.
+The framework will pick up your filter and call it for each element context. Be advised that if you filter out 
+critical elements such as `ElementsContainer` itself, you can break the application.
 
 ## Element lifecycle callbacks
 

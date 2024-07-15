@@ -15,6 +15,7 @@ limitations under the License.
 */
 package org.tframework.core.elements.postprocessing;
 
+import org.tframework.core.Application;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.Priority;
 import org.tframework.core.elements.context.ElementContext;
@@ -42,9 +43,11 @@ public interface ElementInstancePostProcessor {
 
     /**
      * Performs the post-processing.
+     * @param application The {@link Application} which can be used to access anything like
+     *                    profiles, properties or other elements.
      * @param elementContext The {@link ElementContext} to which the instance belongs.
      * @param instance The newly created instance. It may be modified during this process.
      */
-    void postProcessInstance(ElementContext elementContext, Object instance);
+    void postProcessInstance(Application application, ElementContext elementContext, Object instance);
 
 }

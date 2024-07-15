@@ -48,6 +48,7 @@ public abstract class ElementContext {
     protected final ElementScope scope;
     protected final ElementSource source;
     protected final ElementAssembler elementAssembler;
+    protected final DependencyResolutionInput dependencyResolutionInput;
 
     protected Set<Method> methods;
     protected Set<Field> fields;
@@ -76,6 +77,7 @@ public abstract class ElementContext {
         this.scope = scope;
         this.source = source;
         this.elementAssembler = initializeElementAssembler(dependencyResolutionInput);
+        this.dependencyResolutionInput = dependencyResolutionInput;
         collectTypeData();
     }
 
@@ -131,7 +133,7 @@ public abstract class ElementContext {
 
     protected void postProcessInstance(Object instance) {
         if(postProcessor != null) {
-            postProcessor.postProcessInstance(this, instance);
+            postProcessor.postProcessInstance(dependencyResolutionInput.application(), this, instance);
         } else {
             log.debug("No post-processor set for element context '{}', instance will not be post-processed.", name);
         }

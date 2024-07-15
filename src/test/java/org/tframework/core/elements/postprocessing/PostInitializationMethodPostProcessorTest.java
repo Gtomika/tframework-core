@@ -26,22 +26,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.postprocessing.annotations.PostInitialization;
 import org.tframework.core.reflection.AnnotationFilteringResult;
 import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.reflection.methods.MethodInvoker;
 
-@ExtendWith(MockitoExtension.class)
-public class PostInitializationMethodPostProcessorTest {
-
-    @Mock
-    private ElementContext elementContext;
+public class PostInitializationMethodPostProcessorTest extends PostProcessorBaseTest {
 
     @Mock
     private AnnotationScanner annotationScanner;
@@ -79,7 +72,7 @@ public class PostInitializationMethodPostProcessorTest {
         mockFilteringByAnnotation(methods);
         mockThatPostInitMethodIsValid(methods);
 
-        processor.postProcessInstance(elementContext, this);
+        processor.postProcessInstance(application, elementContext, this);
         verifyMethodsInvoked(methods);
     }
 
@@ -90,7 +83,8 @@ public class PostInitializationMethodPostProcessorTest {
         mockFilteringByAnnotation(methods);
         mockThatPostInitMethodIsInvalid(methods);
 
-        assertThrows(PostInitializationMethodException.class, () -> processor.postProcessInstance(elementContext, this));
+        assertThrows(PostInitializationMethodException.class, () ->
+                processor.postProcessInstance(application, elementContext, this));
     }
 
     @Test
@@ -101,7 +95,8 @@ public class PostInitializationMethodPostProcessorTest {
         mockThatPostInitMethodIsValid(methods);
         mockPostInitMethodThrowingAnException(postInit1Method);
 
-        assertThrows(PostInitializationMethodException.class, () -> processor.postProcessInstance(elementContext, this));
+        assertThrows(PostInitializationMethodException.class, () ->
+                processor.postProcessInstance(application, elementContext, this));
     }
 
     private void mockFilteringByAnnotation(Set<Method> methods) {

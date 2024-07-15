@@ -29,10 +29,8 @@ import java.lang.reflect.Method;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.elements.postprocessing.PostProcessorBaseTest;
 import org.tframework.core.events.annotations.Subscribe;
 import org.tframework.core.events.exception.EventSubscriptionException;
 import org.tframework.core.reflection.AnnotationFilteringResult;
@@ -40,8 +38,7 @@ import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.reflection.methods.MethodInvoker;
 
-@ExtendWith(MockitoExtension.class)
-public class SubscribeElementPostProcessorTest {
+public class SubscribeElementPostProcessorTest extends PostProcessorBaseTest {
 
     private static final String TEST_TOPIC = "test";
 
@@ -50,9 +47,6 @@ public class SubscribeElementPostProcessorTest {
 
     @Mock
     private MethodInvoker methodInvoker;
-
-    @Mock
-    private ElementContext elementContext;
 
     @Mock
     private AnnotationScanner annotationScanner;
@@ -86,7 +80,7 @@ public class SubscribeElementPostProcessorTest {
                 true
         )).thenReturn(Set.of());
 
-        postProcessor.postProcessInstance(elementContext, this);
+        postProcessor.postProcessInstance(application, elementContext, this);
 
         verify(eventManager, never()).subscribe(any(), any());
     }
@@ -107,9 +101,8 @@ public class SubscribeElementPostProcessorTest {
         );
         mockMethodFilterAsInvalid(invalidSubscribeMethod);
 
-        var exception = assertThrows(EventSubscriptionException.class, () -> {
-            postProcessor.postProcessInstance(elementContext, this);
-        });
+        var exception = assertThrows(EventSubscriptionException.class, () ->
+                postProcessor.postProcessInstance(application, elementContext, this));
         assertEquals(invalidSubscribeMethod, exception.getMethod());
         assertEquals(elementContext, exception.getElementContext());
         assertTrue(exception.getErrors().contains(SubscribeElementPostProcessor.METHOD_DOES_NOT_HAVE_EXACTLY_ONE_PARAMETER_ERROR));
@@ -131,7 +124,7 @@ public class SubscribeElementPostProcessorTest {
         );
         mockMethodFilterAsValid(validSubscribeMethod);
 
-        postProcessor.postProcessInstance(elementContext, this);
+        postProcessor.postProcessInstance(application, elementContext, this);
 
         verify(eventManager, times(1)).subscribe(eq(TEST_TOPIC), any());
     }

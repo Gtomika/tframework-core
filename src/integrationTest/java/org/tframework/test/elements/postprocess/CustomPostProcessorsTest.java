@@ -43,7 +43,7 @@ public class CustomPostProcessorsTest {
         private Application application;
 
         @Override
-        public void postProcessInstance(ElementContext elementContext, Object instance) {
+        public void postProcessInstance(Application application, ElementContext elementContext, Object instance) {
             if(instance instanceof EpicElement epicElement) {
                 //this processor is called after field injection, so this will work
                 this.application = epicElement.application;

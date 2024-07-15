@@ -24,11 +24,8 @@ import java.lang.reflect.Field;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.annotations.InjectElement;
-import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.InjectAnnotationScanner;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
@@ -36,8 +33,7 @@ import org.tframework.core.elements.dependency.resolver.DependencyResolverAggreg
 import org.tframework.core.reflection.field.SimpleFieldFilter;
 import org.tframework.core.reflection.field.SimpleFieldSetter;
 
-@ExtendWith(MockitoExtension.class)
-public class FieldInjectionPostProcessorTest {
+public class FieldInjectionPostProcessorTest extends PostProcessorBaseTest {
 
     private static final String RESOLVED_DEPENDENCY = "resolved_dependency";
 
@@ -46,9 +42,6 @@ public class FieldInjectionPostProcessorTest {
 
     @Mock
     private DependencyResolverAggregator dependencyResolver;
-
-    @Mock
-    private ElementContext elementContext;
 
     private FieldInjectionPostProcessor fieldInjectionPostProcessor;
 
@@ -84,7 +77,7 @@ public class FieldInjectionPostProcessorTest {
 
         ValidElement instance = new ValidElement();
 
-        fieldInjectionPostProcessor.postProcessInstance(elementContext, instance);
+        fieldInjectionPostProcessor.postProcessInstance(application, elementContext, instance);
 
         assertEquals(RESOLVED_DEPENDENCY, instance.string1);
         assertNull(instance.string2);
@@ -97,7 +90,8 @@ public class FieldInjectionPostProcessorTest {
 
         InvalidElement instance = new InvalidElement();
 
-        assertThrows(FieldInjectionException.class, () -> fieldInjectionPostProcessor.postProcessInstance(elementContext, instance));
+        assertThrows(FieldInjectionException.class, () ->
+                fieldInjectionPostProcessor.postProcessInstance(application, elementContext, instance));
     }
 
     @Test
@@ -114,7 +108,8 @@ public class FieldInjectionPostProcessorTest {
 
         ValidElement instance = new ValidElement();
 
-        assertThrows(FieldInjectionException.class, () -> fieldInjectionPostProcessor.postProcessInstance(elementContext, instance));
+        assertThrows(FieldInjectionException.class, () ->
+                fieldInjectionPostProcessor.postProcessInstance(application, elementContext, instance));
     }
 
     static class ValidElement {

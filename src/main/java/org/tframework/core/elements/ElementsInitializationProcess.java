@@ -31,6 +31,7 @@ import org.tframework.core.elements.context.assembler.ElementContextAssembler;
 import org.tframework.core.elements.context.assembler.MethodElementContextAssembler;
 import org.tframework.core.elements.context.filter.ElementContextFilter;
 import org.tframework.core.elements.context.filter.ElementContextFilterAggregator;
+import org.tframework.core.elements.context.filter.FilteringRound;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.postprocessing.ElementInstancePostProcessor;
 import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorAggregator;
@@ -208,19 +209,31 @@ public class ElementsInitializationProcess {
         log.debug("Found {} filters to apply to element contexts: {}", filters.size(), LogUtils.objectClassNames(filters));
         var filterAggregator = ElementContextFilterAggregator.usingFilters(filters);
 
-        List<ElementContext> discardedContexts = new LinkedList<>();
+        Set<ElementContext> allDiscardedContexts = new HashSet<>();
 
-        elementsContainer.forEach(elementContext -> {
-            if(filterAggregator.discardElementContext(elementContext, application)) {
-                discardedContexts.add(elementContext);
-                log.debug("The element context '{}' is filtered out, and marked for discarding", elementContext.getName());
-            } else {
-                log.debug("The element context '{}' survived filtering and will be kept", elementContext.getName());
-            }
-        });
+        for(FilteringRound round: FilteringRound.values()) {
+            log.debug("Applying filters in round {}", round);
+            List<ElementContext> discardedContextsInRound = new LinkedList<>();
 
-        log.debug("A total of {} element contexts have been filtered out, and will be discarded", discardedContexts.size());
-        discardedContexts.forEach(elementsContainer::removeElementContext);
+            elementsContainer.forEach(context -> filterContext(application, filterAggregator, context, discardedContextsInRound, round));
+            discardedContextsInRound.forEach(elementsContainer::removeElementContext);
+            allDiscardedContexts.addAll(discardedContextsInRound);
+        }
+
+        log.debug("A total of {} element contexts have been filtered out, and will be discarded", allDiscardedContexts.size());
+    }
+
+    private void filterContext(
+            Application application,
+            ElementContextFilterAggregator aggregator,
+            ElementContext context,
+            List<ElementContext> discardedContexts,
+            FilteringRound round
+    ) {
+        if(aggregator.discardElementContext(context, application, round)) {
+            discardedContexts.add(context);
+            log.debug("The element context '{}' is filtered out, and marked for discarding", context.getName());
+        }
     }
 
 }

@@ -36,11 +36,17 @@ public class ElementContextFilterAggregator {
      * Applies all {@link ElementContextFilter}s to the provided {@link ElementContext}.
      * @param elementContext The element context to be filtered.
      * @param application The application containing additional data that can be used by the filters.
+     * @param round The {@link FilteringRound} that the filters should be applied in.
      * @return True, at least one filter wants to discard the context. False if all filters
      * want to keep the context.
      */
-    public boolean discardElementContext(@NonNull ElementContext elementContext, @NonNull Application application) {
+    public boolean discardElementContext(
+            @NonNull ElementContext elementContext,
+            @NonNull Application application,
+            @NonNull FilteringRound round
+    ) {
         return filters.stream()
+                .filter(filter -> filter.applyInRound().contains(round))
                 .anyMatch(filter -> filter.discardElementContext(elementContext, application));
     }
 

@@ -22,14 +22,15 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * Can be placed on element classes or methods, to declare that the element
  * requires a profile (or profiles) to <b>not be set</b>. For example, if we want
- * {@code SomeElement} to be only active when profiles {@code a} and {@code b} are <b>not</b> set:
+ * {@code SomeElement} to be only active when profile {@code a} is <b>not</b> set:
  *
  * <pre>{@code
  * @Element
- * @ForbiddenProfile({"a", "b"})
+ * @ForbiddenProfile("a")
  * public class SomeElement {}
  * }</pre>
  *
+ * This annotation is not repeatable, but you can also use an array of profiles to make multiple ones forbidden.
  * This annotation will have no effect when placed on something that is not an element.
  * @see RequiredProfile
  */

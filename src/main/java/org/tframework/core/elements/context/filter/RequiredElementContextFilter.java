@@ -15,6 +15,7 @@ limitations under the License.
 */
 package org.tframework.core.elements.context.filter;
 
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.Application;
@@ -41,7 +42,18 @@ public class RequiredElementContextFilter implements ElementContextFilter {
         return annotationScanner.scan(elementContext.getSource().annotatedSource(), RequiredElement.class)
                 .stream()
                 .peek(annotation -> validateAnnotation(elementContext, annotation))
-                .anyMatch(annotation -> !requiredElementFulfilled(annotation, application.getElementsContainer()));
+                .anyMatch(annotation -> !requiredElementFulfilled(elementContext, annotation, application.getElementsContainer()));
+    }
+
+    @Override
+    public Set<FilteringRound> applyInRound() {
+        /*
+        - We must apply this in the second round, because if another filter removes the required element,
+        (in round 1) then this filter should not see it (in round 2).
+        - We must also apply it in the third round, because if THIS filter removes the required element
+        (in round 2), then the next filter should not see it (in round 3).
+         */
+        return Set.of(FilteringRound.SECOND_ROUND, FilteringRound.THIRD_ROUND);
     }
 
     private void validateAnnotation(ElementContext elementContext, RequiredElement annotation) {
@@ -55,11 +67,25 @@ public class RequiredElementContextFilter implements ElementContextFilter {
         }
     }
 
-    private boolean requiredElementFulfilled(RequiredElement annotation, ElementsContainer elementsContainer) {
+    private boolean requiredElementFulfilled(
+            ElementContext elementContext,
+            RequiredElement annotation,
+            ElementsContainer elementsContainer
+    ) {
         if(!annotation.name().equals(RequiredElement.NAME_NOT_PROVIDED)) {
-            return elementsContainer.hasElementContext(annotation.name());
+            boolean hasContextWithName = elementsContainer.hasElementContext(annotation.name());
+            if(!hasContextWithName) {
+                log.debug("Element '{}' required another one with name '{}', which was not found. Will be filtered out.",
+                        elementContext.getName(), annotation.name());
+            }
+            return hasContextWithName;
         } else {
-            return elementsContainer.hasElementContext(annotation.type());
+            boolean hasContextWithType = elementsContainer.hasElementContext(annotation.type());
+            if(!hasContextWithType) {
+                log.debug("Element '{}' required another one with type assignable to '{}', which was not found. Will be filtered out.",
+                        elementContext.getName(), annotation.type().getName());
+            }
+            return hasContextWithType;
         }
     }
 }

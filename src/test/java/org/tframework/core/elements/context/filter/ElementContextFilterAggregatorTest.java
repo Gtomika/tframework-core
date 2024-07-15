@@ -54,8 +54,8 @@ public class ElementContextFilterAggregatorTest {
 
     @Test
     public void shouldDiscardElementContext_whenAnyFiltersDiscardIt() {
-        when(filter1.applyInRound()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
-        when(filter2.applyInRound()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
+        when(filter1.applyInRounds()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
+        when(filter2.applyInRounds()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
 
         when(filter1.discardElementContext(elementContext, APPLICATION)).thenReturn(false);
         when(filter2.discardElementContext(elementContext, APPLICATION)).thenReturn(true);
@@ -66,8 +66,8 @@ public class ElementContextFilterAggregatorTest {
 
     @Test
     public void shouldKeepElementContext_whenAllFiltersKeepIt() {
-        when(filter1.applyInRound()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
-        when(filter2.applyInRound()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
+        when(filter1.applyInRounds()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
+        when(filter2.applyInRounds()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
 
         when(filter1.discardElementContext(elementContext, APPLICATION)).thenReturn(false);
         when(filter2.discardElementContext(elementContext, APPLICATION)).thenReturn(false);
@@ -78,8 +78,8 @@ public class ElementContextFilterAggregatorTest {
 
     @Test
     public void shouldRunOnlyFilters_whenRound() {
-        when(filter1.applyInRound()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
-        when(filter2.applyInRound()).thenReturn(Set.of(FilteringRound.SECOND_ROUND));
+        when(filter1.applyInRounds()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
+        when(filter2.applyInRounds()).thenReturn(Set.of(FilteringRound.SECOND_ROUND));
 
         when(filter1.discardElementContext(elementContext, APPLICATION)).thenReturn(false);
 

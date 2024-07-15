@@ -46,7 +46,7 @@ public class RequiredElementContextFilter implements ElementContextFilter {
     }
 
     @Override
-    public Set<FilteringRound> applyInRound() {
+    public Set<FilteringRound> applyInRounds() {
         /*
         - We must apply this in the second round, because if another filter removes the required element,
         (in round 1) then this filter should not see it (in round 2).

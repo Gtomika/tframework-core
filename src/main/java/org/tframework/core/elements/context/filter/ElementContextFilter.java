@@ -61,7 +61,7 @@ public interface ElementContextFilter {
      * Returns which {@link FilteringRound}s to apply this filter in. You only need to override this if
      * your filter depends on the result of another filter, or the result of itself.
      */
-    default Set<FilteringRound> applyInRound() {
+    default Set<FilteringRound> applyInRounds() {
         return Set.of(FilteringRound.FIRST_ROUND);
     }
 }

@@ -46,7 +46,7 @@ public class ElementContextFilterAggregator {
             @NonNull FilteringRound round
     ) {
         return filters.stream()
-                .filter(filter -> filter.applyInRound().contains(round))
+                .filter(filter -> filter.applyInRounds().contains(round))
                 .anyMatch(filter -> filter.discardElementContext(elementContext, application));
     }
 

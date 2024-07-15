@@ -17,9 +17,12 @@ package org.tframework.core.elements.context.filter;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,15 +54,39 @@ public class ElementContextFilterAggregatorTest {
 
     @Test
     public void shouldDiscardElementContext_whenAnyFiltersDiscardIt() {
+        when(filter1.applyInRounds()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
+        when(filter2.applyInRounds()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
+
         when(filter1.discardElementContext(elementContext, APPLICATION)).thenReturn(false);
         when(filter2.discardElementContext(elementContext, APPLICATION)).thenReturn(true);
-        assertTrue(aggregator.discardElementContext(elementContext, APPLICATION));
+
+        boolean discarded = aggregator.discardElementContext(elementContext, APPLICATION, FilteringRound.FIRST_ROUND);
+        assertTrue(discarded);
     }
 
     @Test
     public void shouldKeepElementContext_whenAllFiltersKeepIt() {
+        when(filter1.applyInRounds()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
+        when(filter2.applyInRounds()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
+
         when(filter1.discardElementContext(elementContext, APPLICATION)).thenReturn(false);
         when(filter2.discardElementContext(elementContext, APPLICATION)).thenReturn(false);
-        assertFalse(aggregator.discardElementContext(elementContext, APPLICATION));
+
+        boolean discarded = aggregator.discardElementContext(elementContext, APPLICATION, FilteringRound.FIRST_ROUND);
+        assertFalse(discarded);
     }
+
+    @Test
+    public void shouldRunOnlyFilters_whenRound() {
+        when(filter1.applyInRounds()).thenReturn(Set.of(FilteringRound.FIRST_ROUND));
+        when(filter2.applyInRounds()).thenReturn(Set.of(FilteringRound.SECOND_ROUND));
+
+        when(filter1.discardElementContext(elementContext, APPLICATION)).thenReturn(false);
+
+        boolean discarded = aggregator.discardElementContext(elementContext, APPLICATION, FilteringRound.FIRST_ROUND);
+
+        assertFalse(discarded);
+        verify(filter2, never()).discardElementContext(elementContext, APPLICATION);
+    }
+
 }

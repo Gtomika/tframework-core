@@ -15,6 +15,7 @@ limitations under the License.
 */
 package org.tframework.core.elements.context.filter;
 
+import java.util.Set;
 import org.tframework.core.Application;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.annotations.Element;
@@ -56,4 +57,11 @@ public interface ElementContextFilter {
      */
     boolean discardElementContext(ElementContext elementContext, Application application);
 
+    /**
+     * Returns which {@link FilteringRound}s to apply this filter in. You only need to override this if
+     * your filter depends on the result of another filter, or the result of itself.
+     */
+    default Set<FilteringRound> applyInRounds() {
+        return Set.of(FilteringRound.FIRST_ROUND);
+    }
 }

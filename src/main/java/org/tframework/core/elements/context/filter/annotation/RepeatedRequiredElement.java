@@ -20,27 +20,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
- * Can be placed on element classes or methods, to declare that the element
- * requires a profile (or profiles) to <b>not be set</b>. For example, if we want
- * {@code SomeElement} to be only active when profile {@code a} is <b>not</b> set:
- *
- * <pre>{@code
- * @Element
- * @ForbiddenProfile("a")
- * public class SomeElement {}
- * }</pre>
- *
- * This annotation is not repeatable, but you can also use an array of profiles to make multiple ones forbidden.
- * This annotation will have no effect when placed on something that is not an element.
- * @see RequiredProfile
+ * Repeatable version of {@link RequiredElement}.
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ForbiddenProfile {
-
-    /**
-     * The profiles that <b>must not be set</b> for the element to be activated.
-     */
-    String[] value();
-
+public @interface RepeatedRequiredElement {
+    RequiredElement[] value();
 }

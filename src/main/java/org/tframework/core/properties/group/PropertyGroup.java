@@ -13,16 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.tframework.core.elements.annotations.subtypes;
+package org.tframework.core.properties.group;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import org.tframework.core.elements.annotations.Element;
-import org.tframework.core.properties.annotations.Property;
 
 /**
- * This is a composed {@link Element} annotation for property groups. A property group is
+ * This annotation can be used to inject property groups into elements. A property group is
  * a collection of properties that share the same prefix. For example this is the {@code my.props}
  * group with properties {@code a} and {@code b}:
  *
@@ -37,6 +35,7 @@ import org.tframework.core.properties.annotations.Property;
  * into a single object. To load the property group from the example above, you would create a class like this:
  *
  * <pre>{@code
+ * @Element
  * @PropertyGroup(name = "my.props")
  * public class MyProps {
  *     private int a;
@@ -49,6 +48,7 @@ import org.tframework.core.properties.annotations.Property;
  * you can use {@link Property}:
  *
  * <pre>{@code
+ * @Element
  * @PropertyGroup(name = "my.props")
  * public class MyProps {
  *     @Property("a") private int aValue;
@@ -58,7 +58,6 @@ import org.tframework.core.properties.annotations.Property;
  *
  * The {@code MyProps} element can then be injected into any other element.
  */
-@Element
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 public @interface PropertyGroup {

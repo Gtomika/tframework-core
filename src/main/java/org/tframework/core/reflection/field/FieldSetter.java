@@ -18,7 +18,8 @@ package org.tframework.core.reflection.field;
 import java.lang.reflect.Field;
 
 /**
- * Sets values into object's {@link Field}s.
+ * Sets values into object's {@link Field}s and replaces the many checked exceptions
+ * with {@link FieldSettingException}.
  */
 public interface FieldSetter {
 

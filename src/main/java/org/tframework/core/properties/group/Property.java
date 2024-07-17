@@ -13,13 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package org.tframework.core.properties.annotations;
+package org.tframework.core.properties.group;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import org.tframework.core.elements.annotations.InjectProperty;
-import org.tframework.core.elements.annotations.subtypes.PropertyGroup;
 
 /**
  * This annotation can be used to specify properties in certain situations, for example when using

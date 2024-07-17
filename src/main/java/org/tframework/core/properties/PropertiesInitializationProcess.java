@@ -25,6 +25,9 @@ import org.tframework.core.properties.extractors.PropertiesExtractor;
 import org.tframework.core.properties.filescanners.PropertyFileScanner;
 import org.tframework.core.properties.filescanners.PropertyFileScannersFactory;
 import org.tframework.core.properties.parsers.PropertyParser;
+import org.tframework.core.properties.placeholders.PropertyPlaceholderResolver;
+import org.tframework.core.properties.placeholders.PropertyPlaceholderResolverAggregator;
+import org.tframework.core.properties.placeholders.PropertyPlaceholderResolversFactory;
 import org.tframework.core.properties.scanners.PropertyScanner;
 import org.tframework.core.properties.scanners.PropertyScannersFactory;
 import org.tframework.core.properties.yamlparsers.YamlParser;
@@ -49,6 +52,8 @@ import org.tframework.core.readers.ResourceNotFoundException;
  *     <li>{@link PropertyParser} will convert the raw properties into {@link Property} objects.</li>
  *     <li>There will be added to the {@link PropertiesContainer}, overriding existing values.</li>
  * </ul>
+ * When properties are found from all sources, the placeholders in them will be
+ * resolved using {@link PropertyPlaceholderResolver}s.
  */
 @Slf4j
 @Builder
@@ -72,7 +77,11 @@ public class PropertiesInitializationProcess {
     public PropertiesContainer initialize(PropertiesInitializationInput input) {
         var propertyFileScanners = PropertyFileScannersFactory.createTframeworkPropertyFileScanners(input);
         var propertyScanners = PropertyScannersFactory.createDefaultPropertyScanners(input);
-        return initialize(propertyFileScanners, propertyScanners);
+
+        var placeholderResolvers = PropertyPlaceholderResolversFactory.createDefaultPlaceholderResolvers();
+        var placeholderResolverAggregator = PropertyPlaceholderResolverAggregator.usingResolvers(placeholderResolvers);
+
+        return initialize(propertyFileScanners, propertyScanners, placeholderResolverAggregator);
     }
 
     /**
@@ -84,11 +93,13 @@ public class PropertiesInitializationProcess {
      */
     PropertiesContainer initialize(
             List<PropertyFileScanner> propertyFileScanners,
-            List<PropertyScanner> propertyScanners
+            List<PropertyScanner> propertyScanners,
+            PropertyPlaceholderResolverAggregator placeholderResolverAggregator
     ) {
-        return PropertiesContainerFactory.empty()
+        var properties = PropertiesContainerFactory.empty()
                 .merge(readPropertiesFromFiles(propertyFileScanners))
                 .merge(readDirectlySpecifiedProperties(propertyScanners));
+        return placeholderResolverAggregator.resolvePlaceholders(properties);
     }
 
     private PropertiesContainer readPropertiesFromFiles(List<PropertyFileScanner> propertyFileScanners) {

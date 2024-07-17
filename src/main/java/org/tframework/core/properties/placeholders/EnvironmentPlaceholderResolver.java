@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class EnvironmentPlaceholderResolver implements PropertyPlaceholderResolver {
 
-    private static final Pattern ENV_PATTERN = Pattern.compile("env\\{(\\w+)(\\|(\\w+))?}");
+    private static final Pattern ENV_PATTERN = Pattern.compile("env\\{([^}|]+)(\\|([^}|]+))?}");
 
     private final EnvironmentVariableReader environmentVariableReader;
 

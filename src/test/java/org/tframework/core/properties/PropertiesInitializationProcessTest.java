@@ -17,6 +17,7 @@ package org.tframework.core.properties;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -29,6 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.properties.extractors.PropertiesExtractor;
 import org.tframework.core.properties.filescanners.PropertyFileScanner;
 import org.tframework.core.properties.parsers.PropertyParser;
+import org.tframework.core.properties.placeholders.PropertyPlaceholderResolverAggregator;
 import org.tframework.core.properties.scanners.PropertyScanner;
 import org.tframework.core.properties.yamlparsers.YamlParser;
 import org.tframework.core.readers.ResourceFileReader;
@@ -85,6 +87,9 @@ class PropertiesInitializationProcessTest {
     @Mock
     private PropertyParser propertyParser;
 
+    @Mock
+    private PropertyPlaceholderResolverAggregator placeholderResolverAggregator;
+
     private PropertiesInitializationProcess propertiesInitializationProcess;
 
     @BeforeEach
@@ -118,6 +123,10 @@ class PropertiesInitializationProcessTest {
         for(int i = 0; i < TEST_RAW_PROPERTIES.size(); i++) {
             when(propertyParser.parseProperty(TEST_RAW_PROPERTIES.get(i))).thenReturn(TEST_PARSED_DIRECTLY_SPECIFIED_PROPERTIES.get(i));
         }
+
+        //placeholder resolution is not tested here, it just returns the same properties
+        when(placeholderResolverAggregator.resolvePlaceholders(any(PropertiesContainer.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
     }
 
     private void makeAssertions(PropertiesContainer container) {
@@ -150,7 +159,7 @@ class PropertiesInitializationProcessTest {
     public void shouldInitializeProperties() {
         setupMocks();
         var propertiesContainer = propertiesInitializationProcess.initialize(
-                List.of(propertyFileScanner), List.of(propertyScanner)
+                List.of(propertyFileScanner), List.of(propertyScanner), placeholderResolverAggregator
         );
         makeAssertions(propertiesContainer);
     }

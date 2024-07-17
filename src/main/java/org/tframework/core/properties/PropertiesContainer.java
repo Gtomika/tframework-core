@@ -207,6 +207,13 @@ public final class PropertiesContainer {
     }
 
     /**
+     * Gets a copy of the properties in this container.
+     */
+    public List<Property> properties() {
+        return List.copyOf(properties);
+    }
+
+    /**
      * Creates a new {@link PropertiesContainer} with the original ones merged with the ones found in
      * the other container. Properties in the other container will override the current ones.
      * @param otherContainer Non-null container to merge into this one.

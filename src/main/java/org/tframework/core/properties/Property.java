@@ -15,13 +15,17 @@ limitations under the License.
 */
 package org.tframework.core.properties;
 
+import lombok.Builder;
+import lombok.With;
+
 /**
  * Represents a property, which consists of the name and the value.
  * @see PropertyValue
  */
+@Builder
 public record Property(
         String name,
-        PropertyValue value
+        @With PropertyValue value
 ) implements Comparable<Property> {
 
     @Override

@@ -103,7 +103,7 @@ Please note that individual properties set this way will override properties set
 Once a property is set, it can be used in the application. The most common use case is injecting the property value into 
 elements.
 
-### Injecting properties 1-by-1
+### Injecting properties one-by-one
 
 You can use the `@InjectProperty("property.name")` annotation to inject a property into an element. Let's take a look at 
 an example element. Here is a way how to inject a properties into it:
@@ -181,6 +181,9 @@ public class CoolProps {
 
 You can then use this property group in any other element.
 
+> :gear: **Technical note**: See the [PropertyGroupPostProcessor](../src/main/java/org/tframework/core/properties/group/PropertyGroupPostProcessor.java), 
+> which is an element post processor that injects properties into property group elements.
+
 ### Getting properties from container
 
 The element `PropertiesContainer` is always available in the application. You can use it to get properties directly.
@@ -235,6 +238,57 @@ and marking your class as an element. The framework will automatically pick up a
 also possible to just inject the property as string, and do the conversion manually.
 
 > :gear: **Technical note**: See the [property converter package](../src/main/java/org/tframework/core/properties/converters)
+
+## Property placeholders
+
+Property placeholders allow to reference other things inside the properties. These will be resolved when the framework 
+initializes.
+
+### Environment variable placeholders
+
+You can resolve environment variables by using the `env{VAR_NAME|default value}` syntax. The default value 
+part is optional and `env{VAR_NAME}` is also accepted. For example, assuming we have an environmental variable 
+`NAME` set to `Luke`, we can use it in the property file like this:
+
+```yaml
+jedi:
+  name: env{NAME} Skywalker
+```
+
+When you inject the property `jedi.name`, the value will be `Luke Skywalker`. However, if the `NAME` environmental
+variable is not set, there will be a `PropertyNotFoundException` raised. You can make the placeholder safe by 
+providing a default value:
+
+```yaml
+jedi:
+  name: env{NAME|Obi-Wan} Kenobi
+```
+  
+### Framework property placeholders
+
+You can also reference other properties by using the `prop{PROPERTY_NAME|default value}` syntax. The behaviour 
+is the same as with the environment variables placeholders, but the resolved values will be from the framework properties.
+
+```yaml
+jedi:
+  title: Master
+  name: prop{jedi.title} Kenobi
+```
+
+Do note however that the in these cases, the property resolution will not be recursive. This means that while you can 
+reference other properties with placeholders, the resolved value will have the placeholders as they were in the original
+property. For example:
+
+```yaml
+jedi:
+  title: env{TITLE|Jedi Knight}
+  name: prop{jedi.title} Anakin Skywalker
+  description: prop{jedi.name} is an esteemed member of the Jedi Order
+```
+
+In this case, when we inject the `jedi.description` property, the value will be
+`prop{jedi.title} Anakin Skywalker is an esteemed member of the Jedi Order`. `jedi.description` will resolve 
+its own placeholders, but it will not do so recursively for the `jedi.name` property.
 
 ## Filtering elements based on properties
 

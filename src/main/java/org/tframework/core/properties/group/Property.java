@@ -24,7 +24,7 @@ import org.tframework.core.elements.annotations.InjectProperty;
  * This annotation can be used to specify properties in certain situations, for example when using
  * {@link PropertyGroup} to load properties into a class.
  * <p><br>
- * <b></b>Do not confuse</b> this annotation with {@link InjectProperty}. That one is used to inject properties
+ * <b>Do not confuse</b> this annotation with {@link InjectProperty}. That one is used to inject properties
  * into elements, while this one is used to specify properties in certain situations.
  */
 @Documented

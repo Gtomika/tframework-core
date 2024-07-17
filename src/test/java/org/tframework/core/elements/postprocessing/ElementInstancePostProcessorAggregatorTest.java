@@ -24,13 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.tframework.core.elements.context.ElementContext;
 
 @ExtendWith(MockitoExtension.class)
-public class ElementInstancePostProcessorAggregatorTest {
-
-    @Mock
-    private ElementContext elementContext;
+public class ElementInstancePostProcessorAggregatorTest extends PostProcessorBaseTest {
 
     @Mock
     private ElementInstancePostProcessor processor;
@@ -46,8 +42,8 @@ public class ElementInstancePostProcessorAggregatorTest {
     public void shouldPostProcessInstance() {
         Object instance = new Object();
 
-        aggregator.postProcessInstance(elementContext, instance);
+        aggregator.postProcessInstance(application, elementContext, instance);
 
-        verify(processor, times(1)).postProcessInstance(elementContext, instance);
+        verify(processor, times(1)).postProcessInstance(application, elementContext, instance);
     }
 }

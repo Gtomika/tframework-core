@@ -39,9 +39,9 @@ public final class DependencyResolversFactory {
     public static List<DependencyResolver> createParameterDependencyResolvers(DependencyResolutionInput input) {
         //the order is important here! fallback must be the last
         return List.of(
-                createElementDependencyResolver(input.elementsContainer()),
-                createPropertyDependencyResolver(input.propertiesContainer()),
-                createFallbackDependencyResolver(input.elementsContainer())
+                createElementDependencyResolver(input.application().getElementsContainer()),
+                createPropertyDependencyResolver(input.application().getPropertiesContainer()),
+                createFallbackDependencyResolver(input.application().getElementsContainer())
         );
     }
 
@@ -52,8 +52,8 @@ public final class DependencyResolversFactory {
     public static List<DependencyResolver> createFieldDependencyResolvers(DependencyResolutionInput input) {
         //the order is important here! fallback is not present, fields must be explicitly annotated
         return List.of(
-                createElementDependencyResolver(input.elementsContainer()),
-                createPropertyDependencyResolver(input.propertiesContainer())
+                createElementDependencyResolver(input.application().getElementsContainer()),
+                createPropertyDependencyResolver(input.application().getPropertiesContainer())
         );
     }
 

@@ -103,7 +103,7 @@ Please note that individual properties set this way will override properties set
 Once a property is set, it can be used in the application. The most common use case is injecting the property value into 
 elements.
 
-### Injecting properties into elements
+### Injecting properties 1-by-1
 
 You can use the `@InjectProperty("property.name")` annotation to inject a property into an element. Let's take a look at 
 an example element. Here is a way how to inject a properties into it:
@@ -141,6 +141,45 @@ public class CoolElement {
     }
 }
 ```
+
+### Using property groups
+
+A property group is a set of properties that share a common prefix. Sometimes using them as a single element is more 
+convenient then injecting them one-by-one. This is where the `@PropertyGroup` annotation comes in. You can place it 
+on an element, and the properties of your group will be injected into the fields of the element. Assuming we 
+have these properties:
+
+```yaml
+cool:
+  props:
+    property1: value1
+    property2: 1
+```
+
+We can inject them into a property group element like this (getters omitted):
+
+```java
+@Element
+@PropertyGroup(name = "cool.props")
+public class CoolProps {
+    private String property1; //value1 is injected
+    private int property2; //1 is injected
+}
+```
+
+Mapping between properties and fields is done by the field name. If the field name is different, you can use 
+the `@Property` annotation to specify the property name. For example:
+
+```java
+@Element
+@PropertyGroup(name = "cool.props")
+public class CoolProps {
+    @Property("property1") private String someCoolProperty1;
+    @Property("property2") private int someCoolProperty2;
+}
+```
+
+You can then use this property group in any other element.
 
 ### Getting properties from container
 

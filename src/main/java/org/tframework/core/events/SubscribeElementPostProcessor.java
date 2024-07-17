@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.Application;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.postprocessing.ElementInstancePostProcessor;
@@ -53,7 +54,7 @@ public class SubscribeElementPostProcessor implements ElementInstancePostProcess
     private final EventManager eventManager;
 
     @Override
-    public void postProcessInstance(ElementContext elementContext, Object instance) {
+    public void postProcessInstance(Application application, ElementContext elementContext, Object instance) {
         methodFilter.filterByAnnotation(
                 elementContext.getMethods(),
                 Subscribe.class,

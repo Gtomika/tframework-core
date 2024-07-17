@@ -17,6 +17,7 @@ package org.tframework.core.elements.context;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.Application;
 import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.context.source.PreConstructedElementSource;
@@ -39,7 +40,9 @@ public class PreConstructedElementContext extends ElementContext {
                 preConstructedInstance.getClass(),
                 ElementScope.SINGLETON,
                 new PreConstructedElementSource(preConstructedInstance),
-                DependencyResolutionInput.builder().build() //dependency resolution is not used by pre-constructed elements
+                DependencyResolutionInput.builder()
+                        .application(Application.empty())
+                        .build() //dependency resolution is not used by pre-constructed elements
         );
         this.preConstructedInstance = preConstructedInstance;
     }

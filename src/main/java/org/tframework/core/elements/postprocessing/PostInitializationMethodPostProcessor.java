@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.Application;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.Priority;
 import org.tframework.core.elements.context.ElementContext;
@@ -48,7 +49,7 @@ public class PostInitializationMethodPostProcessor implements ElementInstancePos
     private final MethodInvoker methodInvoker;
 
     @Override
-    public void postProcessInstance(ElementContext elementContext, Object instance) {
+    public void postProcessInstance(Application application, ElementContext elementContext, Object instance) {
         methodFilter.filterByAnnotation(
                 elementContext.getMethods(),
                 PostInitialization.class,

@@ -19,6 +19,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.tframework.core.Application;
 import org.tframework.core.elements.context.ElementContext;
 
 /**
@@ -34,8 +35,8 @@ public class ElementInstancePostProcessorAggregator {
     /**
      * Perform the post-processing using all provided {@link ElementInstancePostProcessor}s.
      */
-    public void postProcessInstance(ElementContext elementContext, Object instance) {
-        processors.forEach(processor -> processor.postProcessInstance(elementContext, instance));
+    public void postProcessInstance(Application application, ElementContext elementContext, Object instance) {
+        processors.forEach(processor -> processor.postProcessInstance(application, elementContext, instance));
     }
 
     /**

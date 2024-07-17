@@ -20,6 +20,7 @@ import java.util.LinkedList;
 import java.util.List;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.Application;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.annotations.Priority;
@@ -70,7 +71,7 @@ public class FieldInjectionPostProcessor implements ElementInstancePostProcessor
     }
 
     @Override
-    public void postProcessInstance(ElementContext elementContext, Object instance) {
+    public void postProcessInstance(Application application, ElementContext elementContext, Object instance) {
         elementContext.getFields().stream()
                 .filter(injectAnnotationScanner::hasAnyInjectAnnotations)
                 .peek(field -> {

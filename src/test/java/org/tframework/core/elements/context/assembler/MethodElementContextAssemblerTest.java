@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.tframework.core.Application;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.context.ElementContext;
@@ -41,9 +42,12 @@ import org.tframework.core.reflection.methods.MethodFilter;
 @ExtendWith(MockitoExtension.class)
 class MethodElementContextAssemblerTest {
 
-    private final DependencyResolutionInput dependencyResolutionInput = new DependencyResolutionInput(
-            ElementsContainer.empty(), PropertiesContainerFactory.empty()
-    );
+    private final DependencyResolutionInput dependencyResolutionInput = DependencyResolutionInput.builder()
+            .application(Application.builder()
+                    .elementsContainer(ElementsContainer.empty())
+                    .propertiesContainer(PropertiesContainerFactory.empty())
+                    .build())
+            .build();
 
     @Mock
     private ElementContext parentElementContext;

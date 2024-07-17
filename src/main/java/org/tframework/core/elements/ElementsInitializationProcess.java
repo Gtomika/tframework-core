@@ -71,16 +71,14 @@ public class ElementsInitializationProcess {
         input.application().setElementsContainer(elementsContainer);
 
         DependencyResolutionInput dependencyResolutionInput = DependencyResolutionInput.builder()
-                .elementsContainer(elementsContainer)
-                .propertiesContainer(input.application().getPropertiesContainer())
+                .application(input.application())
                 .build();
 
         assembleElementContexts(elementsContainer, contextBundle, dependencyResolutionInput);
         addPreConstructedElementContexts(
                 elementsContainer,
                 input.application(),
-                input.preConstructedElementData(),
-                dependencyResolutionInput
+                input.preConstructedElementData()
         );
         log.info("Successfully assembled a total of {} element contexts", elementsContainer.elementCount());
 
@@ -174,15 +172,13 @@ public class ElementsInitializationProcess {
     private void addPreConstructedElementContexts(
             ElementsContainer elementsContainer,
             Application application,
-            Set<PreConstructedElementData> preConstructedElementData,
-            DependencyResolutionInput dependencyResolutionInput
+            Set<PreConstructedElementData> preConstructedElementData
     ) {
         //certain objects are added by default as pre-constructed elements
         elementsContainer.addElementContext(PreConstructedElementContext.of(elementsContainer));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application.getProfilesContainer()));
         elementsContainer.addElementContext(PreConstructedElementContext.of(application.getPropertiesContainer()));
-        elementsContainer.addElementContext(PreConstructedElementContext.of(dependencyResolutionInput));
 
         //custom pre-constructed elements may be provided as well
         preConstructedElementData.forEach(data -> {

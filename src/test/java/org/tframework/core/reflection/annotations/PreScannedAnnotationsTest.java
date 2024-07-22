@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.AnnotatedElement;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.tframework.core.elements.annotations.Element;
@@ -28,9 +27,9 @@ import org.tframework.core.elements.annotations.Element;
 @Element //just to have an annotation to test
 public class PreScannedAnnotationsTest {
 
-    private final AnnotatedElement source = this.getClass();
+    private final Class<?> source = this.getClass();
     private final Element annotation = source.getAnnotation(Element.class);
-    private PreScannedAnnotations preScannedAnnotations;
+    private PreScannedAnnotations<Class<?>> preScannedAnnotations;
 
     @BeforeEach
     public void setUp() {

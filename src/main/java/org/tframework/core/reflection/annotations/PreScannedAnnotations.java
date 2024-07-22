@@ -19,6 +19,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Optional;
+import lombok.Getter;
 import lombok.NonNull;
 import org.tframework.core.utils.MultiValueMap;
 
@@ -26,18 +27,21 @@ import org.tframework.core.utils.MultiValueMap;
  * This class stores annotations by type, that were previously scanned. This is
  * useful to reduce the amount of scanning that needs to be done, and make these
  * annotations available to any component that needs them.
+ * @param <T> The type of {@link AnnotatedElement} that the annotations were scanned from.
  */
-public class PreScannedAnnotations {
+public class PreScannedAnnotations<T extends AnnotatedElement> {
 
-    private final AnnotatedElement source;
+    @Getter
+    private final T source;
+
     private final MultiValueMap<Class<? extends Annotation>, Annotation> annotations;
 
-    PreScannedAnnotations(AnnotatedElement source, MultiValueMap<Class<? extends Annotation>, Annotation> annotations) {
+    PreScannedAnnotations(T source, MultiValueMap<Class<? extends Annotation>, Annotation> annotations) {
         this.source = source;
         this.annotations = annotations;
     }
 
-    PreScannedAnnotations(AnnotatedElement source) {
+    PreScannedAnnotations(T source) {
         this(source, new MultiValueMap<>());
     }
 
@@ -87,16 +91,7 @@ public class PreScannedAnnotations {
      * Creates a new instance of this class, without any stored annotations.
      * @param source The source {@link AnnotatedElement} of the annotations, like a class or method.
      */
-    public static PreScannedAnnotations empty(AnnotatedElement source) {
-        return new PreScannedAnnotations(source);
-    }
-
-    /**
-     * Scans the annotations of a given source, and stores them in a new instance of this class.
-     * @param source The source {@link AnnotatedElement} of the annotations, like a class or method.
-     * @param scanner An {@link AnnotationScanner} to scan the annotations.
-     */
-    public static PreScannedAnnotations scanAndStore(AnnotatedElement source, AnnotationScanner scanner) {
-
+    public static <T extends AnnotatedElement> PreScannedAnnotations<T> empty(T source) {
+        return new PreScannedAnnotations<T>(source);
     }
 }

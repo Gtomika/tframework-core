@@ -33,6 +33,8 @@ import org.tframework.core.elements.context.filter.ElementContextFilter;
 import org.tframework.core.elements.context.filter.ElementContextFilterAggregator;
 import org.tframework.core.elements.context.filter.FilteringRound;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
+import org.tframework.core.elements.modifier.ElementsContainerModifier;
+import org.tframework.core.elements.modifier.ElementsContainerModifierAggregator;
 import org.tframework.core.elements.postprocessing.ElementInstancePostProcessor;
 import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorAggregator;
 import org.tframework.core.elements.scanner.ElementClassScanner;
@@ -87,10 +89,9 @@ public class ElementsInitializationProcess {
         filterElementContext(elementsContainer, input.application());
         log.info("A total of {} element contexts survived after filtering", elementsContainer.elementCount());
 
-        var postProcessors = ElementUtils.getElementInstances(elementsContainer, ElementInstancePostProcessor.class);
-        log.debug("Found {} post-processors to apply to element instances: {}", postProcessors.size(), LogUtils.objectClassNames(postProcessors));
-        var postProcessorAggregator = ElementInstancePostProcessorAggregator.usingPostProcessors(postProcessors);
-        elementsContainer.forEach(context -> context.setPostProcessor(postProcessorAggregator));
+        processElementContainer(elementsContainer, dependencyResolutionInput);
+
+        findElementInstancePostProcessors(elementsContainer);
 
         elementsContainer.initializeElementContexts();
         log.info("Successfully initialized {} element contexts", elementsContainer.elementCount());
@@ -232,4 +233,19 @@ public class ElementsInitializationProcess {
         }
     }
 
+    private void processElementContainer(ElementsContainer elementsContainer, DependencyResolutionInput dependencyResolutionInput) {
+        var processors = ElementUtils.getElementInstances(elementsContainer, ElementsContainerModifier.class);
+        log.debug("Found {} processors to apply to element container: {}", processors.size(), LogUtils.objectClassNames(processors));
+
+        var aggregator = ElementsContainerModifierAggregator.usingProcessors(processors);
+        aggregator.modifyElementsContainer(elementsContainer, dependencyResolutionInput);
+    }
+
+    private void findElementInstancePostProcessors(ElementsContainer elementsContainer) {
+        var postProcessors = ElementUtils.getElementInstances(elementsContainer, ElementInstancePostProcessor.class);
+        log.debug("Found {} post-processors to apply to element instances: {}", postProcessors.size(), LogUtils.objectClassNames(postProcessors));
+
+        var postProcessorAggregator = ElementInstancePostProcessorAggregator.usingPostProcessors(postProcessors);
+        elementsContainer.forEach(context -> context.setPostProcessor(postProcessorAggregator));
+    }
 }

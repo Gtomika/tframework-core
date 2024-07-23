@@ -145,7 +145,6 @@ public class ElementsContainer implements Iterable<ElementContext> {
      * @throws ElementNameNotUniqueException If an element with the same name is already stored in this container.
      * @throws IllegalStateException If the container is already initialized.
      */
-    @TFrameworkInternal
     public void addElementContext(@NonNull ElementContext elementContext) throws ElementNameNotUniqueException {
         if (initialized) {
             throw new IllegalStateException("New element context cannot be added after the container is initialized.");
@@ -166,7 +165,6 @@ public class ElementsContainer implements Iterable<ElementContext> {
      * @return True if there was an override, false if there was no element context with this name.
      * @throws IllegalStateException If the container is already initialized.
      */
-    @TFrameworkInternal
     public boolean overrideElementContext(@NonNull ElementContext elementContext) {
         if (initialized) {
             throw new IllegalStateException("Element contexts cannot be overridden after the container is initialized.");

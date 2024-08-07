@@ -17,7 +17,8 @@ package org.tframework.core.elements.context;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Set;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.Setter;
@@ -31,6 +32,8 @@ import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorAggregator;
+import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 import org.tframework.core.reflection.field.SimpleFieldScanner;
 import org.tframework.core.reflection.methods.DeclaredMethodScanner;
 
@@ -43,15 +46,50 @@ import org.tframework.core.reflection.methods.DeclaredMethodScanner;
 @Getter
 public abstract class ElementContext {
 
+    /**
+     * Unique name of the element.
+     */
     protected final String name;
+
+    /**
+     * Type of the element (which is the type of it's {@link #source}).
+     */
     protected final Class<?> type;
+
+    /**
+     * {@link ElementScope} of the element.
+     */
     protected final ElementScope scope;
+
+    /**
+     * {@link ElementSource} of the element. Contains information about where the element was found.
+     */
     protected final ElementSource source;
+
+    /**
+     * The {@link ElementAssembler} that is responsible for creating instances of this element.
+     */
     protected final ElementAssembler elementAssembler;
+
     protected final DependencyResolutionInput dependencyResolutionInput;
 
-    protected Set<Method> methods;
-    protected Set<Field> fields;
+    /**
+     * {@link PreScannedAnnotations} that were found on the element source. Can be
+     * used to reduce the amount of scanning that needs to be done.
+     */
+    protected PreScannedAnnotations annotationsOnElementSource;
+
+    /**
+     * {@link PreScannedAnnotations} that were found on the methods of the element. Can be
+     * used to reduce the amount of method and annotation scanning that needs to be done.
+     */
+    protected Map<Method, PreScannedAnnotations> annotationsOnMethods;
+
+    /**
+     * {@link PreScannedAnnotations} that were found on the fields of the element. Can be
+     * used to reduce the amount of field and annotation scanning that needs to be done.
+     */
+    protected Map<Field, PreScannedAnnotations> annotationsOnFields;
 
     @Setter
     private ElementInstancePostProcessorAggregator postProcessor;
@@ -78,19 +116,32 @@ public abstract class ElementContext {
         this.source = source;
         this.elementAssembler = initializeElementAssembler(dependencyResolutionInput);
         this.dependencyResolutionInput = dependencyResolutionInput;
-        collectTypeData();
+        preScanAnnotations();
     }
 
     private ElementAssembler initializeElementAssembler(DependencyResolutionInput dependencyResolutionInput) {
         return ElementAssemblersFactory.createElementAssembler(this, dependencyResolutionInput);
     }
 
-    private void collectTypeData() {
+    private void preScanAnnotations() {
+        var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
+        annotationsOnElementSource = PreScannedAnnotations.fromScanned(
+                source.annotatedSource(), annotationScanner.scan(source.annotatedSource())
+        );
+
         var methodScanner = new DeclaredMethodScanner();
-        methods = methodScanner.scanMethods(type);
+        var methods = methodScanner.scanMethods(type);
+        annotationsOnMethods = methods.stream().collect(Collectors.toMap(
+                method -> method,
+                method -> PreScannedAnnotations.fromScanned(method, annotationScanner.scan(method))
+        ));
 
         var fieldScanner = new SimpleFieldScanner();
-        fields = fieldScanner.getAllFields(type);
+        var fields = fieldScanner.getAllFields(type);
+        annotationsOnFields = fields.stream().collect(Collectors.toMap(
+                field -> field,
+                field -> PreScannedAnnotations.fromScanned(field, annotationScanner.scan(field))
+        ));
     }
 
     /**

@@ -27,21 +27,23 @@ import org.tframework.core.utils.MultiValueMap;
  * This class stores annotations by type, that were previously scanned. This is
  * useful to reduce the amount of scanning that needs to be done, and make these
  * annotations available to any component that needs them.
- * @param <T> The type of {@link AnnotatedElement} that the annotations were scanned from.
  */
-public class PreScannedAnnotations<T extends AnnotatedElement> {
+public class PreScannedAnnotations {
 
     @Getter
-    private final T source;
+    private final AnnotatedElement source;
 
     private final MultiValueMap<Class<? extends Annotation>, Annotation> annotations;
 
-    PreScannedAnnotations(T source, MultiValueMap<Class<? extends Annotation>, Annotation> annotations) {
+    PreScannedAnnotations(
+            AnnotatedElement source,
+            MultiValueMap<Class<? extends Annotation>, Annotation> annotations
+    ) {
         this.source = source;
         this.annotations = annotations;
     }
 
-    PreScannedAnnotations(T source) {
+    PreScannedAnnotations(AnnotatedElement source) {
         this(source, new MultiValueMap<>());
     }
 
@@ -91,7 +93,22 @@ public class PreScannedAnnotations<T extends AnnotatedElement> {
      * Creates a new instance of this class, without any stored annotations.
      * @param source The source {@link AnnotatedElement} of the annotations, like a class or method.
      */
-    public static <T extends AnnotatedElement> PreScannedAnnotations<T> empty(T source) {
-        return new PreScannedAnnotations<T>(source);
+    public static  PreScannedAnnotations empty(AnnotatedElement source) {
+        return new PreScannedAnnotations(source);
+    }
+
+    /**
+     * Creates a new instance of this class, with the given list of annotations.
+     * This is a bridge between {@link AnnotationScanner} and {@link PreScannedAnnotations} classes.
+     * @param source The source {@link AnnotatedElement} of the annotations, like a class or method.
+     * @param annotations The list of annotations to store.
+     * @return A new instance of this class with the given annotations.
+     */
+    public static PreScannedAnnotations fromScanned(AnnotatedElement source, List<? extends Annotation> annotations) {
+        MultiValueMap<Class<? extends Annotation>, Annotation> map = new MultiValueMap<>();
+        for(Annotation annotation: annotations) {
+            map.putValue(annotation.annotationType(), annotation);
+        }
+        return new PreScannedAnnotations(source, map);
     }
 }

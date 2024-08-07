@@ -29,7 +29,7 @@ public class PreScannedAnnotationsTest {
 
     private final Class<?> source = this.getClass();
     private final Element annotation = source.getAnnotation(Element.class);
-    private PreScannedAnnotations<Class<?>> preScannedAnnotations;
+    private PreScannedAnnotations preScannedAnnotations;
 
     @BeforeEach
     public void setUp() {

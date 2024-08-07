@@ -30,7 +30,8 @@ public final class AnnotationScannersFactory {
      */
     public static ComposedAnnotationScanner createComposedAnnotationScanner() {
         var matcher = AnnotationMatchersFactory.createExtendedAnnotationMatcher();
-        return new ComposedAnnotationScanner(matcher);
+        var repeatedHandler = RepeatedAnnotationHandlersFactory.create();
+        return new ComposedAnnotationScanner(matcher, repeatedHandler);
     }
 
 }

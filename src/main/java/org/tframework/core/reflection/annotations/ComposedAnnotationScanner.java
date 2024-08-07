@@ -28,7 +28,7 @@ import org.tframework.core.elements.annotations.Element;
 
 /**
  * The composed annotation scanner implements 'extended annotation detection', which is more elaborate than
- * the simple one provided by {@link Class#isAnnotationPresent(Class)}. {@code isAnnotationPresent} can only find
+ * the simple one provided by {@link AnnotatedElement#isAnnotationPresent(Class)}. {@code isAnnotationPresent} can only find
  * <b>directly present</b> annotations. On the other hand, this scanner finds <b>composed annotations.</b>
  * <br>
  * We say that a component {@code A} has composed annotation {@code @B} if either is fulfilled:
@@ -39,10 +39,6 @@ import org.tframework.core.elements.annotations.Element;
  * Note the word 'supported'. Some types of annotations are unsupported due to technical limitations. Composed annotation
  * scanning cannot be used to find unsupported annotations, neither will it scan them. See {@link #isUnsupportedAnnotation(Class)}
  * method for the types of unsupported annotations.
- * <br>
- * While annotations that are placed on themselves are supported, only the first occurrence of the annotation will be
- * found by the scanner (the one on itself will not be found). Also, for circular annotations (where 2 annotations are
- * placed on each other), the scanning will stop at the first match.
  * @see AnnotationMatcher
  */
 @Slf4j
@@ -57,6 +53,10 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
      */
     private static final int MAX_DEPTH = 10;
 
+    private static final String MAX_DEPTH_WARNING = "Maximum depth (" +
+            MAX_DEPTH + ") of recursion exceeded, stopping the composed annotation scan."
+            + " This is likely due to circular annotations.";
+
     /**
      * A set of packages that commonly have unsupported annotations. This is no a complete list,
      * but it covers the most common cases, and it's used for performance reasons.
@@ -69,24 +69,36 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
     );
 
     private final AnnotationMatcher annotationMatcher;
+    private final RepeatedAnnotationHandler repeatedAnnotationHandler;
 
     /**
-     * Scans the class (provided at construction time) for composed annotations.
-     * @param annotatedElement Element to scan for the annotation.
+     * Scans the {@link AnnotatedElement} for all composed annotations.
+     * @param annotatedElement {@link AnnotatedElement} to scan for the annotation.
+     * @return List of annotations that were found in the scan. This is a list, because a composed annotation can be present
+     * multiple times on the scanned component.
+     */
+    @Override
+    public List<? extends Annotation> scan(AnnotatedElement annotatedElement) {
+        return scanAll(annotatedElement, 0);
+    }
+
+    /**
+     * Scans the {@link AnnotatedElement} for composed annotations of a specific type.
+     * @param annotatedElement Component to scan for the annotation.
      * @param annotationToFind The annotation to composed scan for.
      * @return List of annotations that were found in the scan. This is a list, because a composed annotation can be present
-     * multiple times on the scanned class.
+     * multiple times on the scanned component.
      * @param <A> Type of {@code annotationToFind}.
      * @throws UnsupportedAnnotationException If {@code annotationToFind} is unsupported for composed scanning.
      */
     @Override
     public <A extends Annotation> List<A> scan(AnnotatedElement annotatedElement, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        return scan(annotatedElement, annotationToFind, false, 0);
+        return scanByType(annotatedElement, annotationToFind, false, 0);
     }
 
     /**
-     * Scans the class (provided at construction time) for one composed annotation. Always the first matched
+     * Scans the {@link AnnotatedElement} for one composed annotation. Always the first matched
      * annotation is returned. If only one scanned annotation is needed, this method is a more performant
      * choice than {@link #scan(AnnotatedElement, Class)}. If you need to make sure that at most one annotation was found,
      * use {@link #scanOneStrict(AnnotatedElement, Class)} instead.
@@ -99,7 +111,7 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
     @Override
     public <A extends Annotation> Optional<A> scanOne(AnnotatedElement annotatedElement, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        var scannedAnnotations = scan(annotatedElement, annotationToFind, true, 0);
+        var scannedAnnotations = scanByType(annotatedElement, annotationToFind, true, 0);
         if(!scannedAnnotations.isEmpty()) {
             return Optional.of(scannedAnnotations.getFirst());
         } else {
@@ -108,7 +120,7 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
     }
 
     /**
-     * Scans the class (provided at construction time) for one composed annotation. Unlike {@link #scan(AnnotatedElement, Class)},
+     * Scans the {@link AnnotatedElement} for one composed annotation. Unlike {@link #scan(AnnotatedElement, Class)},
      * this method will raise an exception if multiple annotations are found.
      * @param annotatedElement Element to scan for the annotation.
      * @param annotationToFind The annotation to composed scan for.
@@ -120,7 +132,7 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
     @Override
     public <A extends Annotation> Optional<A> scanOneStrict(AnnotatedElement annotatedElement, Class<A> annotationToFind) {
         checkIfUnsupported(annotationToFind);
-        var scannedAnnotations = scan(annotatedElement, annotationToFind, false, 0);
+        var scannedAnnotations = scanByType(annotatedElement, annotationToFind, false, 0);
         if(scannedAnnotations.size() == 1) {
             return Optional.of(scannedAnnotations.getFirst());
         } else if(scannedAnnotations.size() > 1) {
@@ -163,33 +175,61 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
         return scanOne(annotatedElement, annotationToFind).isPresent();
     }
 
-    private <A extends Annotation> List<A> scan(
+    /**
+     * Internal method that recursively scans for <b>all</b> annotations.
+     */
+    private List<Annotation> scanAll(AnnotatedElement annotatedElement, int depth) {
+        if(depth > MAX_DEPTH) {
+            log.warn(MAX_DEPTH_WARNING);
+            return new LinkedList<>();
+        }
+        log.trace("Scanning for ALL composed annotations on '{}'.", annotatedElement);
+        List<Annotation> annotations = new LinkedList<>();
+        for(Annotation annotationOnScannedComponent: annotatedElement.getAnnotations()) {
+            if(isUnsupportedAnnotation(annotationOnScannedComponent.annotationType())) {
+                continue;
+            }
+            try {
+                var repeatedAnnotations = repeatedAnnotationHandler.extractRepeatedAnnotations(
+                        //we simply don't know the type of the repeated annotation, but it is guaranteed to be an annotation
+                        annotationOnScannedComponent, null
+                );
+                annotations.addAll(repeatedAnnotations);
+            } catch (UnsupportedAnnotationException e) {
+                //this annotation is not a container for repeated annotations, just add it
+                annotations.add(annotationOnScannedComponent);
+            }
+            var recursiveResults = scanAll(annotationOnScannedComponent.annotationType(), depth + 1);
+            annotations.addAll(recursiveResults);
+        }
+        return annotations;
+    }
+
+    /**
+     * Internal method that recursively scans for annotations of a given type.
+     * TODO: should this be rewritten to use scanAll and filter?
+     */
+    private <A extends Annotation> List<A> scanByType(
             AnnotatedElement annotatedElement,
             Class<A> annotationToFind,
             boolean stopOnFirstFind,
             int depth
     ) {
         if(depth > MAX_DEPTH) {
-            log.warn("Maximum depth of recursion exceeded, stopping the composed annotation scan."
-                    + " This is likely due to circular annotations.");
+            log.warn(MAX_DEPTH_WARNING);
             return new LinkedList<>();
         }
-
-        log.trace("Scanning for composed annotation '{}' on class '{}'.",
-                annotationToFind.getName(), annotatedElement.getClass().getName());
-
+        log.trace("Scanning for composed annotation '{}' on '{}'.", annotationToFind.getName(), annotatedElement);
         List<A> composedAnnotations = new LinkedList<>();
 
-        for(Annotation annotationOnScannedClass: annotatedElement.getAnnotations()) {
-
+        for(Annotation annotationOnScannedComponent: annotatedElement.getAnnotations()) {
             //all unsupported annotations will be skipped
-            if(isUnsupportedAnnotation(annotationOnScannedClass.annotationType())) {
+            if(isUnsupportedAnnotation(annotationOnScannedComponent.annotationType())) {
                 continue;
             }
-
-            var matchResult = annotationMatcher.matches(annotationToFind, annotationOnScannedClass);
+            var matchResult = annotationMatcher.matches(annotationToFind, annotationOnScannedComponent);
             if(matchResult.matches()) {
-                //this annotation is what is scanned for, directly present on 'scannedClass' one or more times
+                //this annotation is what is scanned for, directly present on scanned component one or more times
                 var matchedAnnotations = matchResult.matchedAnnotations();
                 if(stopOnFirstFind && !matchedAnnotations.isEmpty()) {
                     composedAnnotations.add(matchedAnnotations.getFirst());
@@ -197,9 +237,9 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
                 }
                 composedAnnotations.addAll(matchedAnnotations);
             } else {
-                //this annotation on 'scannedClass' is a different one, must check annotations on it
-                var result = scan(
-                        annotationOnScannedClass.annotationType(),
+                //this annotation on scanned component is a different one, must check annotations on it
+                var result = scanByType(
+                        annotationOnScannedComponent.annotationType(),
                         annotationToFind,
                         stopOnFirstFind,
                         depth + 1
@@ -220,5 +260,4 @@ public class ComposedAnnotationScanner implements AnnotationScanner {
             throw new UnsupportedAnnotationException(annotationToFind);
         }
     }
-
 }

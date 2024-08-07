@@ -15,15 +15,16 @@ limitations under the License.
 */
 package org.tframework.core.reflection.annotations;
 
-import org.junit.jupiter.api.Test;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
-public class PreScannerTest {
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
+public final class RepeatedAnnotationHandlersFactory {
 
-    private final PreScanner<Class<?>> preScanner = new PreScanner<>();
-
-    @Test
-    public void shouldScanAllAnnotations() {
+    /**
+     * Creates a new instance of {@link RepeatedAnnotationHandler}.
+     */
+    public static RepeatedAnnotationHandler create() {
+        return new RepeatedAnnotationHandler();
     }
-
-
 }

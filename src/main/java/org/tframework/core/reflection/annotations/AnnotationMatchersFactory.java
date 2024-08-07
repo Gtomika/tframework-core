@@ -28,7 +28,8 @@ public final class AnnotationMatchersFactory {
      * Creates an {@link ExtendedAnnotationMatcher}.
      */
     public static ExtendedAnnotationMatcher createExtendedAnnotationMatcher() {
-        return new ExtendedAnnotationMatcher();
+        var repeatedHandler = RepeatedAnnotationHandlersFactory.create();
+        return new ExtendedAnnotationMatcher(repeatedHandler);
     }
 
 }

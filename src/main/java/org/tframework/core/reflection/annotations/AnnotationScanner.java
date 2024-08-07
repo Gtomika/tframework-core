@@ -28,6 +28,13 @@ import java.util.Optional;
 public interface AnnotationScanner {
 
     /**
+     * Scans <b>all</b> supported annotations on a given {@link AnnotatedElement}.
+     * @param annotatedElement The {@link AnnotatedElement} (for example class or method) to scan.
+     * @return List with all the scanned annotations on {@code annotatedElement}.
+     */
+    List<? extends Annotation> scan(AnnotatedElement annotatedElement);
+
+    /**
      * Scans for and returns all matching annotations on the selected element.
      * @param annotatedElement The {@link AnnotatedElement} (for example class or method) to scan.
      * @param annotationToFind The annotation to find.

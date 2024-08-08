@@ -34,7 +34,7 @@ ext {
     junitJupiterVersion = "5.8.2"
     mockitoVersion = "5.8.0"
     log4jBindingVersion = "2.23.1"
-    tframeworkTestVersion = "0.0.5"
+    tframeworkTestVersion = "0.6.0-pre"
 }
 
 repositories {

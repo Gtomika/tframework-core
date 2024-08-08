@@ -28,9 +28,13 @@ public interface AnnotationMatcher {
     /**
      * Performs the annotation matching: determines if the {@code annotationToMatch} can be matched
      * to the type {@code expectedAnnotationClass}.
+     * @param expectedAnnotationClass The class that should be matched (expected annotation type).
      * @param annotationToMatch The annotation to match against the {@code expectedAnnotationClass}.
      * @return An {@link AnnotationMatchingResult} with the match status.
      */
-    <A extends Annotation> AnnotationMatchingResult<A> matches(Class<A> expectedAnnotationClass, Annotation annotationToMatch);
+    <A extends Annotation> AnnotationMatchingResult<A> matches(
+            Class<A> expectedAnnotationClass,
+            Annotation annotationToMatch
+    );
 
 }

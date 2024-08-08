@@ -17,6 +17,7 @@ package org.tframework.core.elements.dependency.resolver;
 
 import java.util.Optional;
 import org.tframework.core.elements.dependency.DependencyDefinition;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 
 /**
  * Resolves basic (non-element) dependency definitions into dependency values. These dependency resolvers do
@@ -27,8 +28,12 @@ public non-sealed interface BasicDependencyResolver extends DependencyResolver {
     /**
      * Resolves the dependency definition into a dependency value.
      * @param dependencyDefinition The {@link DependencyDefinition} that should be resolved.
+     * @param preScannedAnnotations {@link PreScannedAnnotations} with annotation data of this dependency.
      * @return The resolved dependency value, or empty if this resolver could not resolve this dependency.
      */
-    Optional<Object> resolveDependency(DependencyDefinition dependencyDefinition);
+    Optional<Object> resolveDependency(
+            DependencyDefinition dependencyDefinition,
+            PreScannedAnnotations preScannedAnnotations
+    );
 
 }

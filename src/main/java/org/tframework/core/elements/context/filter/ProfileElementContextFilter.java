@@ -53,6 +53,7 @@ public class ProfileElementContextFilter implements ElementContextFilter {
             ProfilesContainer profilesContainer
     ) {
         var annotatedElementSource = elementContext.getSource().annotatedSource();
+        //TODO #110: replace annotation scanning
         var requiredProfiles = annotationScanner.scan(annotatedElementSource, RequiredProfile.class)
                 .stream()
                 .flatMap(requiredProfileAnnotation -> Arrays.stream(requiredProfileAnnotation.value()))

@@ -1,5 +1,5 @@
 /*
-Copyright 2023 Tamas Gaspar
+Copyright 2024 Tamas Gaspar
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,20 +18,13 @@ package org.tframework.core.reflection.annotations;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-/**
- * Utilities to create {@link AnnotationScanner}s.
- */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class AnnotationScannersFactory {
+public final class RepeatedAnnotationHandlersFactory {
 
     /**
-     * Creates a {@link ComposedAnnotationScanner} that uses {@link ExtendedAnnotationMatcher}
-     * to find annotations on classes.
+     * Creates a new instance of {@link RepeatedAnnotationHandler}.
      */
-    public static ComposedAnnotationScanner createComposedAnnotationScanner() {
-        var matcher = AnnotationMatchersFactory.createExtendedAnnotationMatcher();
-        var repeatedHandler = RepeatedAnnotationHandlersFactory.create();
-        return new ComposedAnnotationScanner(matcher, repeatedHandler);
+    public static RepeatedAnnotationHandler create() {
+        return new RepeatedAnnotationHandler();
     }
-
 }

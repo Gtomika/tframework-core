@@ -34,6 +34,7 @@ import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerAggregator;
 import org.tframework.core.elements.dependency.resolver.helper.ElementDependencyResolverHelper;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 
 @ExtendWith(MockitoExtension.class)
 class FallbackDependencyResolverTest {
@@ -52,6 +53,9 @@ class FallbackDependencyResolverTest {
 
     @Mock
     private ElementDependencyGraph dependencyGraph;
+
+    @Mock
+    private PreScannedAnnotations preScannedAnnotations;
 
     private FallbackDependencyResolver fallbackDependencyResolver;
     private DependencyDefinition dependencyDefinition;
@@ -78,7 +82,8 @@ class FallbackDependencyResolverTest {
         var resolvedDependency = fallbackDependencyResolver.resolveDependency(
                 dependencyDefinition,
                 originalElementContext,
-                dependencyGraph
+                dependencyGraph,
+                preScannedAnnotations
         );
 
         assertTrue(resolvedDependency.isPresent());
@@ -96,7 +101,8 @@ class FallbackDependencyResolverTest {
         var resolvedDependency = fallbackDependencyResolver.resolveDependency(
                 dependencyDefinition,
                 originalElementContext,
-                dependencyGraph
+                dependencyGraph,
+                preScannedAnnotations
         );
 
         assertTrue(resolvedDependency.isPresent());
@@ -112,7 +118,8 @@ class FallbackDependencyResolverTest {
         var resolvedDependency = fallbackDependencyResolver.resolveDependency(
                 dependencyDefinition,
                 originalElementContext,
-                ElementDependencyGraph.empty()
+                ElementDependencyGraph.empty(),
+                preScannedAnnotations
         );
         assertTrue(resolvedDependency.isEmpty());
     }

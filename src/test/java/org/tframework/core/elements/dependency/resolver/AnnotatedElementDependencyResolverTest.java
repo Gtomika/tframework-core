@@ -31,10 +31,11 @@ import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
-import org.tframework.core.elements.dependency.InjectAnnotationScanner;
+import org.tframework.core.elements.dependency.InjectAnnotationHelper;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerAggregator;
 import org.tframework.core.elements.dependency.resolver.helper.ElementDependencyResolverHelper;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 
 @ExtendWith(MockitoExtension.class)
 class AnnotatedElementDependencyResolverTest {
@@ -43,7 +44,7 @@ class AnnotatedElementDependencyResolverTest {
     private static final String DEPENDENCY_VALUE = "value";
 
     @Mock
-    private InjectAnnotationScanner injectAnnotationScanner;
+    private InjectAnnotationHelper injectAnnotationHelper;
 
     @Mock
     private ElementContext originalElementContext;
@@ -63,6 +64,9 @@ class AnnotatedElementDependencyResolverTest {
     @Mock
     private ElementDependencyGraph dependencyGraph;
 
+    @Mock
+    private PreScannedAnnotations preScannedAnnotations;
+
     private AnnotatedElementDependencyResolver elementDependencyResolver;
 
     private Field someField;
@@ -77,7 +81,7 @@ class AnnotatedElementDependencyResolverTest {
     void setUp() throws Exception {
         elementDependencyResolver = new AnnotatedElementDependencyResolver(
                 elementsContainer,
-                injectAnnotationScanner,
+                injectAnnotationHelper,
                 byNameResolverHelper,
                 byTypeResolverHelper,
                 specialDependencyHandlerAggregator
@@ -94,7 +98,7 @@ class AnnotatedElementDependencyResolverTest {
 
     @Test
     public void shouldResolveDependency_whenDelegatedToByNameResolver() {
-        when(injectAnnotationScanner.findInjectAnnotation(someField, InjectElement.class))
+        when(injectAnnotationHelper.findInjectAnnotation(preScannedAnnotations, InjectElement.class))
                 .thenReturn(Optional.of(injectElementWithNameProvided));
         when(byNameResolverHelper.resolveElementDependency(
                 elementsContainer,
@@ -107,7 +111,8 @@ class AnnotatedElementDependencyResolverTest {
         var resolvedDependency = elementDependencyResolver.resolveDependency(
                 dependencyDefinitionWithNameProvided,
                 originalElementContext,
-                dependencyGraph
+                dependencyGraph,
+                preScannedAnnotations
         );
 
         assertTrue(resolvedDependency.isPresent());
@@ -116,7 +121,7 @@ class AnnotatedElementDependencyResolverTest {
 
     @Test
     public void shouldResolveDependency_whenDelegatedToByTypeResolver() {
-        when(injectAnnotationScanner.findInjectAnnotation(otherField, InjectElement.class))
+        when(injectAnnotationHelper.findInjectAnnotation(preScannedAnnotations, InjectElement.class))
                 .thenReturn(Optional.of(injectElementWithNameNotProvided));
         when(byTypeResolverHelper.resolveElementDependency(
                 elementsContainer,
@@ -129,7 +134,8 @@ class AnnotatedElementDependencyResolverTest {
         var resolvedDependency = elementDependencyResolver.resolveDependency(
                 dependencyDefinitionWithNameNotProvided,
                 originalElementContext,
-                dependencyGraph
+                dependencyGraph,
+                preScannedAnnotations
         );
 
         assertTrue(resolvedDependency.isPresent());
@@ -138,7 +144,7 @@ class AnnotatedElementDependencyResolverTest {
 
     @Test
     public void shouldNotResolveDependency_whenExceptionHappensDuringResolution() {
-        when(injectAnnotationScanner.findInjectAnnotation(someField, InjectElement.class))
+        when(injectAnnotationHelper.findInjectAnnotation(preScannedAnnotations, InjectElement.class))
                 .thenReturn(Optional.of(injectElementWithNameProvided));
         when(byNameResolverHelper.resolveElementDependency(
                 elementsContainer,
@@ -151,21 +157,23 @@ class AnnotatedElementDependencyResolverTest {
         var resolvedDependency = elementDependencyResolver.resolveDependency(
                 dependencyDefinitionWithNameProvided,
                 originalElementContext,
-                ElementDependencyGraph.empty()
+                ElementDependencyGraph.empty(),
+                preScannedAnnotations
         );
         assertTrue(resolvedDependency.isEmpty());
     }
 
     @Test
     public void shouldThrowException_whenInjectAnnotationPlacementIsInvalid() {
-        when(injectAnnotationScanner.findInjectAnnotation(someField, InjectElement.class))
+        when(injectAnnotationHelper.findInjectAnnotation(preScannedAnnotations, InjectElement.class))
                 .thenThrow(new RuntimeException("Illegal, multiple inject annotations found"));
 
         assertThrows(RuntimeException.class, () -> {
             elementDependencyResolver.resolveDependency(
                     dependencyDefinitionWithNameProvided,
                     originalElementContext,
-                    ElementDependencyGraph.empty()
+                    ElementDependencyGraph.empty(),
+                    preScannedAnnotations
             );
         });
     }

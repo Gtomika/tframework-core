@@ -39,6 +39,7 @@ public class RequiredElementContextFilter implements ElementContextFilter {
 
     @Override
     public boolean discardElementContext(ElementContext elementContext, Application application) {
+        //TODO #110: replace annotation scanning
         return annotationScanner.scan(elementContext.getSource().annotatedSource(), RequiredElement.class)
                 .stream()
                 .peek(annotation -> validateAnnotation(elementContext, annotation))

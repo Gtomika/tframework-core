@@ -28,17 +28,34 @@ import org.junit.jupiter.params.provider.ValueSource;
 class ComposedAnnotationScannerTest {
 
     /*
-    This may not be the best approach, but instead of using a mock annotation matcher, I decided to
-    use a concrete implementation, to reduce mocking noise in these tests.
+    This may not be the best approach, but instead of using a mocks, I decided to
+    use a concrete implementation, to significantly reduce mocking noise in these tests.
      */
     private final ExtendedAnnotationMatcher extendedAnnotationMatcher = AnnotationMatchersFactory.createExtendedAnnotationMatcher();
-    private final ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(extendedAnnotationMatcher);
+    private final RepeatedAnnotationHandler repeatedAnnotationHandler = RepeatedAnnotationHandlersFactory.create();
+    private final ComposedAnnotationScanner scanner = new ComposedAnnotationScanner(extendedAnnotationMatcher, repeatedAnnotationHandler);
+
+    @TestAnnotationA("A on HasManyAnnotations #1")
+    @TestAnnotationA("A on HasManyAnnotations #2")
+    @TestAnnotationB("B on HasManyAnnotations")
+    @TestAnnotationC("C on HasManyAnnotations")
+    static class HasManyAnnotations {}
+
+    @Test
+    public void scanAll_shouldFindAllSupportedAnnotations() {
+        var allAnnotations = scanner.scan(HasManyAnnotations.class);
+        //test annotation A should be present 4 times: 2 directly, 1 on B, 2 on C
+        assertEquals(5, allAnnotations.stream().filter(a -> a instanceof TestAnnotationA).count());
+        //test annotation B should be present 2 times: 1 directly, 1 on C
+        assertEquals(2, allAnnotations.stream().filter(a -> a instanceof TestAnnotationB).count());
+        //test annotation C should be present 1 time
+        assertEquals(1, allAnnotations.stream().filter(a -> a instanceof TestAnnotationC).count());
+    }
 
     @Test
     public void scan_shouldThrowUnsupportedAnnotationException_whenAnnotationToFindIsInUnsupportedPackage() {
-        UnsupportedAnnotationException actualException = assertThrows(UnsupportedAnnotationException.class, () -> {
-        scanner.scan(ComposedAnnotationScannerTest.class, Retention.class);
-        });
+        UnsupportedAnnotationException actualException = assertThrows(UnsupportedAnnotationException.class,
+                () -> scanner.scan(ComposedAnnotationScannerTest.class, Retention.class));
         assertEquals(
                 actualException.getMessageTemplate().formatted(Retention.class.getName()),
                 actualException.getMessage()
@@ -47,9 +64,8 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scanOne_shouldThrowUnsupportedAnnotationException_whenAnnotationToFindIsInUnsupportedPackage() {
-        UnsupportedAnnotationException actualException = assertThrows(UnsupportedAnnotationException.class, () -> {
-            scanner.scanOne(ComposedAnnotationScannerTest.class, Retention.class);
-        });
+        UnsupportedAnnotationException actualException = assertThrows(UnsupportedAnnotationException.class,
+                () -> scanner.scanOne(ComposedAnnotationScannerTest.class, Retention.class));
         assertEquals(
                 actualException.getMessageTemplate().formatted(Retention.class.getName()),
                 actualException.getMessage()
@@ -58,9 +74,8 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scanOneStrict_shouldThrowUnsupportedAnnotationException_whenAnnotationToFindIsInUnsupportedPackage() {
-        UnsupportedAnnotationException actualException = assertThrows(UnsupportedAnnotationException.class, () -> {
-            scanner.scanOneStrict(ComposedAnnotationScannerTest.class, Retention.class);
-        });
+        UnsupportedAnnotationException actualException = assertThrows(UnsupportedAnnotationException.class,
+                () -> scanner.scanOneStrict(ComposedAnnotationScannerTest.class, Retention.class));
         assertEquals(
                 actualException.getMessageTemplate().formatted(Retention.class.getName()),
                 actualException.getMessage()
@@ -126,9 +141,8 @@ class ComposedAnnotationScannerTest {
     @ParameterizedTest
     @ValueSource(classes = {DirectlyPresentRepeated.class, DirectlyPresentRepeatedContaining.class})
     public void scanOneStrict_shouldThrowException_ifFoundMultipleDirectlyPresentAnnotations(Class<?> testClass) {
-        MultipleAnnotationsScannedException exception = assertThrows(MultipleAnnotationsScannedException.class, () -> {
-            scanner.scanOneStrict(testClass, TestAnnotationA.class);
-        });
+        MultipleAnnotationsScannedException exception = assertThrows(MultipleAnnotationsScannedException.class,
+                () -> scanner.scanOneStrict(testClass, TestAnnotationA.class));
 
         var repeatedAnnotationContainer = DirectlyPresentRepeated.class.getAnnotation(RepeatedTestAnnotationA.class);
         assertEquals(
@@ -190,9 +204,8 @@ class ComposedAnnotationScannerTest {
 
     @Test
     public void scanOneStrict_shouldThrowException_whenFoundMultipleAnnotations_composedInTwoLayers() {
-        MultipleAnnotationsScannedException exception = assertThrows(MultipleAnnotationsScannedException.class, () -> {
-            scanner.scanOneStrict(ComposedPresentTwoLayers.class, TestAnnotationA.class);
-        });
+        MultipleAnnotationsScannedException exception = assertThrows(MultipleAnnotationsScannedException.class,
+                () -> scanner.scanOneStrict(ComposedPresentTwoLayers.class, TestAnnotationA.class));
 
         List<TestAnnotationA> composedAnnotationsExpectedInMessage = scanner.scan(ComposedPresentTwoLayers.class, TestAnnotationA.class);
         assertEquals(

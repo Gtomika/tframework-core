@@ -26,7 +26,7 @@ import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.annotations.Priority;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
-import org.tframework.core.elements.dependency.InjectAnnotationScanner;
+import org.tframework.core.elements.dependency.InjectAnnotationHelper;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverConfig;
@@ -53,18 +53,18 @@ public class FieldInjectionPostProcessor implements ElementInstancePostProcessor
 
     static final String DEPENDENCY_DECLARED_AS_FIELD = "Field";
 
-    private final InjectAnnotationScanner injectAnnotationScanner;
+    private final InjectAnnotationHelper injectAnnotationHelper;
     private final FieldFilter fieldFilter;
     private final FieldSetter fieldSetter;
     private final DependencyResolverAggregator dependencyResolver;
 
     public FieldInjectionPostProcessor(
-            InjectAnnotationScanner injectAnnotationScanner,
+            InjectAnnotationHelper injectAnnotationHelper,
             FieldFilter fieldFilter,
             FieldSetter fieldSetter,
             @InjectElement(DependencyResolverConfig.FIELD_DEPENDENCY_RESOLVER_ELEMENT_NAME) DependencyResolverAggregator dependencyResolver
     ) {
-        this.injectAnnotationScanner = injectAnnotationScanner;
+        this.injectAnnotationHelper = injectAnnotationHelper;
         this.fieldFilter = fieldFilter;
         this.fieldSetter = fieldSetter;
         this.dependencyResolver = dependencyResolver;
@@ -72,14 +72,15 @@ public class FieldInjectionPostProcessor implements ElementInstancePostProcessor
 
     @Override
     public void postProcessInstance(Application application, ElementContext elementContext, Object instance) {
-        elementContext.getFields().stream()
-                .filter(injectAnnotationScanner::hasAnyInjectAnnotations)
-                .peek(field -> {
+        elementContext.getAnnotationsOnFields().entrySet().stream()
+                .filter(entry -> injectAnnotationHelper.hasAnyInjectAnnotations(entry.getValue()))
+                .peek(entry -> {
+                    Field field = entry.getKey();
                     isValidFieldForInjection(elementContext, field);
                     log.debug("Element context '{}', field '{}': candidate for field injection",
                             elementContext.getName(), field.getName());
                 })
-                .forEach(field ->  setDependencyField(elementContext, instance, field));
+                .forEach(entry ->  setDependencyField(elementContext, instance, entry.getKey()));
     }
 
     private void isValidFieldForInjection(ElementContext elementContext, Field field) {
@@ -100,10 +101,12 @@ public class FieldInjectionPostProcessor implements ElementInstancePostProcessor
     private void setDependencyField(ElementContext elementContext, Object instance, Field field) {
         try {
             var dependencyDefinition = DependencyDefinition.fromField(field);
+            var preScannedAnnotationsOnField = elementContext.getAnnotationsOnFields().get(field);
             Object resolvedDependency = dependencyResolver.resolveDependency(
                     dependencyDefinition,
                     elementContext,
                     ElementDependencyGraph.empty(),
+                    preScannedAnnotationsOnField,
                     DEPENDENCY_DECLARED_AS_FIELD
             );
             fieldSetter.setFieldValue(instance, field, resolvedDependency);
@@ -113,5 +116,4 @@ public class FieldInjectionPostProcessor implements ElementInstancePostProcessor
             throw new FieldInjectionException(field, elementContext, e);
         }
     }
-
 }

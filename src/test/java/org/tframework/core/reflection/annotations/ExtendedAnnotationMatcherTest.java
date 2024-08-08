@@ -23,7 +23,9 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 class ExtendedAnnotationMatcherTest {
 
-    private final ExtendedAnnotationMatcher matcher = new ExtendedAnnotationMatcher();
+    //not mocked to significantly reduce test complexity
+    private final RepeatedAnnotationHandler repeatedAnnotationHandler = RepeatedAnnotationHandlersFactory.create();
+    private final ExtendedAnnotationMatcher matcher = new ExtendedAnnotationMatcher(repeatedAnnotationHandler);
 
     @TestAnnotationA("A on MatchWhenEquals")
     static class MatchWhenEquals {}

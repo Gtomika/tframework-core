@@ -28,7 +28,6 @@ import org.tframework.core.elements.postprocessing.ElementInstancePostProcessor;
 import org.tframework.core.events.annotations.Subscribe;
 import org.tframework.core.events.exception.EventSubscriptionException;
 import org.tframework.core.reflection.AnnotationFilteringResult;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.reflection.methods.MethodInvocationException;
 import org.tframework.core.reflection.methods.MethodInvoker;
@@ -48,25 +47,25 @@ public class SubscribeElementPostProcessor implements ElementInstancePostProcess
     static final String METHOD_IS_ABSTRACT_ERROR = "method is abstract";
     static final String METHOD_DOES_NOT_HAVE_EXACTLY_ONE_PARAMETER_ERROR = "method does not have exactly one parameter";
 
-    private final AnnotationScanner annotationScanner;
     private final MethodFilter methodFilter;
     private final MethodInvoker methodInvoker;
     private final EventManager eventManager;
 
     @Override
     public void postProcessInstance(Application application, ElementContext elementContext, Object instance) {
-        methodFilter.filterByAnnotation(
-                elementContext.getMethods(),
-                Subscribe.class,
-                annotationScanner,
-                true
-        ).stream()
+        elementContext.getAnnotationsOnMethods().entrySet().stream()
+                .filter(entry -> entry.getValue().hasAnnotation(Subscribe.class))
+                .map(entry -> {
+                    var subscribeAnnotation = entry.getValue().getAnnotationStrict(Subscribe.class).get();
+                    var method = entry.getKey();
+                    return new AnnotationFilteringResult<>(subscribeAnnotation, method);
+                })
                 .peek(result -> {
                     checkValidSubscribeMethod(elementContext, result.annotationSource());
                     log.debug("Element context '{}', method '{}': valid subscribe method",
                             elementContext.getName(), LogUtils.niceExecutableName(result.annotationSource()));
                 })
-                .forEach(method -> subscribe(elementContext, method, instance));
+                .forEach(result -> subscribe(elementContext, result, instance));
     }
 
     private void checkValidSubscribeMethod(ElementContext elementContext, Method method) {

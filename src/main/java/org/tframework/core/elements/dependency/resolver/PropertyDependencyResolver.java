@@ -15,7 +15,6 @@ limitations under the License.
 */
 package org.tframework.core.elements.dependency.resolver;
 
-import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -23,9 +22,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.annotations.InjectProperty;
 import org.tframework.core.elements.dependency.DependencyDefinition;
-import org.tframework.core.elements.dependency.InjectAnnotationScanner;
+import org.tframework.core.elements.dependency.InjectAnnotationHelper;
 import org.tframework.core.properties.PropertiesContainer;
 import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 
 /**
  * This {@link BasicDependencyResolver} is responsible for resolving dependencies that are annotated with
@@ -37,11 +37,14 @@ import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
 public class PropertyDependencyResolver implements BasicDependencyResolver {
 
     private final PropertiesContainer propertiesContainer;
-    private final InjectAnnotationScanner injectAnnotationScanner;
+    private final InjectAnnotationHelper injectAnnotationHelper;
 
     @Override
-    public Optional<Object> resolveDependency(DependencyDefinition dependencyDefinition) {
-        var matchingResult = matchPropertiesInjectAnnotation(dependencyDefinition.annotationSource());
+    public Optional<Object> resolveDependency(
+            DependencyDefinition dependencyDefinition,
+            PreScannedAnnotations preScannedAnnotations
+    ) {
+        var matchingResult = matchPropertiesInjectAnnotation(preScannedAnnotations);
         if(matchingResult.matches()) {
             InjectProperty injectAnnotation = matchingResult.matchedAnnotations().getFirst();
             String dependencyName = injectAnnotation.value();
@@ -72,8 +75,8 @@ public class PropertyDependencyResolver implements BasicDependencyResolver {
         }
     }
 
-    private AnnotationMatchingResult<InjectProperty> matchPropertiesInjectAnnotation(AnnotatedElement dependencyDefinition) {
-        return injectAnnotationScanner.findInjectAnnotation(dependencyDefinition, InjectProperty.class)
+    private AnnotationMatchingResult<InjectProperty> matchPropertiesInjectAnnotation(PreScannedAnnotations preScannedAnnotations) {
+        return injectAnnotationHelper.findInjectAnnotation(preScannedAnnotations, InjectProperty.class)
                 .stream()
                 .findAny()
                 .map(injectProperty -> new AnnotationMatchingResult<>(true, List.of(injectProperty)))

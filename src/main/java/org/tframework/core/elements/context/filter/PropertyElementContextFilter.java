@@ -39,6 +39,7 @@ public class PropertyElementContextFilter implements ElementContextFilter {
     @Override
     public boolean discardElementContext(ElementContext elementContext, Application application) {
         var properties = application.getPropertiesContainer();
+        //TODO #110: replace annotation scanning
         return annotationScanner.scan(elementContext.getSource().annotatedSource(), RequiredProperty.class)
                 .stream()
                 .anyMatch(requiredProperty -> !requiredPropertyFulfilled(requiredProperty, properties, elementContext));

@@ -34,6 +34,7 @@ public class PriorityAnnotationComparator implements Comparator<ElementContext> 
 
     @Override
     public int compare(ElementContext e1, ElementContext e2) {
+        //TODO #110: replace annotation scanning
         Integer e1Priority = annotationScanner.scanOneStrict(e1.getSource().annotatedSource(), Priority.class)
                 .map(Priority::value)
                 .orElse(Priority.DEFAULT);

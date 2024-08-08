@@ -18,10 +18,13 @@ package org.tframework.core.elements.assembler;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +36,7 @@ import org.tframework.core.elements.context.source.MethodElementSource;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 
 @ExtendWith(MockitoExtension.class)
 class MethodElementAssemblerTest {
@@ -46,6 +50,12 @@ class MethodElementAssemblerTest {
     @Mock
     private DependencyResolverAggregator aggregator;
 
+    @Mock
+    private Map<Parameter, PreScannedAnnotations> preScannedParams;
+
+    @Mock
+    private PreScannedAnnotations preScannedAnnotations;
+
     private MethodElementAssembler methodElementAssembler;
     private DependencyDefinition dummyStringDependencyDefinition;
 
@@ -57,6 +67,8 @@ class MethodElementAssemblerTest {
         when(elementContext.getName()).thenReturn("dummyElement");
         doReturn(DummyElement.class).when(elementContext).getType();
         when(elementContext.getSource()).thenReturn(methodElementSource);
+        when(preScannedParams.get(any())).thenReturn(preScannedAnnotations);
+        when(elementContext.getAnnotationsOnConstructionParams()).thenReturn(preScannedParams);
 
         methodElementAssembler = MethodElementAssembler.builder()
                 .elementContext(elementContext)
@@ -77,6 +89,7 @@ class MethodElementAssemblerTest {
                 dummyStringDependencyDefinition,
                 elementContext,
                 dependencyGraph,
+                preScannedAnnotations,
                 MethodElementAssembler.DEPENDENCY_DECLARED_AS
         )).thenReturn(expectedElement.dummyString);
 
@@ -94,6 +107,7 @@ class MethodElementAssemblerTest {
                 dummyStringDependencyDefinition,
                 elementContext,
                 dependencyGraph,
+                preScannedAnnotations,
                 MethodElementAssembler.DEPENDENCY_DECLARED_AS
         )).thenThrow(new RuntimeException("Failed to resolve dependency :("));
 

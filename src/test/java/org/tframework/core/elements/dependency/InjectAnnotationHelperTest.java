@@ -33,38 +33,35 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.annotations.InjectProperty;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.annotations.MultipleAnnotationsScannedException;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 
 @InjectProperty("test") //these exist just to get them as objects in the test
 @InjectElement("test")
 @ExtendWith(MockitoExtension.class)
-class InjectAnnotationScannerTest {
+class InjectAnnotationHelperTest {
 
     private String testFieldActual;
 
     @Mock
-    private AnnotationScanner annotationScanner;
+    private PreScannedAnnotations preScannedAnnotations;
 
-    private InjectAnnotationScanner injectAnnotationScanner;
+    private InjectAnnotationHelper injectAnnotationHelper;
     private Field testField;
 
     @BeforeEach
     void setUp() throws NoSuchFieldException {
-        injectAnnotationScanner = InjectAnnotationScanner.wrappingScanner(annotationScanner);
+        injectAnnotationHelper = new InjectAnnotationHelper();
         testField = this.getClass().getDeclaredField("testFieldActual");
     }
 
     @Test
     public void shouldThrowException_ifMultipleInjectAnnotationsAreFound_withTheSameType() {
-        when(annotationScanner.scanOneStrict(testField, InjectElement.class))
+        when(preScannedAnnotations.getAnnotationStrict(InjectElement.class))
                 .thenThrow(MultipleAnnotationsScannedException.class);
 
-        assertThrows(MultipleAnnotationsScannedException.class, () -> {
-            injectAnnotationScanner.findInjectAnnotation(testField, InjectElement.class);
-        });
-
-        //no point testing the exception message, because it was provided by a mock
+        assertThrows(MultipleAnnotationsScannedException.class,
+                () -> injectAnnotationHelper.findInjectAnnotation(preScannedAnnotations, InjectElement.class));
     }
 
     @Test
@@ -73,13 +70,15 @@ class InjectAnnotationScannerTest {
                 this.getClass().getAnnotation(InjectElement.class),
                 this.getClass().getAnnotation(InjectProperty.class)
         );
-        when(annotationScanner.scanOneStrict(testField, InjectElement.class))
+
+        when(preScannedAnnotations.getSource()).thenReturn(testField);
+        when(preScannedAnnotations.getAnnotationStrict(InjectElement.class))
                 .thenReturn(Optional.of((InjectElement) multipleInjectAnnotations.get(0)));
-        when(annotationScanner.scanOneStrict(testField, InjectProperty.class))
+        when(preScannedAnnotations.getAnnotationStrict(InjectProperty.class))
                 .thenReturn(Optional.of((InjectProperty) multipleInjectAnnotations.get(1)));
 
         var exception = assertThrows(MultipleAnnotationsScannedException.class, () -> {
-            injectAnnotationScanner.findInjectAnnotation(testField, InjectElement.class);
+            injectAnnotationHelper.findInjectAnnotation(preScannedAnnotations, InjectElement.class);
         });
 
         assertEquals(
@@ -91,12 +90,12 @@ class InjectAnnotationScannerTest {
     @ParameterizedTest
     @ValueSource(classes = {InjectElement.class, InjectProperty.class})
     public void shouldReturnEmpty_ifNoInjectAnnotationsAreFound(Class<? extends Annotation> injectAnnotationType) {
-        when(annotationScanner.scanOneStrict(testField, InjectElement.class))
+        when(preScannedAnnotations.getAnnotationStrict(InjectElement.class))
                 .thenReturn(Optional.empty());
-        when(annotationScanner.scanOneStrict(testField, InjectProperty.class))
+        when(preScannedAnnotations.getAnnotationStrict(InjectProperty.class))
                 .thenReturn(Optional.empty());
 
-        var injectAnnotation = injectAnnotationScanner.findInjectAnnotation(testField, injectAnnotationType);
+        var injectAnnotation = injectAnnotationHelper.findInjectAnnotation(preScannedAnnotations, injectAnnotationType);
 
         assertTrue(injectAnnotation.isEmpty());
     }
@@ -104,15 +103,14 @@ class InjectAnnotationScannerTest {
     @Test
     public void shouldReturnInjectAnnotation_ifExactlyOneIsFound() {
         InjectElement injectElementAnnotation = this.getClass().getAnnotation(InjectElement.class);
-        when(annotationScanner.scanOneStrict(testField, InjectElement.class))
+        when(preScannedAnnotations.getAnnotationStrict(InjectElement.class))
                 .thenReturn(Optional.of(injectElementAnnotation));
-        when(annotationScanner.scanOneStrict(testField, InjectProperty.class))
+        when(preScannedAnnotations.getAnnotationStrict(InjectProperty.class))
                 .thenReturn(Optional.empty());
 
-        var injectAnnotation = injectAnnotationScanner.findInjectAnnotation(testField, InjectElement.class);
+        var injectAnnotation = injectAnnotationHelper.findInjectAnnotation(preScannedAnnotations, InjectElement.class);
 
         assertTrue(injectAnnotation.isPresent());
         assertEquals(injectElementAnnotation, injectAnnotation.get());
     }
-
 }

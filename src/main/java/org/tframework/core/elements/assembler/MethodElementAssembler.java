@@ -89,9 +89,15 @@ public class MethodElementAssembler extends ElementAssembler {
         Object[] methodArgs = new Object[methodElementSource.elementConstructionParameters().size()];
         for (int i = 0; i < methodArgs.length; i++) {
             var methodParameter = methodElementSource.elementConstructionParameters().get(i);
-            DependencyDefinition dependencyDefinition = DependencyDefinition.fromParameter(methodParameter);
+            var dependencyDefinition = DependencyDefinition.fromParameter(methodParameter);
+            var preScannedAnnotations = elementContext.getAnnotationsOnConstructionParams().get(methodParameter);
+
             methodArgs[i] = dependencyResolverAggregator.resolveDependency(
-                    dependencyDefinition, elementContext, dependencyGraph, DEPENDENCY_DECLARED_AS
+                    dependencyDefinition,
+                    elementContext,
+                    dependencyGraph,
+                    preScannedAnnotations,
+                    DEPENDENCY_DECLARED_AS
             );
         }
         return methodArgs;

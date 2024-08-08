@@ -22,22 +22,18 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.tframework.core.elements.postprocessing.annotations.PostInitialization;
-import org.tframework.core.reflection.AnnotationFilteringResult;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.reflection.methods.MethodInvoker;
 
 public class PostInitializationMethodPostProcessorTest extends PostProcessorBaseTest {
-
-    @Mock
-    private AnnotationScanner annotationScanner;
 
     @Mock
     private MethodFilter methodFilter;
@@ -67,21 +63,22 @@ public class PostInitializationMethodPostProcessorTest extends PostProcessorBase
 
     @Test
     public void shouldInvokeValidPostInitializationMethod() {
-        var methods = Set.of(postInit1Method, postInit2Method);
-        when(elementContext.getMethods()).thenReturn(methods);
-        mockFilteringByAnnotation(methods);
-        mockThatPostInitMethodIsValid(methods);
+        var methodData = Map.of(
+                postInit1Method, preScanMethod(postInit1Method),
+                postInit2Method, preScanMethod(postInit2Method)
+        );
+        when(elementContext.getAnnotationsOnMethods()).thenReturn(methodData);
+        mockThatPostInitMethodIsValid(methodData.keySet());
 
         processor.postProcessInstance(application, elementContext, this);
-        verifyMethodsInvoked(methods);
+        verifyMethodsInvoked(methodData.keySet());
     }
 
     @Test
     public void shouldThrowException_whenPostInitializationMethodIsInvalid() {
-        var methods = Set.of(postInit1Method);
-        when(elementContext.getMethods()).thenReturn(methods);
-        mockFilteringByAnnotation(methods);
-        mockThatPostInitMethodIsInvalid(methods);
+        var methodData = Map.of(postInit1Method, preScanMethod(postInit1Method));
+        when(elementContext.getAnnotationsOnMethods()).thenReturn(methodData);
+        mockThatPostInitMethodIsInvalid(methodData.keySet());
 
         assertThrows(PostInitializationMethodException.class, () ->
                 processor.postProcessInstance(application, elementContext, this));
@@ -89,29 +86,13 @@ public class PostInitializationMethodPostProcessorTest extends PostProcessorBase
 
     @Test
     public void shouldThrowException_whenPostInitializationMethodIsValid_butCannotBeExecuted() {
-        var methods = Set.of(postInit1Method);
-        when(elementContext.getMethods()).thenReturn(methods);
-        mockFilteringByAnnotation(methods);
-        mockThatPostInitMethodIsValid(methods);
+        var methodData = Map.of(postInit1Method, preScanMethod(postInit1Method));
+        when(elementContext.getAnnotationsOnMethods()).thenReturn(methodData);
+        mockThatPostInitMethodIsValid(methodData.keySet());
         mockPostInitMethodThrowingAnException(postInit1Method);
 
         assertThrows(PostInitializationMethodException.class, () ->
                 processor.postProcessInstance(application, elementContext, this));
-    }
-
-    private void mockFilteringByAnnotation(Set<Method> methods) {
-        var filteringResults = toFilteringResults(methods);
-        when(methodFilter.filterByAnnotation(methods, PostInitialization.class, annotationScanner, false))
-                .thenReturn(filteringResults);
-    }
-
-    private Set<AnnotationFilteringResult<PostInitialization, Method>> toFilteringResults(Set<Method> methods) {
-        return methods.stream()
-                .map(method -> {
-                    var annotation = method.getAnnotation(PostInitialization.class);
-                    return new AnnotationFilteringResult<>(annotation, method);
-                })
-                .collect(Collectors.toSet());
     }
 
     private void mockThatPostInitMethodIsValid(Set<Method> methods) {
@@ -142,4 +123,11 @@ public class PostInitializationMethodPostProcessorTest extends PostProcessorBase
                 .invokeMethodWithNoParametersAndIgnoreResult(this, method));
     }
 
+    private PreScannedAnnotations preScanMethod(Method method) {
+        var preScannedAnnotations = PreScannedAnnotations.empty(method);
+        if(method.isAnnotationPresent(PostInitialization.class)) {
+            preScannedAnnotations.add(method.getAnnotation(PostInitialization.class));
+        }
+        return preScannedAnnotations;
+    }
 }

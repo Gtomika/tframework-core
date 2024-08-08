@@ -26,7 +26,6 @@ import org.tframework.core.elements.annotations.Priority;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.postprocessing.annotations.PostInitialization;
 import org.tframework.core.reflection.AnnotationFilteringResult;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.reflection.methods.MethodInvoker;
 import org.tframework.core.utils.LogUtils;
@@ -44,25 +43,23 @@ import org.tframework.core.utils.LogUtils;
 @RequiredArgsConstructor
 public class PostInitializationMethodPostProcessor implements ElementInstancePostProcessor {
 
-    private final AnnotationScanner annotationScanner;
     private final MethodFilter methodFilter;
     private final MethodInvoker methodInvoker;
 
     @Override
     public void postProcessInstance(Application application, ElementContext elementContext, Object instance) {
-        methodFilter.filterByAnnotation(
-                elementContext.getMethods(),
-                PostInitialization.class,
-                annotationScanner,
-                false
-        ).stream()
-                .map(AnnotationFilteringResult::annotationSource)
-                .peek(method -> {
-                    checkValidPostInitializationMethod(elementContext, method);
-                    log.debug("Element context '{}', method '{}': valid post-initialization method",
-                            elementContext.getName(), LogUtils.niceExecutableName(method));
+        elementContext.getAnnotationsOnMethods().entrySet().stream()
+                .filter(entry -> entry.getValue().hasAnnotation(PostInitialization.class))
+                .map(entry -> {
+                    PostInitialization annotation = entry.getValue().getAnnotationStrict(PostInitialization.class).get();
+                    return new AnnotationFilteringResult<>(annotation, entry.getKey());
                 })
-                .forEach(method -> invokePostInitializationMethod(elementContext, method, instance));
+                .peek(result -> {
+                    checkValidPostInitializationMethod(elementContext, result.annotationSource());
+                    log.debug("Element context '{}', method '{}': valid post-initialization method",
+                            elementContext.getName(), LogUtils.niceExecutableName(result.annotationSource()));
+                })
+                .forEach(result -> invokePostInitializationMethod(elementContext, result.annotationSource(), instance));
     }
 
     private void checkValidPostInitializationMethod(ElementContext elementContext, Method method) {

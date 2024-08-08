@@ -15,8 +15,11 @@ limitations under the License.
 */
 package org.tframework.core.elements.context;
 
+import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
+import java.util.Collection;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.Getter;
@@ -32,6 +35,7 @@ import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.postprocessing.ElementInstancePostProcessorAggregator;
+import org.tframework.core.reflection.annotations.AnnotationScanner;
 import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 import org.tframework.core.reflection.field.SimpleFieldScanner;
@@ -80,14 +84,18 @@ public abstract class ElementContext {
     protected PreScannedAnnotations annotationsOnElementSource;
 
     /**
-     * {@link PreScannedAnnotations} that were found on the methods of the element. Can be
-     * used to reduce the amount of method and annotation scanning that needs to be done.
+     * {@link PreScannedAnnotations} that were found on the elements construction time dependencies.
+     * Such as constructor parameters or method parameters.
+     */
+    protected Map<Parameter, PreScannedAnnotations> annotationsOnConstructionParams;
+
+    /**
+     * {@link PreScannedAnnotations} that were found on the methods of the element.
      */
     protected Map<Method, PreScannedAnnotations> annotationsOnMethods;
 
     /**
-     * {@link PreScannedAnnotations} that were found on the fields of the element. Can be
-     * used to reduce the amount of field and annotation scanning that needs to be done.
+     * {@link PreScannedAnnotations} that were found on the fields of the element.
      */
     protected Map<Field, PreScannedAnnotations> annotationsOnFields;
 
@@ -125,22 +133,30 @@ public abstract class ElementContext {
 
     private void preScanAnnotations() {
         var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
+        log.trace("Pre-scanning annotations on element source: {}", source.annotatedSource());
         annotationsOnElementSource = PreScannedAnnotations.fromScanned(
                 source.annotatedSource(), annotationScanner.scan(source.annotatedSource())
         );
 
         var methodScanner = new DeclaredMethodScanner();
         var methods = methodScanner.scanMethods(type);
-        annotationsOnMethods = methods.stream().collect(Collectors.toMap(
-                method -> method,
-                method -> PreScannedAnnotations.fromScanned(method, annotationScanner.scan(method))
-        ));
+        log.trace("Pre-scanning annotations on element {} methods", methods.size());
+        annotationsOnMethods = preScan(methods, annotationScanner);
 
         var fieldScanner = new SimpleFieldScanner();
         var fields = fieldScanner.getAllFields(type);
-        annotationsOnFields = fields.stream().collect(Collectors.toMap(
-                field -> field,
-                field -> PreScannedAnnotations.fromScanned(field, annotationScanner.scan(field))
+        log.trace("Pre-scanning annotations on element {} fields", fields.size());
+        annotationsOnFields = preScan(fields, annotationScanner);
+
+        var params = source.elementConstructionParameters();
+        log.trace("Pre-scanning annotations on element {} construction parameters", params.size());
+        annotationsOnConstructionParams = preScan(params, annotationScanner);
+    }
+
+    private <E extends AnnotatedElement> Map<E, PreScannedAnnotations> preScan(Collection<E> toScan, AnnotationScanner annotationScanner) {
+        return toScan.stream().collect(Collectors.toMap(
+                element -> element,
+                element -> PreScannedAnnotations.fromScanned(element, annotationScanner.scan(element))
         ));
     }
 

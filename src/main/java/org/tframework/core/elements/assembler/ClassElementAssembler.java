@@ -73,9 +73,15 @@ public class ClassElementAssembler extends ElementAssembler {
         Object[] constructorArgs = new Object[classElementSource.elementConstructionParameters().size()];
         for (int i = 0; i < constructorArgs.length; i++) {
             var constructorParameter = classElementSource.elementConstructionParameters().get(i);
-            DependencyDefinition dependencyDefinition = DependencyDefinition.fromParameter(constructorParameter);
+            var dependencyDefinition = DependencyDefinition.fromParameter(constructorParameter);
+            var preScannedAnnotations = elementContext.getAnnotationsOnConstructionParams().get(constructorParameter);
+
             constructorArgs[i] = aggregator.resolveDependency(
-                    dependencyDefinition, elementContext, dependencyGraph, DEPENDENCY_DECLARED_AS
+                    dependencyDefinition,
+                    elementContext,
+                    dependencyGraph,
+                    preScannedAnnotations,
+                    DEPENDENCY_DECLARED_AS
             );
         }
         return constructorArgs;

@@ -119,14 +119,15 @@ public class SubscribeElementPostProcessorTest extends PostProcessorBaseTest {
 
 
     private void setUpElementContextPreScanning(Method method) {
-        var methodsAnnotationData = Map.of(method,
-                createPreScanningData(method, method.getAnnotation(Subscribe.class)));
+        var methodsAnnotationData = Map.of(method, createPreScanningData(method));
         when(elementContext.getAnnotationsOnMethods()).thenReturn(methodsAnnotationData);
     }
 
-    private PreScannedAnnotations createPreScanningData(Method method, Subscribe subscribeAnnotation) {
+    private PreScannedAnnotations createPreScanningData(Method method) {
         var annotations = PreScannedAnnotations.empty(method);
-        annotations.add(subscribeAnnotation);
+        if(method.isAnnotationPresent(Subscribe.class)) {
+            annotations.add(method.getAnnotation(Subscribe.class));
+        }
         return annotations;
     }
 }

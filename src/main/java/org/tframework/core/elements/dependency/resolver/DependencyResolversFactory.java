@@ -24,7 +24,6 @@ import org.tframework.core.elements.dependency.handler.SpecialElementDependencyH
 import org.tframework.core.elements.dependency.resolver.helper.ElementByNameResolverHelper;
 import org.tframework.core.elements.dependency.resolver.helper.ElementByTypeResolverHelper;
 import org.tframework.core.properties.PropertiesContainer;
-import org.tframework.core.reflection.annotations.AnnotationScannersFactory;
 
 /**
  * Utilities to create {@link BasicDependencyResolver}s.
@@ -58,11 +57,10 @@ public final class DependencyResolversFactory {
     }
 
     public static AnnotatedElementDependencyResolver createElementDependencyResolver(ElementsContainer elementsContainer) {
-        var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
         var handlerAggregator = SpecialElementDependencyHandlerFactory.createDefaultHandlerAggregator();
         return new AnnotatedElementDependencyResolver(
                 elementsContainer,
-                InjectAnnotationHelper.wrappingScanner(annotationScanner),
+                new InjectAnnotationHelper(),
                 new ElementByNameResolverHelper(),
                 new ElementByTypeResolverHelper(),
                 handlerAggregator
@@ -70,10 +68,9 @@ public final class DependencyResolversFactory {
     }
 
     public static PropertyDependencyResolver createPropertyDependencyResolver(PropertiesContainer propertiesContainer) {
-        var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
         return new PropertyDependencyResolver(
                 propertiesContainer,
-                InjectAnnotationHelper.wrappingScanner(annotationScanner)
+                new InjectAnnotationHelper()
         );
     }
 

@@ -20,8 +20,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Field;
-import java.util.Optional;
-import java.util.Set;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -30,7 +29,7 @@ import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.postprocessing.PostProcessorBaseTest;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 import org.tframework.core.reflection.field.FieldSetter;
 
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -40,9 +39,6 @@ public class PropertyGroupPostProcessorTest extends PostProcessorBaseTest {
     private static final String PROPERTY_NAME = "custom-property-name";
     private static final String NAMED_PROPERTY_VALUE = "namedPropertyValue";
     private static final String DEFAULT_PROPERTY_VALUE = "defaultPropertyValue";
-
-    @Mock
-    private AnnotationScanner annotationScanner;
 
     @Mock
     private FieldSetter fieldSetter;
@@ -63,7 +59,10 @@ public class PropertyGroupPostProcessorTest extends PostProcessorBaseTest {
         namedPropertyField = MyProps.class.getDeclaredField("myNamedProp");
         defaultPropertyField = MyProps.class.getDeclaredField("myDefaultProp");
 
-        when(elementContext.getFields()).thenReturn(Set.of(namedPropertyField, defaultPropertyField));
+        when(elementContext.getAnnotationsOnFields()).thenReturn(Map.of(
+                defaultPropertyField, toPreScanned(defaultPropertyField),
+                namedPropertyField, toPreScanned(namedPropertyField)
+        ));
         when(elementContext.getSource()).thenReturn(elementSource);
         when(elementContext.getName()).thenReturn("myPropsElement");
         when(elementSource.annotatedSource()).thenReturn(MyProps.class);
@@ -71,8 +70,8 @@ public class PropertyGroupPostProcessorTest extends PostProcessorBaseTest {
 
     @Test
     public void shouldNotProcessInstance_whenPropertyGroupAnnotationIsNotPresent() {
-        when(annotationScanner.scanOneStrict(elementSource.annotatedSource(), PropertyGroup.class))
-                .thenReturn(Optional.empty());
+        var elementSourceAnnotations = PreScannedAnnotations.empty(elementSource.annotatedSource());
+        when(elementContext.getAnnotationsOnElementSource()).thenReturn(elementSourceAnnotations);
 
         postProcessor.postProcessInstance(application, elementContext, myProps);
 
@@ -81,13 +80,9 @@ public class PropertyGroupPostProcessorTest extends PostProcessorBaseTest {
 
     @Test
     public void shouldProcessInstance_whenPropertyGroupAnnotationIsPresent() {
-        when(annotationScanner.scanOneStrict(elementSource.annotatedSource(), PropertyGroup.class))
-                .thenReturn(Optional.of(MyProps.class.getAnnotation(PropertyGroup.class)));
-
-        when(annotationScanner.scanOneStrict(namedPropertyField, Property.class))
-                .thenReturn(Optional.of(namedPropertyField.getAnnotation(Property.class)));
-        when(annotationScanner.scanOneStrict(defaultPropertyField, Property.class))
-                .thenReturn(Optional.empty());
+        var elementSourceAnnotations = PreScannedAnnotations.empty(elementSource.annotatedSource());
+        elementSourceAnnotations.add(MyProps.class.getAnnotation(PropertyGroup.class));
+        when(elementContext.getAnnotationsOnElementSource()).thenReturn(elementSourceAnnotations);
 
         when(propertiesContainer.getPropertyValue(PROPERTY_GROUP_NAME + "." + PROPERTY_NAME, String.class))
                 .thenReturn(NAMED_PROPERTY_VALUE);
@@ -105,6 +100,14 @@ public class PropertyGroupPostProcessorTest extends PostProcessorBaseTest {
         verify(fieldSetter).setFieldValue(myProps, defaultPropertyField, DEFAULT_PROPERTY_VALUE);
     }
 
+    private PreScannedAnnotations toPreScanned(Field field) {
+        var annotations = PreScannedAnnotations.empty(field);
+        if(field.isAnnotationPresent(Property.class)) {
+            annotations.add(field.getAnnotation(Property.class));
+        }
+        return annotations;
+    }
+
     @PropertyGroup(name = PROPERTY_GROUP_NAME)
     static class MyProps {
 
@@ -113,5 +116,4 @@ public class PropertyGroupPostProcessorTest extends PostProcessorBaseTest {
 
         private String myDefaultProp;
     }
-
 }

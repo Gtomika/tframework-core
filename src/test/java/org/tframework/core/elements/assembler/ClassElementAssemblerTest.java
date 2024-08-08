@@ -17,9 +17,12 @@ package org.tframework.core.elements.assembler;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 
+import java.lang.reflect.Parameter;
+import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +37,7 @@ import org.tframework.core.elements.context.source.ClassElementSource;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.resolver.DependencyResolverAggregator;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 
 @ExtendWith(MockitoExtension.class)
 class ClassElementAssemblerTest {
@@ -43,6 +47,12 @@ class ClassElementAssemblerTest {
 
     @Mock
     private ElementContext elementContext;
+
+    @Mock
+    private Map<Parameter, PreScannedAnnotations> preScannedParams;
+
+    @Mock
+    private PreScannedAnnotations preScannedAnnotations;
 
     private ClassElementAssembler classElementAssembler;
     private DependencyDefinition dummyStringDependencyDefinition;
@@ -55,6 +65,8 @@ class ClassElementAssemblerTest {
         when(elementContext.getName()).thenReturn("dummyElement");
         doReturn(DummyElement.class).when(elementContext).getType();
         when(elementContext.getSource()).thenReturn(classElementSource);
+        when(preScannedParams.get(any())).thenReturn(preScannedAnnotations);
+        when(elementContext.getAnnotationsOnConstructionParams()).thenReturn(preScannedParams);
 
         classElementAssembler = ClassElementAssembler.builder()
                 .elementContext(elementContext)
@@ -73,6 +85,7 @@ class ClassElementAssemblerTest {
                 dummyStringDependencyDefinition,
                 elementContext,
                 dependencyGraph,
+                preScannedAnnotations,
                 ClassElementAssembler.DEPENDENCY_DECLARED_AS
         )).thenReturn(expectedElement.dummyString);
 
@@ -88,6 +101,7 @@ class ClassElementAssemblerTest {
                 dummyStringDependencyDefinition,
                 elementContext,
                 dependencyGraph,
+                preScannedAnnotations,
                 ClassElementAssembler.DEPENDENCY_DECLARED_AS
         )).thenThrow(new RuntimeException("Oof, failed to resolve dependency"));
 

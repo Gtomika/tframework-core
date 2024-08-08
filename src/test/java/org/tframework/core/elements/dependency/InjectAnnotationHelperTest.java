@@ -53,7 +53,6 @@ class InjectAnnotationHelperTest {
     void setUp() throws NoSuchFieldException {
         injectAnnotationHelper = new InjectAnnotationHelper();
         testField = this.getClass().getDeclaredField("testFieldActual");
-        when(preScannedAnnotations.getSource()).thenReturn(testField);
     }
 
     @Test
@@ -71,6 +70,8 @@ class InjectAnnotationHelperTest {
                 this.getClass().getAnnotation(InjectElement.class),
                 this.getClass().getAnnotation(InjectProperty.class)
         );
+
+        when(preScannedAnnotations.getSource()).thenReturn(testField);
         when(preScannedAnnotations.getAnnotationStrict(InjectElement.class))
                 .thenReturn(Optional.of((InjectElement) multipleInjectAnnotations.get(0)));
         when(preScannedAnnotations.getAnnotationStrict(InjectProperty.class))

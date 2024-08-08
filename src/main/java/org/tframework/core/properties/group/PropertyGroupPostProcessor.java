@@ -23,7 +23,7 @@ import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.postprocessing.ElementInstancePostProcessor;
 import org.tframework.core.properties.PropertiesContainer;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 import org.tframework.core.reflection.field.FieldSetter;
 
 /**
@@ -35,12 +35,11 @@ import org.tframework.core.reflection.field.FieldSetter;
 @RequiredArgsConstructor
 public class PropertyGroupPostProcessor implements ElementInstancePostProcessor {
 
-    private final AnnotationScanner annotationScanner;
     private final FieldSetter fieldSetter;
 
     @Override
     public void postProcessInstance(Application application, ElementContext elementContext, Object instance) {
-        annotationScanner.scanOneStrict(elementContext.getSource().annotatedSource(), PropertyGroup.class)
+        elementContext.getAnnotationsOnElementSource().getAnnotationStrict(PropertyGroup.class)
                 .ifPresent(propertyGroup -> processPropertyGroup(
                         elementContext,
                         instance,
@@ -58,8 +57,8 @@ public class PropertyGroupPostProcessor implements ElementInstancePostProcessor 
         log.debug("Property group element '{}': Processing property group '{}'...",
                 elementContext.getName(), propertyGroupAnnotation.name());
 
-        elementContext.getFields().forEach(field -> {
-            String propertyName = propertyGroupAnnotation.name() + "." + findPropertyNameInGroup(field);
+        elementContext.getAnnotationsOnFields().forEach((field, preScannedAnnotations) -> {
+            String propertyName = propertyGroupAnnotation.name() + "." + findPropertyNameInGroup(field, preScannedAnnotations);
             log.debug("Property group element '{}': Attempting to inject property '{}' into field '{}'",
                     elementContext.getName(), propertyName, field.getName());
 
@@ -74,8 +73,8 @@ public class PropertyGroupPostProcessor implements ElementInstancePostProcessor 
     Possible improvement: we can apply some logic here instead of just getting field name.
     Like removing underscore, hyphen, checking for camel case etc.
      */
-    private String findPropertyNameInGroup(Field field) {
-        return annotationScanner.scanOneStrict(field, Property.class)
+    private String findPropertyNameInGroup(Field field, PreScannedAnnotations preScannedAnnotations) {
+        return preScannedAnnotations.getAnnotationStrict(Property.class)
                 .map(Property::value)
                 .orElse(field.getName());
     }

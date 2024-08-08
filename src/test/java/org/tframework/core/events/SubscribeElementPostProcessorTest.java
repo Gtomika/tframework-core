@@ -26,15 +26,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
-import java.util.Set;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.tframework.core.elements.postprocessing.PostProcessorBaseTest;
 import org.tframework.core.events.annotations.Subscribe;
 import org.tframework.core.events.exception.EventSubscriptionException;
-import org.tframework.core.reflection.AnnotationFilteringResult;
-import org.tframework.core.reflection.annotations.AnnotationScanner;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 import org.tframework.core.reflection.methods.MethodFilter;
 import org.tframework.core.reflection.methods.MethodInvoker;
 
@@ -49,9 +48,6 @@ public class SubscribeElementPostProcessorTest extends PostProcessorBaseTest {
     private MethodInvoker methodInvoker;
 
     @Mock
-    private AnnotationScanner annotationScanner;
-
-    @Mock
     private EventManager eventManager;
 
     private SubscribeElementPostProcessor postProcessor;
@@ -62,9 +58,7 @@ public class SubscribeElementPostProcessorTest extends PostProcessorBaseTest {
 
     @BeforeEach
     public void setUp() throws Exception {
-        postProcessor = new SubscribeElementPostProcessor(
-                annotationScanner, methodFilter, methodInvoker, eventManager
-        );
+        postProcessor = new SubscribeElementPostProcessor(methodFilter, methodInvoker, eventManager);
         validSubscribeMethod = this.getClass().getMethod("validSubscribe", Object.class);
         invalidSubscribeMethod = this.getClass().getMethod("invalidSubscribe");
         otherMethod = this.getClass().getMethod("otherStuff");
@@ -72,13 +66,7 @@ public class SubscribeElementPostProcessorTest extends PostProcessorBaseTest {
 
     @Test
     public void shouldNotSubscribe_whenMethodIsNotAnnotated() {
-        when(elementContext.getMethods()).thenReturn(Set.of(otherMethod));
-        when(methodFilter.filterByAnnotation(
-                elementContext.getMethods(),
-                Subscribe.class,
-                annotationScanner,
-                true
-        )).thenReturn(Set.of());
+        setUpElementContextPreScanning(otherMethod);
 
         postProcessor.postProcessInstance(application, elementContext, this);
 
@@ -87,18 +75,7 @@ public class SubscribeElementPostProcessorTest extends PostProcessorBaseTest {
 
     @Test
     public void shouldNotSubscribe_whenMethodIsNotValid() {
-        when(elementContext.getMethods()).thenReturn(Set.of(invalidSubscribeMethod));
-        when(methodFilter.filterByAnnotation(
-                elementContext.getMethods(),
-                Subscribe.class,
-                annotationScanner,
-                true
-        )).thenReturn(Set.of(
-                new AnnotationFilteringResult<>(
-                        invalidSubscribeMethod.getAnnotation(Subscribe.class),
-                        invalidSubscribeMethod
-                ))
-        );
+        setUpElementContextPreScanning(invalidSubscribeMethod);
         mockMethodFilterAsInvalid(invalidSubscribeMethod);
 
         var exception = assertThrows(EventSubscriptionException.class, () ->
@@ -110,18 +87,7 @@ public class SubscribeElementPostProcessorTest extends PostProcessorBaseTest {
 
     @Test
     public void shouldSubscribe_whenMethodIsAnnotatedAndValid() {
-        when(elementContext.getMethods()).thenReturn(Set.of(validSubscribeMethod));
-        when(methodFilter.filterByAnnotation(
-                elementContext.getMethods(),
-                Subscribe.class,
-                annotationScanner,
-                true
-        )).thenReturn(Set.of(
-                new AnnotationFilteringResult<>(
-                        validSubscribeMethod.getAnnotation(Subscribe.class),
-                        validSubscribeMethod
-                ))
-        );
+       setUpElementContextPreScanning(validSubscribeMethod);
         mockMethodFilterAsValid(validSubscribeMethod);
 
         postProcessor.postProcessInstance(application, elementContext, this);
@@ -150,4 +116,17 @@ public class SubscribeElementPostProcessorTest extends PostProcessorBaseTest {
 
     @Subscribe(TEST_TOPIC) //no param
     public void invalidSubscribe() {}
+
+
+    private void setUpElementContextPreScanning(Method method) {
+        var methodsAnnotationData = Map.of(method,
+                createPreScanningData(method, method.getAnnotation(Subscribe.class)));
+        when(elementContext.getAnnotationsOnMethods()).thenReturn(methodsAnnotationData);
+    }
+
+    private PreScannedAnnotations createPreScanningData(Method method, Subscribe subscribeAnnotation) {
+        var annotations = PreScannedAnnotations.empty(method);
+        annotations.add(subscribeAnnotation);
+        return annotations;
+    }
 }

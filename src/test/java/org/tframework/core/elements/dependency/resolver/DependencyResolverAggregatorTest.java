@@ -30,6 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 import org.tframework.core.utils.LogUtils;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,6 +46,9 @@ class DependencyResolverAggregatorTest {
 
     @Mock
     private ElementDependencyResolver elementDependencyResolver;
+
+    @Mock
+    private PreScannedAnnotations preScannedAnnotations;
 
     private List<DependencyResolver> dependencyResolvers;
     private DependencyResolverAggregator aggregator;
@@ -62,7 +66,7 @@ class DependencyResolverAggregatorTest {
     @Test
     void shouldResolveDependency() {
         String dependencyValue = "someValue";
-        when(basicDependencyResolver.resolveDependency(dependencyDefinition))
+        when(basicDependencyResolver.resolveDependency(dependencyDefinition, preScannedAnnotations))
                 .thenReturn(Optional.of(dependencyValue));
 
         var dependencyGraph = ElementDependencyGraph.empty();
@@ -70,6 +74,7 @@ class DependencyResolverAggregatorTest {
                 dependencyDefinition,
                 originalElementContext,
                 dependencyGraph,
+                preScannedAnnotations,
                 DEPENDENCY_DECLARED_AS
         );
 
@@ -80,15 +85,16 @@ class DependencyResolverAggregatorTest {
     void shouldThrowDependencyResolutionException_whenDependencyCannotBeResolved() {
         var dependencyGraph = ElementDependencyGraph.empty();
 
-        when(basicDependencyResolver.resolveDependency(dependencyDefinition))
+        when(basicDependencyResolver.resolveDependency(dependencyDefinition, preScannedAnnotations))
                 .thenReturn(Optional.empty());
-        when(elementDependencyResolver.resolveDependency(dependencyDefinition, originalElementContext, dependencyGraph))
+        when(elementDependencyResolver.resolveDependency(dependencyDefinition, originalElementContext, dependencyGraph, preScannedAnnotations))
                 .thenReturn(Optional.empty());
 
         var e = assertThrows(DependencyResolutionException.class, () -> aggregator.resolveDependency(
                         dependencyDefinition,
                         originalElementContext,
                         dependencyGraph,
+                        preScannedAnnotations,
                         DEPENDENCY_DECLARED_AS
                 )
         );

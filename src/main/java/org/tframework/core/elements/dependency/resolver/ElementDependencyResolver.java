@@ -19,6 +19,7 @@ import java.util.Optional;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 
 /**
  * Resolves element dependency definitions into element instances. This requires more complex logic
@@ -32,12 +33,14 @@ public non-sealed interface ElementDependencyResolver extends DependencyResolver
      * @param dependencyDefinition {@link DependencyDefinition} which describes the element dependency.
      * @param originalElementContext The original {@link ElementContext} whose dependencies are being resolved.
      * @param dependencyGraph {@link ElementDependencyGraph} with the current state of the dependency resolution.
+     * @param preScannedAnnotations {@link PreScannedAnnotations} with the annotations data of the dependency.
      * @return {@link Optional} with the element instance, if resolved, empty if not.
      */
     Optional<Object> resolveDependency(
             DependencyDefinition dependencyDefinition,
             ElementContext originalElementContext,
-            ElementDependencyGraph dependencyGraph
+            ElementDependencyGraph dependencyGraph,
+            PreScannedAnnotations preScannedAnnotations
     );
 
 }

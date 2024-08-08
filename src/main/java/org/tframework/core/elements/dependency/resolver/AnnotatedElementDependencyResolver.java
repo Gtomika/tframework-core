@@ -15,7 +15,6 @@ limitations under the License.
 */
 package org.tframework.core.elements.dependency.resolver;
 
-import java.lang.reflect.AnnotatedElement;
 import java.util.List;
 import java.util.Optional;
 import lombok.AccessLevel;
@@ -26,11 +25,12 @@ import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.annotations.InjectElement;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
-import org.tframework.core.elements.dependency.InjectAnnotationScanner;
+import org.tframework.core.elements.dependency.InjectAnnotationHelper;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerAggregator;
 import org.tframework.core.elements.dependency.resolver.helper.ElementDependencyResolverHelper;
 import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 
 /**
  * This {@link ElementDependencyResolver} is responsible for resolving dependencies that are annotated with
@@ -42,7 +42,7 @@ import org.tframework.core.reflection.annotations.AnnotationMatchingResult;
 public class AnnotatedElementDependencyResolver implements ElementDependencyResolver {
 
     private final ElementsContainer elementsContainer;
-    private final InjectAnnotationScanner injectAnnotationScanner;
+    private final InjectAnnotationHelper injectAnnotationHelper;
     private final ElementDependencyResolverHelper byNameResolverHelper;
     private final ElementDependencyResolverHelper byTypeResolverHelper;
     private final SpecialDependencyHandlerAggregator specialDependencyHandlerAggregator;
@@ -51,9 +51,10 @@ public class AnnotatedElementDependencyResolver implements ElementDependencyReso
     public Optional<Object> resolveDependency(
             DependencyDefinition dependencyDefinition,
             ElementContext originalElementContext,
-            ElementDependencyGraph dependencyGraph
+            ElementDependencyGraph dependencyGraph,
+            PreScannedAnnotations preScannedAnnotations
     ) {
-        var matchingResult = matchInjectAnnotation(dependencyDefinition.annotationSource());
+        var matchingResult = matchInjectAnnotation(preScannedAnnotations);
         if(matchingResult.matches()) {
             InjectElement injectAnnotation = matchingResult.matchedAnnotations().getFirst();
             try {
@@ -86,8 +87,8 @@ public class AnnotatedElementDependencyResolver implements ElementDependencyReso
         }
     }
 
-    private AnnotationMatchingResult<InjectElement> matchInjectAnnotation(AnnotatedElement dependencyDefinition) {
-        return injectAnnotationScanner.findInjectAnnotation(dependencyDefinition, InjectElement.class)
+    private AnnotationMatchingResult<InjectElement> matchInjectAnnotation(PreScannedAnnotations preScannedAnnotations) {
+        return injectAnnotationHelper.findInjectAnnotation(preScannedAnnotations, InjectElement.class)
                 .stream()
                 .findAny()
                 .map(injectElement -> new AnnotationMatchingResult<>(true, List.of(injectElement)))

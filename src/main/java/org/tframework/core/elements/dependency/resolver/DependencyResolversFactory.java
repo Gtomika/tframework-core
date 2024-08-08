@@ -19,7 +19,7 @@ import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.tframework.core.elements.ElementsContainer;
-import org.tframework.core.elements.dependency.InjectAnnotationScanner;
+import org.tframework.core.elements.dependency.InjectAnnotationHelper;
 import org.tframework.core.elements.dependency.handler.SpecialElementDependencyHandlerFactory;
 import org.tframework.core.elements.dependency.resolver.helper.ElementByNameResolverHelper;
 import org.tframework.core.elements.dependency.resolver.helper.ElementByTypeResolverHelper;
@@ -62,7 +62,7 @@ public final class DependencyResolversFactory {
         var handlerAggregator = SpecialElementDependencyHandlerFactory.createDefaultHandlerAggregator();
         return new AnnotatedElementDependencyResolver(
                 elementsContainer,
-                InjectAnnotationScanner.wrappingScanner(annotationScanner),
+                InjectAnnotationHelper.wrappingScanner(annotationScanner),
                 new ElementByNameResolverHelper(),
                 new ElementByTypeResolverHelper(),
                 handlerAggregator
@@ -73,7 +73,7 @@ public final class DependencyResolversFactory {
         var annotationScanner = AnnotationScannersFactory.createComposedAnnotationScanner();
         return new PropertyDependencyResolver(
                 propertiesContainer,
-                InjectAnnotationScanner.wrappingScanner(annotationScanner)
+                InjectAnnotationHelper.wrappingScanner(annotationScanner)
         );
     }
 

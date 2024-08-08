@@ -25,6 +25,7 @@ import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
 import org.tframework.core.elements.dependency.handler.SpecialDependencyHandlerAggregator;
 import org.tframework.core.elements.dependency.resolver.helper.ElementDependencyResolverHelper;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 
 /**
  * This {@link ElementDependencyResolver} is responsible for resolving dependencies that <b>are not</b>
@@ -47,7 +48,8 @@ public class FallbackDependencyResolver implements ElementDependencyResolver {
     public Optional<Object> resolveDependency(
             DependencyDefinition dependencyDefinition,
             ElementContext originalElementContext,
-            ElementDependencyGraph dependencyGraph
+            ElementDependencyGraph dependencyGraph,
+            PreScannedAnnotations preScannedAnnotations
     ) {
         //we have no '@InjectX' annotations, so the type will be used to resolve
         log.debug("Attempting to resolve dependency with type '{}' from the elements", dependencyDefinition.dependencyType());

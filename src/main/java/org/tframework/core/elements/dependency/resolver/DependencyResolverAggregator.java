@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.tframework.core.elements.context.ElementContext;
 import org.tframework.core.elements.dependency.DependencyDefinition;
 import org.tframework.core.elements.dependency.graph.ElementDependencyGraph;
+import org.tframework.core.reflection.annotations.PreScannedAnnotations;
 
 /**
  * The dependency resolver aggregator combines multiple {@link DependencyResolver}s to
@@ -39,6 +40,7 @@ public class DependencyResolverAggregator {
      * @param dependencyDefinition The {@link DependencyDefinition} of the dependency to resolve.
      * @param originalElementContext The {@link ElementContext} whose dependencies are being resolved.
      * @param dependencyGraph {@link ElementDependencyGraph} with the current state of the resolution process.
+     * @param preScannedAnnotations {@link PreScannedAnnotations} with the annotations data of the dependency.
      * @param dependencyDeclaredAs An informative string which defines where the dependency is declared.
      *                             For example 'constructor parameter' or 'field'.
      * @return The resolved dependency value.
@@ -48,11 +50,16 @@ public class DependencyResolverAggregator {
             DependencyDefinition dependencyDefinition,
             ElementContext originalElementContext,
             ElementDependencyGraph dependencyGraph,
+            PreScannedAnnotations preScannedAnnotations,
             String dependencyDeclaredAs
     ) throws DependencyResolutionException {
         for(DependencyResolver resolver: dependencyResolvers) {
             var resolvedDependency = attemptResolutionWithOneResolver(
-                    resolver, dependencyDefinition, originalElementContext, dependencyGraph
+                    resolver,
+                    dependencyDefinition,
+                    originalElementContext,
+                    dependencyGraph,
+                    preScannedAnnotations
             );
             if(resolvedDependency.isPresent()) {
                 return resolvedDependency.get();
@@ -69,11 +76,12 @@ public class DependencyResolverAggregator {
             DependencyResolver dependencyResolver,
             DependencyDefinition dependencyDefinition,
             ElementContext originalElementContext,
-            ElementDependencyGraph dependencyGraph
+            ElementDependencyGraph dependencyGraph,
+            PreScannedAnnotations preScannedAnnotations
     ) {
         return switch (dependencyResolver) {
-            case BasicDependencyResolver bdr -> bdr.resolveDependency(dependencyDefinition);
-            case ElementDependencyResolver edr -> edr.resolveDependency(dependencyDefinition, originalElementContext, dependencyGraph);
+            case BasicDependencyResolver bdr -> bdr.resolveDependency(dependencyDefinition, preScannedAnnotations);
+            case ElementDependencyResolver edr -> edr.resolveDependency(dependencyDefinition, originalElementContext, dependencyGraph, preScannedAnnotations);
         };
     }
 

@@ -21,10 +21,11 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.ElementUtils;
-import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.ElementConstructor;
 import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.elements.context.ElementContextFactory;
 import org.tframework.core.elements.context.source.ClassElementSource;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
 import org.tframework.core.elements.scanner.ElementScanningResult;
@@ -66,17 +67,30 @@ public class ClassElementContextAssembler implements ElementContextAssembler<Cla
             DependencyResolutionInput dependencyResolutionInput
     ) throws ElementContextAssemblingException {
         var elementClass = scanningResult.annotationSource();
+        var elementAnnotation = scanningResult.elementAnnotation();
+        log.debug("Creating element context for element class '{}' annotated with '{}'",
+                elementClass.getName(), ElementUtils.stringifyElementAnnotation(elementAnnotation));
+        return assemble(
+                elementAnnotation.name(),
+                elementAnnotation.scope(),
+                elementClass,
+                dependencyResolutionInput
+        );
+    }
+
+    public ElementContext assemble(
+            String elementName,
+            ElementScope elementScope,
+            Class<?> elementClass,
+            DependencyResolutionInput dependencyResolutionInput
+    ) {
         validateElementType(elementClass);
         var elementSource = new ClassElementSource(elementClass, findAppropriateConstructor(elementClass));
         log.trace("Created element source for element class '{}': {}", elementClass.getName(), elementSource);
 
-        Element elementAnnotation = scanningResult.elementAnnotation();
-        ElementContext elementContext = ElementContext.from(
-                elementAnnotation, elementClass, elementSource, dependencyResolutionInput
+        return ElementContextFactory.from(
+                elementName, elementScope, elementClass, elementSource, dependencyResolutionInput
         );
-        log.debug("Created element context for element class '{}' annotated with '{}'",
-                elementClass.getName(), ElementUtils.stringifyElementAnnotation(elementAnnotation));
-        return elementContext;
     }
 
     /**

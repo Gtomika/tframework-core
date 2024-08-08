@@ -225,35 +225,4 @@ public abstract class ElementContext {
                 ", source=" + source +
                 '}';
     }
-
-    /**
-     * Creates an {@link ElementContext} from the given {@link Element} annotation and additional input.
-     * @param elementAnnotation The {@link Element} annotation: determines the scope and name of the element.
-     * @param type The type of the element.
-     * @param source The {@link ElementSource} of the element.
-     * @param dependencyResolutionInput {@link DependencyResolutionInput} that allows the context to resolve
-     *                                  its own dependencies.
-     */
-    public static ElementContext from(
-            Element elementAnnotation,
-            Class<?> type,
-            ElementSource source,
-            DependencyResolutionInput dependencyResolutionInput
-    ) {
-        return switch (elementAnnotation.scope()) {
-            case SINGLETON -> new SingletonElementContext(
-                    elementAnnotation.name(),
-                    type,
-                    source,
-                    dependencyResolutionInput
-            );
-            case PROTOTYPE -> new PrototypeElementContext(
-                    elementAnnotation.name(),
-                    type,
-                    source,
-                    dependencyResolutionInput
-            );
-        };
-    }
-
 }

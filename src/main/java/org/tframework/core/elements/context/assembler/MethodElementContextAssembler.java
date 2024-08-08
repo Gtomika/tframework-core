@@ -22,9 +22,10 @@ import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.elements.ElementScope;
 import org.tframework.core.elements.ElementUtils;
-import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.context.ElementContext;
+import org.tframework.core.elements.context.ElementContextFactory;
 import org.tframework.core.elements.context.source.ElementSource;
 import org.tframework.core.elements.context.source.MethodElementSource;
 import org.tframework.core.elements.dependency.resolver.DependencyResolutionInput;
@@ -58,24 +59,35 @@ public class MethodElementContextAssembler implements ElementContextAssembler<Me
             ElementScanningResult<Method> scanningResult,
             DependencyResolutionInput dependencyResolutionInput
     ) throws ElementContextAssemblingException {
+        var elementMethod = scanningResult.annotationSource();
+        var elementAnnotation = scanningResult.elementAnnotation();
+        log.debug("Created element context for element method '{}' annotated with '{}'",
+                LogUtils.niceExecutableName(elementMethod), ElementUtils.stringifyElementAnnotation(elementAnnotation));
+        return assemble(
+                elementAnnotation.name(),
+                elementAnnotation.scope(),
+                elementMethod,
+                dependencyResolutionInput
+        );
+    }
+
+    private ElementContext assemble(
+            String elementName,
+            ElementScope elementScope,
+            Method elementMethod,
+            DependencyResolutionInput dependencyResolutionInput
+    ) {
         Objects.requireNonNull(parentElementContext, "parentElementContext must not be null when assembling element context from method");
 
-        Method elementMethod = scanningResult.annotationSource();
         Class<?> elementType = elementMethod.getReturnType();
         validateMethod(elementMethod, elementType);
 
         ElementSource elementSource = new MethodElementSource(elementMethod, parentElementContext);
         log.trace("Created element source for element method '{}': {}", LogUtils.niceExecutableName(elementMethod), elementSource);
 
-        Element elementAnnotation = scanningResult.elementAnnotation();
-
-        ElementContext elementContext = ElementContext.from(
-                elementAnnotation, elementType, elementSource, dependencyResolutionInput
+        return ElementContextFactory.from(
+                elementName, elementScope, elementType, elementSource, dependencyResolutionInput
         );
-
-        log.debug("Created element context for element method '{}' annotated with '{}'",
-                LogUtils.niceExecutableName(elementMethod), ElementUtils.stringifyElementAnnotation(elementAnnotation));
-        return elementContext;
     }
 
     /**

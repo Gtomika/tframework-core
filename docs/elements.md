@@ -97,10 +97,45 @@ public class MyConfig {
 }
 ```
 
-In the above example, we have declared two elements, `myElement` and `myElement2`. The first one is a singleton, while the second one is a prototype.
-Note that we had to provide the `name` attribute. Otherwise, there would be a naming conflict.
+### Programmatically declaring elements
+
+In some cases, you may want to declare elements programmatically, instead of using the `@Element` annotation.
+This can be done using the `ElementsContainerModifier` interface. You can implement this interface and mark it as an element, 
+and the framework will pick it up and call it to modify the elements container. Let's look at this example 
+where we want to create 100 `String` elements. This would be tedious to do with annotations.
+
+```java
+@Element
+public class StringElementsCreatorModifier implements ElementsContainerModifier {
+
+    @Override
+    public void modifyElementsContainer(ElementsContainer elementsContainer, DependencyResolutionInput dependencyResolutionInput) {
+        for(int i = 0; i < 100; i++) {
+            String name = "string-element-" + i;
+            String value = "value-" + i;
+            var elementContext = ElementContextFactory.singleton(value, name);
+            elementsContainer.addElementContext(elementContext);
+        }
+    }
+}
+```
+
+There are several more ways of creating `ElementContext`s provided in the `ElementContextFactory` class. The 
+`ElementsContainer` provides the methods to add or remove the element contexts. We can use the created 
+string elements just like any other element. For example, all of them can be injected:
+
+```java
+@InjectElement
+private List<String> stringElements;
+```
+
+Please note that `ElementsContainerModifier`s are eagerly initialized, so you should not depend on a 
+lot of other elements in them (because all dependencies will also be eagerly created).
 
 ### Element constructors
+
+In the above example, we have declared two elements, `myElement` and `myElement2`. The first one is a singleton, while the second one is a prototype.
+Note that we had to provide the `name` attribute. Otherwise, there would be a naming conflict.
 
 The framework needs to be able to make instances of elements. For this, it needs access to a **public** constructor.
 If you have only one public constructor, it will be selected by default (no need to annotated it). If you have multiple 

@@ -355,6 +355,15 @@ Such method must be:
 
 An example can be seen above in the field injection section.
 
+### Pre-destroy
+
+Although there is no `@PreDestroy` annotation, 
+if you need to run cleanup code for an element, you can do that by subscribing to the `CoreEvents.APPLICATION_SHUTTING_DOWN`
+topic. More info about this topic can be found in the [events document](./events.md) *Core Events* section.
+
+Note that if the JVM is shut down forcefully, the framework will not get a chance to publish this event, 
+resulting in cleanup code not being run.
+
 ### Custom actions on element
 
 You can define your own element post processors by implementing the `ElementInstancePostProcessor` interface, and 

@@ -82,11 +82,11 @@ public class CoreInitializationProcess {
             );
             application.setElementsContainer(elementsContainer);
 
-            application.finalizeApplication();
-            log.info("Successfully initialized the application '{}'! Let's get started!", application.getName());
-
             var eventManager = elementsContainer.getElement(EventManager.class);
             eventManager.publish(CoreEvents.APPLICATION_INITIALIZED, application);
+
+            application.finalizeApplication();
+            log.info("Successfully initialized the application '{}'! Let's get started!", application.getName());
 
             return application;
         } catch (InitializationException e) {

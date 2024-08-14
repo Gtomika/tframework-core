@@ -78,10 +78,11 @@ public final class TFramework {
     }
 
     /**
-     * Stops a TFramework application gracefully.
+     * Stops a TFramework application gracefully. This is simply a wrapper
+     * around {@link Application#close()}.
      * @param application The {@link Application} to stop.
      */
     public static void stop(Application application) {
-        //TODO
+        application.close();
     }
 }

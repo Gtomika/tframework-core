@@ -82,8 +82,10 @@ There are some core events that are published by the framework. You can subscrib
 get notified about some important framework events. These topics are collected in the `CoreEvents` class 
 as constants.
 
-- `CoreEvents.APPLICATION_INITIALIZED`: This event is published when the application is initialized. The 
+- `CoreEvents.APPLICATION_INITIALIZED`: This event is published after the application is initialized. The 
 payload is the `Application` element.
+- `CoreEvents.APPLICATION_SHUTTING_DOWN`: This event is published when the application is shutting down.
+The payload is the `Application` element.
 
 ## Next steps
 

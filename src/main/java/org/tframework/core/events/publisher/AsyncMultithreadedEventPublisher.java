@@ -19,10 +19,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
+import org.tframework.core.Application;
 import org.tframework.core.elements.annotations.Element;
 import org.tframework.core.elements.annotations.InjectProperty;
+import org.tframework.core.events.CoreEvents;
 import org.tframework.core.events.Event;
 import org.tframework.core.events.Subscription;
+import org.tframework.core.events.annotations.Subscribe;
 
 /**
  * This {@link EventPublisher} uses several threads to publish events asynchronously. It is
@@ -55,12 +58,19 @@ public class AsyncMultithreadedEventPublisher implements EventPublisher {
      * publishes to complete.
      * @param millis The maximum time to wait for the executor service to shutdown in milliseconds.
      */
-    public void shutdown(long millis) {
+    public void shutdown(long millis, boolean awaitTermination) {
         try {
             executorService.shutdown();
-            executorService.awaitTermination(millis, TimeUnit.MILLISECONDS);
+            if(awaitTermination) {
+                executorService.awaitTermination(millis, TimeUnit.MILLISECONDS);
+            }
         } catch (InterruptedException e) {
             log.error("Interrupted while waiting for executor service to shutdown", e);
         }
+    }
+
+    @Subscribe(CoreEvents.APPLICATION_SHUTTING_DOWN)
+    public void onApplicationShuttingDown(Application application) {
+        shutdown(5000, false);
     }
 }

@@ -39,7 +39,7 @@ public class AsyncMultithreadedEventPublisherTest {
         var subscription = new Subscription("topic", UUID.randomUUID(), this::callback);
         var event = new Event("topic", "payload");
         publisher.publish(event, subscription);
-        publisher.shutdown(1000);
+        publisher.shutdown(1000, true);
         assertTrue(published);
     }
 

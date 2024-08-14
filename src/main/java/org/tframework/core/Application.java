@@ -19,8 +19,11 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
+import lombok.extern.slf4j.Slf4j;
 import org.tframework.core.elements.ElementsContainer;
 import org.tframework.core.elements.annotations.PreConstructedElement;
+import org.tframework.core.events.CoreEvents;
+import org.tframework.core.events.EventManager;
 import org.tframework.core.profiles.ProfilesContainer;
 import org.tframework.core.properties.PropertiesContainer;
 
@@ -29,13 +32,15 @@ import org.tframework.core.properties.PropertiesContainer;
  * information. You may request these information from the application directly, but it is recommended to use
  * dependency injection instead, where possible.
  */
+@Slf4j
 @Getter
 @ToString
 @EqualsAndHashCode
 @PreConstructedElement
-public class Application {
+public class Application implements AutoCloseable {
 
     private boolean finalized;
+    private boolean shutDown;
 
     private String name;
     private Class<?> rootClass;
@@ -45,6 +50,7 @@ public class Application {
 
     private Application() {
         this.finalized = false;
+        this.shutDown = false;
     }
 
     /**
@@ -93,12 +99,46 @@ public class Application {
     }
 
     /**
-     * Finalizes the application. This method should only be called by the framework.
+     * Finalizes the application. This is after initialization, preventing further
+     * modifications. This method should only be called by the framework.
      */
     @TFrameworkInternal
     public void finalizeApplication() {
         checkForFinalization();
         this.finalized = true;
+
+        Thread shutdownHook = new Thread(() -> {
+            log.info("Shutting down the application '{}' due to JVM shutdown...", name);
+            close();
+        });
+        Runtime.getRuntime().addShutdownHook(shutdownHook);
+    }
+
+    /**
+     * Closes the application, sending an event on the {@link CoreEvents#APPLICATION_SHUTTING_DOWN}
+     * topic. If you call this method, you should not keep using the application. For example, a
+     * short-lived application can be started and closed in a single try-with-resources block:
+     * <pre>{@code
+     * public static void main(String[] args) {
+     *      try (Application application = TFramework.start("my-app", MyApplication.class, args)) {
+     *          // Do something with the application
+     *      }
+     * }
+     * }</pre>
+     * Some applications may not need to be closed, for example, if they are long-lived, like a server.
+     * Additionally, application closing is registered as a JVM shutdown hook, so it will be called
+     * automatically when the JVM is shutting down (however, this isn't guaranteed if the JVM stops abruptly).
+     */
+    @Override
+    public synchronized void close() {
+        if(shutDown) {
+            log.debug("The application '{}' has already been shut down, ignoring further attempts", name);
+            return;
+        }
+        log.info("Shutting down the application '{}'...", name);
+        EventManager eventManager = elementsContainer.getElement(EventManager.class);
+        eventManager.publish(CoreEvents.APPLICATION_SHUTTING_DOWN, this);
+        this.shutDown = true;
     }
 
     private void checkForFinalization() {

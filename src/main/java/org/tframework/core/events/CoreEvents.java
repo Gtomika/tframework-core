@@ -27,8 +27,16 @@ public final class CoreEvents {
 
     /**
      * Event topic for the application initialization event. The payload of this event
-     * will be the {@link Application} instance.
+     * will be the {@link Application} instance. Only a single event will be sent on
+     * this topic, when the application is initialized.
      */
     public static final String APPLICATION_INITIALIZED = "org-tframework-core-application-initialized";
+
+    /**
+     * Event topic for the application shutting down event. The payload of this event
+     * will be the {@link Application} instance. Only a single event will be sent on
+     *  this topic, when the application is shutting down.
+     */
+    public static final String APPLICATION_SHUTTING_DOWN = "org-tframework-core-application-shutting-down";
 
 }

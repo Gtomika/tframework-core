@@ -135,10 +135,14 @@ public class Application implements AutoCloseable {
             log.debug("The application '{}' has already been shut down, ignoring further attempts", name);
             return;
         }
-        log.info("Shutting down the application '{}'...", name);
-        EventManager eventManager = elementsContainer.getElement(EventManager.class);
-        eventManager.publish(CoreEvents.APPLICATION_SHUTTING_DOWN, this);
-        this.shutDown = true;
+        try {
+            log.info("Shutting down the application '{}'...", name);
+            EventManager eventManager = elementsContainer.getElement(EventManager.class);
+            eventManager.publish(CoreEvents.APPLICATION_SHUTTING_DOWN, this);
+            this.shutDown = true;
+        } catch (Exception e) {
+            log.error("An error occurred while shutting down the application '{}'", name, e);
+        }
     }
 
     private void checkForFinalization() {
